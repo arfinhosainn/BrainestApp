@@ -143,8 +143,7 @@ android-tools-common = { group = "com.android.tools", name = "common", version.r
 
 convention-android-application = { id = "com.scelio.brainest.convention.android.application", version = "unspecified" }
 convention-android-application-compose = { id = "com.scelio.brainest.convention.android.application.compose", version = "unspecified" }
-
-
+convention-cmp-application = { id = "com.scelio.brainest.convention.cmp.application", version = "unspecified" }
 
 
 

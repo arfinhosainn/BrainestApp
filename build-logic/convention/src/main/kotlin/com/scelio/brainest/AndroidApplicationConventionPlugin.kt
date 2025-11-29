@@ -1,3 +1,4 @@
+
 import com.android.build.api.dsl.ApplicationExtension
 import com.scelio.brainest.convention.configureKotlinAndroid
 import com.scelio.brainest.convention.libs
@@ -14,7 +15,7 @@ class AndroidApplicationConventionPlugin: Plugin<Project> {
             }
 
             extensions.configure<ApplicationExtension> {
-                namespace = "com.plcoding.chirp"
+                namespace = "com.scelio.brainest"
 
                 defaultConfig {
                     applicationId = libs.findVersion("projectApplicationId").get().toString()

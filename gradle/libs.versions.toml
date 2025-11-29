@@ -2,7 +2,7 @@
 # Build tools
 agp = "8.13.1"
 kotlin = "2.2.20"
-ksp = "2.2.20-1.0.31"
+ksp = "2.2.20-2.0.2"
 androidTools = "31.12.0"
 desugarJdkLibs = "2.1.5"
 
@@ -144,6 +144,8 @@ android-tools-common = { group = "com.android.tools", name = "common", version.r
 convention-android-application = { id = "com.scelio.brainest.convention.android.application", version = "unspecified" }
 convention-android-application-compose = { id = "com.scelio.brainest.convention.android.application.compose", version = "unspecified" }
 convention-cmp-application = { id = "com.scelio.brainest.convention.cmp.application", version = "unspecified" }
+convention-kmp-library = { id = "com.scelio.brainest.convention.kmp.library", version = "unspecified" }
+
 
 
 

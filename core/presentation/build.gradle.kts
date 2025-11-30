@@ -19,6 +19,10 @@ kotlin {
 
                 implementation(compose.components.resources)
 
+                implementation(libs.material3.adaptive)
+
+
+
 
             }
         }

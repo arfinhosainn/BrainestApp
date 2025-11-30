@@ -167,6 +167,9 @@ convention-kmp-library = { id = "com.scelio.brainest.convention.kmp.library", ve
 convention-cmp-library = { id = "com.scelio.brainest.convention.cmp.library", version = "unspecified" }
 convention-cmp-feature = { id = "com.scelio.brainest.convention.cmp.feature", version = "unspecified" }
 convention-buildkonfig = { id = "com.scelio.brainest.convention.buildkonfig", version = "unspecified" }
+convention-room = { id = "com.scelio.brainest.convention.room", version = "unspecified" }
+
+
 
 
 

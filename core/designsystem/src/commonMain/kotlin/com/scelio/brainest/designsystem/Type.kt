@@ -86,7 +86,7 @@ val Typography
 
         bodyMedium = TextStyle(
             fontFamily = SanFranciscoFont,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Medium,
             fontSize = 16.sp,
             lineHeight = 21.sp
         ),

@@ -44,6 +44,9 @@ coil = "3.3.0"
 coil-network = "3.3.0"
 moko = "0.20.1"
 buildkonfig = "0.17.1"
+kermit = "2.0.6"
+
+
 
 projectApplicationId = "com.scelio.brainest"
 projectVersionName = "1.0"
@@ -118,6 +121,10 @@ material3-adaptive-navigation = { module = "org.jetbrains.compose.material3.adap
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+
+#Logging
+touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+
 
 
 # Coil
@@ -204,5 +211,6 @@ ktor-common = [
     "ktor-client-core",
     "ktor-client-content-negotiation",
     "ktor-serialization-kotlinx-json",
-    "ktor-client-auth"
+    "ktor-client-auth",
+    "ktor-client-logging"
 ]

@@ -1,6 +1,5 @@
 package com.scelio.brainest.presentation.register
 
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle

@@ -19,7 +19,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class HttpClientFactory(
-    private val chirpLogger: BrainestLogger
+    private val brainestLogger: BrainestLogger
 ) {
 
     fun create(engine: HttpClientEngine): HttpClient {
@@ -38,7 +38,7 @@ class HttpClientFactory(
             install(Logging) {
                 logger = object : Logger {
                     override fun log(message: String) {
-                        chirpLogger.debug(message)
+                        brainestLogger.debug(message)
                     }
                 }
                 level = LogLevel.ALL

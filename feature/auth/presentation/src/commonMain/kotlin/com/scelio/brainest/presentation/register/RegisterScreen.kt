@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import brainest.feature.auth.presentation.generated.resources.Res
 import brainest.feature.auth.presentation.generated.resources.email
 import brainest.feature.auth.presentation.generated.resources.email_placeholder
@@ -33,10 +32,11 @@ import com.scelio.brainest.designsystem.components.textfields.BrainestTextField
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegisterRoot(
-    viewModel: RegisterViewModel = viewModel(),
+    viewModel: RegisterViewModel = koinViewModel(),
     onRegisterSuccess: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

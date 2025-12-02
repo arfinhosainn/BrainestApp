@@ -23,6 +23,10 @@ kotlin {
 
                 implementation(libs.supabase.postgrest.kt)
 
+                implementation(libs.koin.core)
+
+
+
 
 
 

@@ -21,10 +21,10 @@ expect suspend fun <T> platformSafeCall(
     handleResponse: suspend (HttpResponse) -> Result<T, DataError.Remote>
 ): Result<T, DataError.Remote>
 
-suspend inline fun <reified Request, reified Response: Any> HttpClient.post(
+suspend inline fun <reified Request, reified Response : Any> HttpClient.post(
     route: String,
-    queryParams: Map<String, Any> = mapOf(),
     body: Request,
+    queryParams: Map<String, Any> = mapOf(),
     crossinline builder: HttpRequestBuilder.() -> Unit = {}
 ): Result<Response, DataError.Remote> {
     return safeCall {
@@ -39,7 +39,7 @@ suspend inline fun <reified Request, reified Response: Any> HttpClient.post(
     }
 }
 
-suspend inline fun <reified Response: Any> HttpClient.get(
+suspend inline fun <reified Response : Any> HttpClient.get(
     route: String,
     queryParams: Map<String, Any> = mapOf(),
     crossinline builder: HttpRequestBuilder.() -> Unit = {}
@@ -55,7 +55,7 @@ suspend inline fun <reified Response: Any> HttpClient.get(
     }
 }
 
-suspend inline fun <reified Response: Any> HttpClient.delete(
+suspend inline fun <reified Response : Any> HttpClient.delete(
     route: String,
     queryParams: Map<String, Any> = mapOf(),
     crossinline builder: HttpRequestBuilder.() -> Unit = {}
@@ -71,7 +71,7 @@ suspend inline fun <reified Response: Any> HttpClient.delete(
     }
 }
 
-suspend inline fun <reified Request, reified Response: Any> HttpClient.put(
+suspend inline fun <reified Request, reified Response : Any> HttpClient.put(
     route: String,
     queryParams: Map<String, Any> = mapOf(),
     body: Request,
@@ -100,14 +100,15 @@ suspend inline fun <reified T> safeCall(
 }
 
 suspend inline fun <reified T> responseToResult(response: HttpResponse): Result<T, DataError.Remote> {
-    return when(response.status.value) {
+    return when (response.status.value) {
         in 200..299 -> {
             try {
                 Result.Success(response.body<T>())
-            } catch(e: NoTransformationFoundException) {
+            } catch (e: NoTransformationFoundException) {
                 Result.Failure(DataError.Remote.SERIALIZATION)
             }
         }
+
         400 -> Result.Failure(DataError.Remote.BAD_REQUEST)
         401 -> Result.Failure(DataError.Remote.UNAUTHORIZED)
         403 -> Result.Failure(DataError.Remote.FORBIDDEN)

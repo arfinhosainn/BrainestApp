@@ -21,6 +21,8 @@ kotlin {
                 implementation(libs.bundles.ktor.common)
                 implementation(libs.touchlab.kermit)
 
+                implementation(libs.supabase.postgrest.kt)
+
 
 
 

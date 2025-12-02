@@ -45,6 +45,9 @@ coil-network = "3.3.0"
 moko = "0.20.1"
 buildkonfig = "0.17.1"
 kermit = "2.0.6"
+supabase = "3.1.4"
+composeAuth = "3.2.6"
+
 
 
 
@@ -125,6 +128,11 @@ sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sql
 #Logging
 touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
+
+#Supabase
+compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth", version.ref = "composeAuth" }
+supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
+realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }
 
 
 # Coil

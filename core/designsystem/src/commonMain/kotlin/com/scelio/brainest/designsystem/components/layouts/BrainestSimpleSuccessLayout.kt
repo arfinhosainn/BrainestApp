@@ -1,6 +1,7 @@
 package com.scelio.brainest.designsystem.components.layouts
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,10 +22,10 @@ import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun BrainestSimpleSuccessLayout(
+fun BrainestSimpleResultLayout(
     title: String,
     description: String,
-    icon: @Composable () -> Unit,
+    icon: @Composable ColumnScope.() -> Unit,
     primaryButton: @Composable () -> Unit,
     secondaryButton: @Composable (() -> Unit)? = null,
     secondaryError: String? = null,
@@ -84,7 +85,7 @@ fun BrainestSimpleSuccessLayout(
 @Preview
 fun BrainestSimpleSuccessLayoutPreview() {
     BrainestTheme(darkTheme = false) {
-        BrainestSimpleSuccessLayout(
+        BrainestSimpleResultLayout(
             title = "Hello world!",
             description = "Test description",
             icon = {

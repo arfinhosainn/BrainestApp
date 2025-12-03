@@ -11,13 +11,14 @@ import brainest.feature.auth.presentation.generated.resources.Res
 import brainest.feature.auth.presentation.generated.resources.account_successfully_created
 import brainest.feature.auth.presentation.generated.resources.login
 import brainest.feature.auth.presentation.generated.resources.resend_verification_email
+import brainest.feature.auth.presentation.generated.resources.resent_verification_email
 import brainest.feature.auth.presentation.generated.resources.verification_email_sent_to_x
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestSuccessIcon
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveResultLayout
-import com.scelio.brainest.designsystem.components.layouts.BrainestSimpleSuccessLayout
+import com.scelio.brainest.designsystem.components.layouts.BrainestSimpleResultLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.getString
@@ -63,7 +64,7 @@ fun RegisterSuccessScreen(
         snackbarHostState = snackbarHostState
     ) {
         BrainestAdaptiveResultLayout {
-            BrainestSimpleSuccessLayout(
+            BrainestSimpleResultLayout(
                 title = stringResource(Res.string.account_successfully_created),
                 description = stringResource(
                     Res.string.verification_email_sent_to_x,

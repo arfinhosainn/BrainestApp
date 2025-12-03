@@ -5,6 +5,7 @@ import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.RestException
@@ -31,6 +32,20 @@ class SupabaseAuthService(
                     put("username", username)
                 }
             }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    override suspend fun resendVerificationEmail(
+        email: String
+    ): EmptyResult<DataError.Remote> {
+        return try {
+            supabaseClient.auth.resendEmail(
+                type = OtpType.Email.SIGNUP,
+                email = email
+            )
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Failure(e.toDataError())

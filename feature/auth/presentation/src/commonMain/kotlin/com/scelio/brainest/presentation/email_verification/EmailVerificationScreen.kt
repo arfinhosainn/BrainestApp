@@ -28,7 +28,7 @@ import brainest.feature.auth.presentation.generated.resources.login
 import brainest.feature.auth.presentation.generated.resources.verifying_account
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestSuccessIcon
-import com.scelio.brainest.designsystem.components.brand.ChirpFailureIcon
+import com.scelio.brainest.designsystem.components.brand.BrainestFailureIcon
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveResultLayout
@@ -36,10 +36,11 @@ import com.scelio.brainest.designsystem.components.layouts.BrainestSimpleResultL
 import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun EmailVerificationRoot(
-    viewModel: EmailVerificationViewModel = viewModel()
+    viewModel: EmailVerificationViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -86,7 +87,7 @@ fun EmailVerificationScreen(
                     description = stringResource(Res.string.email_verified_failed_desc),
                     icon = {
                         Spacer(modifier = Modifier.height(32.dp))
-                        ChirpFailureIcon(
+                        BrainestFailureIcon(
                             modifier = Modifier
                                 .size(80.dp)
                         )

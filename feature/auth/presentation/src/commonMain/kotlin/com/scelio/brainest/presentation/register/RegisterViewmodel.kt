@@ -66,16 +66,21 @@ class RegisterViewModel(
         .map { password -> PasswordValidator.validate(password).isValidPassword }
         .distinctUntilChanged()
 
+    private val isRegisteringFlow = state
+        .map { it.isRegistering }
+        .distinctUntilChanged()
+
     private fun observeValidationStates() {
         combine(
             isEmailValidFlow,
             isUsernameValidFlow,
-            isPasswordValidFlow
-        ) { isEmailValid, isUsernameValid, isPasswordValid ->
+            isPasswordValidFlow,
+            isRegisteringFlow
+        ) { isEmailValid, isUsernameValid, isPasswordValid, isRegistering ->
             val allValid = isEmailValid && isUsernameValid && isPasswordValid
             _state.update {
                 it.copy(
-                    canRegister = !it.isRegistering && allValid
+                    canRegister = !isRegistering && allValid
                 )
             }
         }.launchIn(viewModelScope)
@@ -122,6 +127,7 @@ class RegisterViewModel(
                 )
                 .onSuccess {
                     _state.update { it.copy(isRegistering = false) }
+                    eventChannel.send(RegisterEvent.Success(email))
                 }
                 .onFailure { error ->
                     val registrationError = when (error) {

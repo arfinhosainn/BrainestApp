@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="welcome_to_brainest">Welcome to Brainest!</string>
+    <string name="account_successfully_created">Brainest account successfully created!</string>
+    <string name="verification_email_sent_to_x">We've sent a verification email to %1$s</string>
+    <string name="resend_verification_email">Resend verification email</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="email">Email</string>

@@ -15,6 +15,8 @@ class CmpApplicationConventionPlugin: Plugin<Project> {
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
+                apply("org.jetbrains.kotlin.plugin.serialization")
+
             }
 
             configureAndroidTarget()

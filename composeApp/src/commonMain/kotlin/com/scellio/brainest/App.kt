@@ -12,11 +12,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     BrainestTheme {
-        val navController = rememberNavController()
-        DeepLinkListener(navController)
-
         BrainestTheme {
-            NavigationRoot(navController)
+//        RegisterRoot(onRegisterSuccess = {})
+
         }
 
     }

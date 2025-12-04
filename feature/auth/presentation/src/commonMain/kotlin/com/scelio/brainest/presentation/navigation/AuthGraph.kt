@@ -15,13 +15,32 @@ fun NavGraphBuilder.authGraph(
     onLoginSuccess: () -> Unit,
 ) {
     navigation<AuthGraphRoutes.Graph>(
-        startDestination = AuthGraphRoutes.Register
+        startDestination = AuthGraphRoutes.Login
     ) {
+
+        composable<AuthGraphRoutes.Login> {
+            LoginRoot(
+                onLoginSuccess = onLoginSuccess,
+                onForgotPasswordClick = {
+                    navController.navigate(AuthGraphRoutes.ForgotPassword)
+                },
+                onCreateAccountClick = {
+                    navController.navigate(AuthGraphRoutes.Register) {
+                        restoreState = true
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+
         composable<AuthGraphRoutes.Register> {
             RegisterRoot(
                 onRegisterSuccess = { email ->
                     navController.navigate(AuthGraphRoutes.RegisterSuccess(email))
                 }
+
+
             )
         }
         composable<AuthGraphRoutes.RegisterSuccess> { entry ->

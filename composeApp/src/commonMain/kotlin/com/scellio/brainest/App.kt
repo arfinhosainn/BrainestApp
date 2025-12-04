@@ -14,7 +14,6 @@ fun App() {
     BrainestTheme {
         val navController = rememberNavController()
         DeepLinkListener(navController)
-
         BrainestTheme {
             NavigationRoot(navController)
         }

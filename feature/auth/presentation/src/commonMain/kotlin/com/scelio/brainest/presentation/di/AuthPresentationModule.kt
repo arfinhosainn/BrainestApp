@@ -1,6 +1,7 @@
 package com.scelio.brainest.presentation.di
 
 import com.scelio.brainest.presentation.email_verification.EmailVerificationViewModel
+import com.scelio.brainest.presentation.login.LoginViewModel
 import com.scelio.brainest.presentation.register.RegisterViewModel
 import com.scelio.brainest.presentation.register_success.RegisterSuccessViewModel
 import org.koin.dsl.module
@@ -11,4 +12,5 @@ val authPresentationModule = module {
     viewModelOf(::RegisterViewModel)
     viewModelOf(::RegisterSuccessViewModel)
     viewModelOf(::EmailVerificationViewModel)
+    viewModelOf(::LoginViewModel)
 }

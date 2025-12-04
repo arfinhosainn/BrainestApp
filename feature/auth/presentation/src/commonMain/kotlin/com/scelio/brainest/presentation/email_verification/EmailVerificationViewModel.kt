@@ -40,6 +40,12 @@ class EmailVerificationViewModel(
     private fun verifyEmail() {
         viewModelScope.launch {
             _state.update { it.copy(isVerifying = true) }
+
+            if (deepLinkUrl.isEmpty()) {
+                _state.update { it.copy(isVerifying = false, isVerified = false) }
+                return@launch
+            }
+
             authService
                 .verifyEmail(deepLinkUrl)
                 .onSuccess {

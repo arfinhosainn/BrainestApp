@@ -1,6 +1,8 @@
 package com.scelio.brainest.data.auth
 
+import com.scelio.brainest.domain.auth.AuthInfo
 import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.auth.User
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
@@ -61,6 +63,44 @@ class SupabaseAuthService(
                 userSession
             )
             Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(e.toDataError())
+        }
+    }
+
+
+    override suspend fun login(
+        email: String,
+        password: String
+    ): Result<AuthInfo, DataError.Remote> {
+        return try {
+            supabaseClient.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+
+            val session = supabaseClient.auth.currentSessionOrNull()
+                ?: return Result.Failure(DataError.Remote.UNAUTHORIZED)
+
+            val user = session.user
+                ?: return Result.Failure(DataError.Remote.UNKNOWN)
+
+            val username = user.userMetadata?.get("username") as? String
+                ?: return Result.Failure(DataError.Remote.UNKNOWN)
+
+            val authInfo = AuthInfo(
+                accessToken = session.accessToken,
+                refreshToken = session.refreshToken,
+                user = User(
+                    id = user.id,
+                    email = user.email ?: email,
+                    username = username,
+                    hasVerifiedEmail = user.emailConfirmedAt != null,
+                    profilePictureUrl = user.userMetadata?.get("avatar_url") as? String
+                )
+            )
+
+            Result.Success(authInfo)
         } catch (e: Exception) {
             Result.Failure(e.toDataError())
         }

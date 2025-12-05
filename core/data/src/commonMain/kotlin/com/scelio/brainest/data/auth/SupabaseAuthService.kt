@@ -107,6 +107,20 @@ class SupabaseAuthService(
     }
 
 
+    override suspend fun forgotPassword(
+        email: String
+    ): EmptyResult<DataError.Remote> {
+        return try {
+            supabaseClient.auth.resetPasswordForEmail(
+                email = email
+            )
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(e.toDataError())
+        }
+    }
+
+
     private fun Exception.toDataError(): DataError.Remote {
         return when (this) {
             is RestException -> {

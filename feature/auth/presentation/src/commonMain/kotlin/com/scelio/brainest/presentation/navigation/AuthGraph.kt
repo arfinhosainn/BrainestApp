@@ -7,6 +7,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.scelio.brainest.presentation.email_verification.EmailVerificationRoot
+import com.scelio.brainest.presentation.forgot_password.ForgotPasswordRoot
 import com.scelio.brainest.presentation.login.LoginRoot
 import com.scelio.brainest.presentation.register.RegisterRoot
 import com.scelio.brainest.presentation.register_success.RegisterSuccessRoot
@@ -90,6 +91,9 @@ fun NavGraphBuilder.authGraph(
                     }
                 }
             )
+        }
+        composable<AuthGraphRoutes.ForgotPassword> {
+            ForgotPasswordRoot()
         }
     }
 }

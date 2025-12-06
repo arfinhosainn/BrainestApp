@@ -30,6 +30,7 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestBrandLogo
 import com.scelio.brainest.designsystem.extended
 import com.scelio.brainest.presentation.util.DeviceConfiguration
+import com.scelio.brainest.presentation.util.clearFocusOnTap
 import com.scelio.brainest.presentation.util.currentDeviceConfiguration
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -52,6 +53,7 @@ fun BrainestAdaptiveFormLayout(
         DeviceConfiguration.MOBILE_PORTRAIT -> {
             BrainestSurface(
                 modifier = modifier
+                    .clearFocusOnTap()
                     .consumeWindowInsets(WindowInsets.navigationBars)
                     .consumeWindowInsets(WindowInsets.displayCutout),
                 header = {

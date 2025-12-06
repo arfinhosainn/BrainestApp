@@ -22,5 +22,14 @@ interface AuthService {
 
     suspend fun verifyEmail(deepLinkUrl: String): EmptyResult<DataError.Remote>
 
+    suspend fun forgotPassword(
+        email: String
+    ): EmptyResult<DataError.Remote>
+
+    suspend fun resetPassword(
+        deepLinkUrl: String,
+        newPassword: String
+    ): EmptyResult<DataError.Remote>
+
 
 }

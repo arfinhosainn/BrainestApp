@@ -19,7 +19,7 @@ sealed interface AuthGraphRoutes {
     data object ForgotPassword : AuthGraphRoutes
 
     @Serializable
-    data object ResetPassword : AuthGraphRoutes
+    data class ResetPassword(val deepLinkUrl: String? = null) : AuthGraphRoutes
 
     @Serializable
     data class EmailVerification(val deepLinkUrl: String? = null) : AuthGraphRoutes

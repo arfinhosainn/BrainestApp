@@ -33,6 +33,7 @@ import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveResultLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSimpleResultLayout
+import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
 import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -63,55 +64,57 @@ fun EmailVerificationScreen(
     state: EmailVerificationState,
     onAction: (EmailVerificationAction) -> Unit,
 ) {
-    BrainestAdaptiveResultLayout {
-        when {
-            state.isVerifying -> {
-                VerifyingContent(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
-            state.isVerified -> {
-                BrainestSimpleResultLayout(
-                    title = stringResource(Res.string.email_verified_successfully),
-                    description = stringResource(Res.string.email_verified_successfully_desc),
-                    icon = {
-                        BrainestSuccessIcon()
-                    },
-                    primaryButton = {
-                        BrainestButton(
-                            text = stringResource(Res.string.login),
-                            onClick = {
-                                onAction(EmailVerificationAction.OnLoginClick)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                )
-            }
-            else -> {
-                BrainestSimpleResultLayout(
-                    title = stringResource(Res.string.email_verified_failed),
-                    description = stringResource(Res.string.email_verified_failed_desc),
-                    icon = {
-                        Spacer(modifier = Modifier.height(32.dp))
-                        BrainestFailureIcon(
-                            modifier = Modifier
-                                .size(80.dp)
-                        )
-                        Spacer(modifier = Modifier.height(32.dp))
-                    },
-                    primaryButton = {
-                        BrainestButton(
-                            text = stringResource(Res.string.close),
-                            onClick = {
-                                onAction(EmailVerificationAction.OnCloseClick)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            style = BrainestButtonStyle.SECONDARY
-                        )
-                    }
-                )
+    BrainestSnackbarScaffold {
+        BrainestAdaptiveResultLayout {
+            when {
+                state.isVerifying -> {
+                    VerifyingContent(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+                state.isVerified -> {
+                    BrainestSimpleResultLayout(
+                        title = stringResource(Res.string.email_verified_successfully),
+                        description = stringResource(Res.string.email_verified_successfully_desc),
+                        icon = {
+                            BrainestSuccessIcon()
+                        },
+                        primaryButton = {
+                            BrainestButton(
+                                text = stringResource(Res.string.login),
+                                onClick = {
+                                    onAction(EmailVerificationAction.OnLoginClick)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    )
+                }
+                else -> {
+                    BrainestSimpleResultLayout(
+                        title = stringResource(Res.string.email_verified_failed),
+                        description = stringResource(Res.string.email_verified_failed_desc),
+                        icon = {
+                            Spacer(modifier = Modifier.height(32.dp))
+                            BrainestFailureIcon(
+                                modifier = Modifier
+                                    .size(80.dp)
+                            )
+                            Spacer(modifier = Modifier.height(32.dp))
+                        },
+                        primaryButton = {
+                            BrainestButton(
+                                text = stringResource(Res.string.close),
+                                onClick = {
+                                    onAction(EmailVerificationAction.OnCloseClick)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                style = BrainestButtonStyle.SECONDARY
+                            )
+                        }
+                    )
+                }
             }
         }
     }

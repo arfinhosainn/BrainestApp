@@ -28,6 +28,7 @@ import com.scelio.brainest.designsystem.components.brand.BrainestBrandLogo
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveFormLayout
+import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
 import com.scelio.brainest.designsystem.components.textfields.BrainestPasswordTextField
 import com.scelio.brainest.designsystem.components.textfields.BrainestTextField
 import com.scelio.brainest.presentation.util.ObserveAsEvents
@@ -68,69 +69,71 @@ fun LoginScreen(
     state: LoginState,
     onAction: (LoginAction) -> Unit,
 ) {
-    BrainestAdaptiveFormLayout(
-        headerText = stringResource(Res.string.welcome_back),
-        errorText = state.error?.asString(),
-        logo = {
-            BrainestBrandLogo()
-        },
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        BrainestTextField(
-            state = state.emailTextFieldState,
-            placeholder = stringResource(Res.string.email_placeholder),
-            keyboardType = KeyboardType.Email,
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth(),
-            title = stringResource(Res.string.email)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        BrainestPasswordTextField(
-            state = state.passwordTextFieldState,
-            placeholder = stringResource(Res.string.password),
-            isPasswordVisible = state.isPasswordVisible,
-            onToggleVisibilityClick = {
-                onAction(LoginAction.OnTogglePasswordVisibility)
+    BrainestSnackbarScaffold {
+        BrainestAdaptiveFormLayout(
+            headerText = stringResource(Res.string.welcome_back),
+            errorText = state.error?.asString(),
+            logo = {
+                BrainestBrandLogo()
             },
-            title = stringResource(Res.string.password),
             modifier = Modifier
-                .fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(Res.string.forgot_password),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier
-                .align(Alignment.End)
-                .clickable {
-                    onAction(LoginAction.OnForgotPasswordClick)
-                }
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+                .fillMaxSize()
+        ) {
+            BrainestTextField(
+                state = state.emailTextFieldState,
+                placeholder = stringResource(Res.string.email_placeholder),
+                keyboardType = KeyboardType.Email,
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                title = stringResource(Res.string.email)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            BrainestPasswordTextField(
+                state = state.passwordTextFieldState,
+                placeholder = stringResource(Res.string.password),
+                isPasswordVisible = state.isPasswordVisible,
+                onToggleVisibilityClick = {
+                    onAction(LoginAction.OnTogglePasswordVisibility)
+                },
+                title = stringResource(Res.string.password),
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(Res.string.forgot_password),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable {
+                        onAction(LoginAction.OnForgotPasswordClick)
+                    }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        BrainestButton(
-            text = stringResource(Res.string.login),
-            onClick = {
-                onAction(LoginAction.OnLoginClick)
-            },
-            enabled = state.canLogin,
-            isLoading = state.isLoggingIn,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        BrainestButton(
-            text = stringResource(Res.string.create_account),
-            onClick = {
-                onAction(LoginAction.OnSignUpClick)
-            },
-            style = BrainestButtonStyle.SECONDARY,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
+            BrainestButton(
+                text = stringResource(Res.string.login),
+                onClick = {
+                    onAction(LoginAction.OnLoginClick)
+                },
+                enabled = state.canLogin,
+                isLoading = state.isLoggingIn,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BrainestButton(
+                text = stringResource(Res.string.create_account),
+                onClick = {
+                    onAction(LoginAction.OnSignUpClick)
+                },
+                style = BrainestButtonStyle.SECONDARY,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
     }
 }
 

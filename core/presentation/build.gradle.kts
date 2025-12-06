@@ -21,6 +21,8 @@ kotlin {
 
                 implementation(libs.material3.adaptive)
 
+                implementation(libs.bundles.koin.common)
+
 
 
 

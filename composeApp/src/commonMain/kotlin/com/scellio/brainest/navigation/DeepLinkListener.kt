@@ -11,8 +11,18 @@ fun DeepLinkListener(
 ) {
     DisposableEffect(Unit) {
         ExternalUriHandler.listener = { uri ->
-            val encodedUri = uri.encodeUrl()
-            navController.navigate(AuthGraphRoutes.EmailVerification(deepLinkUrl = encodedUri))
+            when {
+                uri.contains("/auth/verify") -> {
+                    navController.navigate(
+                        AuthGraphRoutes.EmailVerification(deepLinkUrl = uri)
+                    )
+                }
+                uri.contains("/auth/reset-password") -> {
+                    navController.navigate(
+                        AuthGraphRoutes.ResetPassword(deepLinkUrl = uri)
+                    )
+                }
+            }
         }
         onDispose {
             ExternalUriHandler.listener = null
@@ -20,12 +30,4 @@ fun DeepLinkListener(
     }
 }
 
-private fun String.encodeUrl(): String {
-    return this.map { char ->
-        when {
-            char.isLetterOrDigit() -> char.toString()
-            char in "-_.~" -> char.toString()
-            else -> "%${char.code.toString(16).uppercase().padStart(2, '0')}"
-        }
-    }.joinToString("")
-}
+

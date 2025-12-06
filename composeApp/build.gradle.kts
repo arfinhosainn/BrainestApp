@@ -31,6 +31,10 @@ kotlin {
             implementation(projects.feature.chat.domain)
             implementation(projects.feature.chat.presentation)
             implementation(libs.jetbrains.compose.navigation)
+            implementation(libs.bundles.koin.common)
+            implementation(libs.supabase.postgrest.kt)
+
+
 
 
 

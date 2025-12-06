@@ -14,7 +14,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             coreDataModule,
             authPresentationModule,
             corePresentationModule,
-            chatPresentationModule
+            chatPresentationModule,
+            appModule
         )
     }
 }

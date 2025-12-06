@@ -26,6 +26,9 @@ kotlin {
                 implementation(libs.jetbrains.compose.backhandler)
                 implementation(libs.jetbrains.compose.navigation)
 
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+
             }
         }
 

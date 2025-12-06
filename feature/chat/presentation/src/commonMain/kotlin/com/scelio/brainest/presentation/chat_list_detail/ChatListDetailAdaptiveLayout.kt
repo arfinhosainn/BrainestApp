@@ -24,15 +24,16 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scelio.brainest.designsystem.extended
+import com.scelio.brainest.presentation.util.DialogSheetScopedViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ChatListDetailAdaptiveLayout(
-    chatListDetailViewModel: ChatListDetailViewModel = koinViewModel()
+    viewModel: ChatListDetailViewModel = koinViewModel()
 ) {
-    val sharedState by chatListDetailViewModel.state.collectAsStateWithLifecycle()
+    val sharedState by viewModel.state.collectAsStateWithLifecycle()
     val scaffoldDirective = createNoSpacingPaneScaffoldDirective()
     val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator(
         scaffoldDirective = scaffoldDirective
@@ -61,7 +62,8 @@ fun ChatListDetailAdaptiveLayout(
                             text = "Chat $chatIndex",
                             modifier = Modifier
                                 .clickable {
-                                    chatListDetailViewModel.onAction(ChatListDetailAction.OnChatClick(chatIndex.toString()))
+                                    viewModel.onAction(ChatListDetailAction.OnCreateChatClick)
+                                    viewModel.onAction(ChatListDetailAction.OnChatClick(chatIndex.toString()))
                                     scope.launch {
                                         scaffoldNavigator.navigateTo(
                                             ListDetailPaneScaffoldRole.Detail
@@ -90,4 +92,9 @@ fun ChatListDetailAdaptiveLayout(
             }
         }
     )
+    DialogSheetScopedViewModel(
+        visible = sharedState.dialogState is DialogState.CreateChat
+    ) {
+//        CreateChatRoot()
+    }
 }

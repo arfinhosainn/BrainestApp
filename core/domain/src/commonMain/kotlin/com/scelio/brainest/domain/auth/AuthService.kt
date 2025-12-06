@@ -26,5 +26,10 @@ interface AuthService {
         email: String
     ): EmptyResult<DataError.Remote>
 
+    suspend fun resetPassword(
+        deepLinkUrl: String,
+        newPassword: String
+    ): EmptyResult<DataError.Remote>
+
 
 }

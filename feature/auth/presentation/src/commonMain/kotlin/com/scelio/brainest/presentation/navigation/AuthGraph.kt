@@ -11,6 +11,7 @@ import com.scelio.brainest.presentation.forgot_password.ForgotPasswordRoot
 import com.scelio.brainest.presentation.login.LoginRoot
 import com.scelio.brainest.presentation.register.RegisterRoot
 import com.scelio.brainest.presentation.register_success.RegisterSuccessRoot
+import com.scelio.brainest.presentation.reset_password.ResetPasswordRoot
 
 fun NavGraphBuilder.authGraph(
     navController: NavController,
@@ -52,6 +53,7 @@ fun NavGraphBuilder.authGraph(
                 }
             )
         }
+
         composable<AuthGraphRoutes.RegisterSuccess> {
             RegisterSuccessRoot(
                 onLoginClick = {
@@ -63,10 +65,27 @@ fun NavGraphBuilder.authGraph(
                 }
             )
         }
+
+        composable<AuthGraphRoutes.ResetPassword> { backStackEntry ->
+            val route = backStackEntry.toRoute<AuthGraphRoutes.ResetPassword>()
+            val deepLinkUrl = route.deepLinkUrl
+
+            ResetPasswordRoot(
+                deepLinkUrl = deepLinkUrl ?: "",
+                onLoginClick = {
+                    navController.navigate(AuthGraphRoutes.Login) {
+                        popUpTo<AuthGraphRoutes.ResetPassword> {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
         composable<AuthGraphRoutes.EmailVerification>(
             deepLinks = listOf(
                 navDeepLink<AuthGraphRoutes.EmailVerification>(
-                    basePath = "brainest://brainest.app"
+                    basePath = "brainest://brainest.app/auth/verify"
                 ),
                 navDeepLink<AuthGraphRoutes.EmailVerification>(
                     basePath = "https://brainest.app/auth/verify"
@@ -75,6 +94,7 @@ fun NavGraphBuilder.authGraph(
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<AuthGraphRoutes.EmailVerification>()
             val deepLinkUrl = route.deepLinkUrl
+
             EmailVerificationRoot(
                 onLoginClick = {
                     navController.navigate(AuthGraphRoutes.Login) {
@@ -92,6 +112,7 @@ fun NavGraphBuilder.authGraph(
                 }
             )
         }
+
         composable<AuthGraphRoutes.ForgotPassword> {
             ForgotPasswordRoot()
         }

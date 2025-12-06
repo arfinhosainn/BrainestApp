@@ -29,7 +29,10 @@ class SupabaseAuthService(
         username: String
     ): EmptyResult<DataError.Remote> {
         return try {
-            supabaseClient.auth.signUpWith(Email) {
+            supabaseClient.auth.signUpWith(
+                Email,
+                redirectUrl = "brainest://brainest.app/auth/verify"
+            ) {
                 this.email = email
                 this.password = password
                 data = buildJsonObject {
@@ -112,7 +115,8 @@ class SupabaseAuthService(
     ): EmptyResult<DataError.Remote> {
         return try {
             supabaseClient.auth.resetPasswordForEmail(
-                email = email
+                email = email,
+                redirectUrl = "brainest://brainest.app/auth/reset-password"
             )
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -120,6 +124,29 @@ class SupabaseAuthService(
         }
     }
 
+    override suspend fun resetPassword(
+        deepLinkUrl: String,
+        newPassword: String
+    ): EmptyResult<DataError.Remote> {
+        return try {
+            val code = deepLinkUrl
+                .substringAfter("code=", "")
+                .substringBefore("&")
+                .takeIf { it.isNotEmpty() }
+                ?: return Result.Failure(DataError.Remote.UNAUTHORIZED)
+
+            supabaseClient.auth.exchangeCodeForSession(code)
+
+            supabaseClient.auth.updateUser {
+                password = newPassword
+            }
+
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            println("Error resetting password: $e")
+            Result.Failure(e.toDataError())
+        }
+    }
 
     private fun Exception.toDataError(): DataError.Remote {
         return when (this) {

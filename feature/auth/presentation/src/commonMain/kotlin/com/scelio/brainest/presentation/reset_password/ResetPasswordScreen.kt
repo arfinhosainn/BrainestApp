@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -23,19 +24,33 @@ import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveFormLayout
 import com.scelio.brainest.designsystem.components.textfields.BrainestPasswordTextField
 import com.scelio.brainest.designsystem.extended
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ResetPasswordRoot(
-    viewModel: ResetPasswordViewModel = koinViewModel()
+    deepLinkUrl: String,
+    viewModel: ResetPasswordViewModel = koinViewModel(
+        parameters = { parametersOf(deepLinkUrl) }
+    ),
+    onLoginClick: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.isResetSuccessful) {
+        if (state.isResetSuccessful) {
+            delay(2000) // Show success message for 2 seconds
+            onLoginClick()
+        }
+    }
 
     ResetPasswordScreen(
         state = state,
         onAction = viewModel::onAction
+
     )
 }
 

@@ -28,10 +28,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="brainest.app"
-                    android:pathPrefix="/auth/verify"
-                    android:scheme="https" />
+
+                <data android:scheme="https" />
+                <data android:host="brainest.app" />
+
+                <data android:pathPrefix="/auth/verify" />
+                <data android:pathPrefix="/auth/reset-password" />
 
             </intent-filter>
 
@@ -41,9 +43,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="brainest.app"
-                    android:scheme="brainest" />
+
+                <data android:scheme="brainest" />
+                <data android:host="brainest.app" />
+
             </intent-filter>
         </activity>
     </application>

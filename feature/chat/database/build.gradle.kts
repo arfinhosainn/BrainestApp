@@ -15,6 +15,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(projects.feature.chat.domain)
+
+
                 // Add KMP dependencies here
             }
         }

@@ -7,15 +7,12 @@ import com.scelio.brainest.domain.models.ChatMessage
 fun ChatMessage.toOpenAIMessage(): MessageDto {
     val contentList = mutableListOf<ContentDto>()
 
-    // Add text content
     contentList.add(ContentDto.Text(text = content))
 
-    // Add image if present
     imageUrl?.let {
         contentList.add(ContentDto.Image(imageUrl = it))
     }
 
-    // Add file if present
     fileId?.let {
         contentList.add(ContentDto.File(fileId = it))
     }

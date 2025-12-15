@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OutputItemDto(
-    val type: String,
-    val content: String? = null
+    val type: String? = null,
+    val content: List<OutputContentDto> = emptyList()
 )

@@ -1,11 +1,14 @@
 package com.scelio.brainest.presentation.chat_list_detail
 
 import androidx.lifecycle.ViewModel
+import com.scelio.brainest.domain.chat.ChatRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class ChatListDetailViewModel: ViewModel() {
+class ChatListDetailViewModel(
+    private val chatRepository: ChatRepository
+): ViewModel() {
 
     private val _state = MutableStateFlow(ChatListDetailState())
     val state = _state.asStateFlow()

@@ -3,9 +3,8 @@ package com.scelio.brainest.data.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseRequest(
+data class ChatRequest(
     val model: String,
     val input: List<MessageDto>,
-    val stream: Boolean? = null,
-    val tools: List<ToolDto>? = null
+    val stream: Boolean? = null
 )

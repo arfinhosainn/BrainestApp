@@ -10,7 +10,7 @@ data class ChatEntity(
     @PrimaryKey
     val id: String,
     val userId: String,
-    val title: String?,
+    val title: String,
     val model: String,
     val systemPrompt: String?,
     val createdAt: Long, // Timestamp in milliseconds

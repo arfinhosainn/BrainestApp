@@ -201,24 +201,3 @@ fun ChatListItemUi(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ChatItemUIPreview() {
-    BrainestTheme(darkTheme = false) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp)
-        ) {
-            ChatListItemUi(
-                chat = ChatItemUi(
-                id = "1",
-                title = "Title",
-                lastMessage = "Last message",
-                lastMessageTime = "2 min ago",
-                unreadCount = 5
-            ), onClick = {}, onDelete = {})
-        }
-    }
-}

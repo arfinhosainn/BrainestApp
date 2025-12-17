@@ -1,9 +1,13 @@
 package com.scelio.brainest.data.dto
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonClassDiscriminator("content_type")  // <-- Add this to avoid conflict
 sealed class ContentDto {
     @Serializable
     @SerialName("input_text")

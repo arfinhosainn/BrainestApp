@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatResult(
-    val id: String,
+    val id: String? = null,
     val `object`: String? = null,
     val created: Long? = null,
     val model: String? = null,

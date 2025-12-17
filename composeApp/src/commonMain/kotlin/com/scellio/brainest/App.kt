@@ -48,11 +48,7 @@ fun App(
         if (!state.isCheckingAuth) {
             NavigationRoot(
                 navController = navController,
-                startDestination = if (state.isLoggedIn) {
-                    ChatGraphRoutes.Graph
-                } else {
-                    AuthGraphRoutes.Graph
-                }
+                startDestination = ChatGraphRoutes.Graph
             )
         }
     }

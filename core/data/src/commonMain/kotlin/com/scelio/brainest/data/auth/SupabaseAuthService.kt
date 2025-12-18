@@ -181,4 +181,12 @@ class SupabaseAuthService(
             }
         }
     }
+
+
+    override suspend fun currentUserId(): String? {
+        val session = supabaseClient.auth.currentSessionOrNull() ?: return null
+        return session.user?.id
+    }
+
+
 }

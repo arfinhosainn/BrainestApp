@@ -7,14 +7,47 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.buttons.BrainestFloatingActionButton
 import com.scelio.brainest.presentation.chat_list.components.ChatListHeader
+import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
+
+
+@Composable
+fun ChatListRoot(
+    onNavigateToChat: (String) -> Unit,
+    viewModel: ChatListViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                is ChatListEvent.NavigateToChat -> onNavigateToChat(event.chatId)
+                is ChatListEvent.ShowError -> snackbarHostState.showSnackbar(event.error.toString())
+            }
+        }
+    }
+
+    ChatListScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        snackbarHostState = snackbarHostState
+    )
+}
+
 
 @Composable
 fun ChatListScreen(
@@ -22,31 +55,30 @@ fun ChatListScreen(
     onAction: (ChatListAction) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    val listState = rememberLazyListState() // Create list state
+    val listState = rememberLazyListState()
 
     Scaffold(
+        snackbarHost = {SnackbarHost(snackbarHostState) },
         topBar = {
             ChatListHeader(
-                scrollState = listState, // Pass scroll state
+                scrollState = listState,
                 onSettingsClicked = { /* handle */ },
             )
         },
         floatingActionButton = {
             BrainestFloatingActionButton(
-                onClick = {},
-                content = {})
+                onClick = { onAction(ChatListAction.OnFabClick) },
+                content = { /* your icon */ }
+            )
         },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         LazyColumn(
-            state = listState, // Use same state
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            state = listState,
+            modifier = Modifier.fillMaxSize().padding(padding)
         ) {
-            items(100) { index ->
-                Text(index.toString())
-
+            items(state.chats) { chat ->
+                Text(chat.title) // replace with your row UI
             }
         }
     }

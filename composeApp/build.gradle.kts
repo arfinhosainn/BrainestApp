@@ -15,6 +15,7 @@ kotlin {
             implementation(libs.koin.android)
 
 
+
         }
         commonMain.dependencies {
 
@@ -33,7 +34,6 @@ kotlin {
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.bundles.koin.common)
             implementation(libs.supabase.postgrest.kt)
-
 
 
 

@@ -1,77 +1,60 @@
 package com.scelio.brainest.presentation.util
 
-import brainest.feature.chat.presentation.generated.resources.Res
-import brainest.feature.chat.presentation.generated.resources.today
-import brainest.feature.chat.presentation.generated.resources.today_x
-import brainest.feature.chat.presentation.generated.resources.yesterday
-import brainest.feature.chat.presentation.generated.resources.yesterday_x
 
-
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.format.char
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-object DateUtils {
+object DateTimeFormatter {
 
-    fun formatMessageTime(instant: Instant, clock: Clock = Clock.System): UiText {
-        val timeZone = TimeZone.currentSystemDefault()
-        val messageDateTime = instant.toLocalDateTime(timeZone)
-        val todayDate = clock.now().toLocalDateTime(timeZone).date
-        val yesterdayDate = todayDate.minus(1, DateTimeUnit.DAY)
+    fun formatDateTime(instant: Instant): String {
+        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val formattedTime = messageDateTime.format(
-            format = LocalDateTime.Format {
-                amPmHour()
-                char(':')
-                minute()
-                amPmMarker("am", "pm")
-            }
-        )
-        val formattedDateTime = messageDateTime.format(
-            LocalDateTime.Format {
-                day()
-                char('/')
-                monthNumber()
-                char('/')
-                year()
-                chars(", $formattedTime")
-            }
-        )
+        val day = dateTime.day.toString().padStart(2, '0')
+        val month = dateTime.month.number.toString().padStart(2, '0')
+        val year = dateTime.year
 
-        return when(messageDateTime.date) {
-            todayDate -> UiText.Resource(Res.string.today_x, arrayOf(formattedTime))
-            yesterdayDate -> UiText.Resource(Res.string.yesterday_x, arrayOf(formattedTime))
-            else -> UiText.DynamicString(formattedDateTime)
-        }
+        val hour12 = if (dateTime.hour == 0) 12 else if (dateTime.hour > 12) dateTime.hour - 12 else dateTime.hour
+        val minute = dateTime.minute.toString().padStart(2, '0')
+        val amPm = if (dateTime.hour < 12) "AM" else "PM"
+
+        return "$day/$month/$year, $hour12:$minute $amPm"
     }
 
-    fun formatDateSeparator(date: LocalDate, clock: Clock = Clock.System): UiText {
-        val timeZone = TimeZone.currentSystemDefault()
-        val today = clock.now().toLocalDateTime(timeZone).date
-        val yesterday = today.minus(1, DateTimeUnit.DAY)
+    fun formatTime(instant: Instant): String {
+        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
 
-        return when(date) {
-            today -> UiText.Resource(Res.string.today)
-            yesterday -> UiText.Resource(Res.string.yesterday)
-            else -> {
-                val formatted = date.format(
-                    LocalDate.Format {
-                        day()
-                        char('/')
-                        monthNumber()
-                        char('/')
-                        year()
-                    }
-                )
-                UiText.DynamicString(formatted)
-            }
+        val hour12 = if (dateTime.hour == 0) 12 else if (dateTime.hour > 12) dateTime.hour - 12 else dateTime.hour
+        val minute = dateTime.minute.toString().padStart(2, '0')
+        val amPm = if (dateTime.hour < 12) "AM" else "PM"
+
+        return "$hour12:$minute $amPm"
+    }
+
+    fun formatDate(instant: Instant): String {
+        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+
+        val day = dateTime.day.toString().padStart(2, '0')
+        val month = dateTime.month.number.toString().padStart(2, '0')
+        val year = dateTime.year
+
+        return "$day/$month/$year"
+    }
+
+    fun formatRelativeDateTime(instant: Instant): String {
+        val timeZone = TimeZone.currentSystemDefault()
+        val messageDate = instant.toLocalDateTime(timeZone).date
+        val today = Clock.System.now().toLocalDateTime(timeZone).date
+
+        val time = formatTime(instant)
+
+        return when (messageDate) {
+            today -> "Today, $time"
+            today.minus(1, kotlinx.datetime.DateTimeUnit.DAY) -> "Yesterday, $time"
+            else -> formatDateTime(instant)
         }
     }
 }

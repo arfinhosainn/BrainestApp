@@ -32,4 +32,8 @@ interface AuthService {
     ): EmptyResult<DataError.Remote>
 
 
+    suspend fun currentUserId(): String?
+
+
+
 }

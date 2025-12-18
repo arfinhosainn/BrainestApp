@@ -22,6 +22,11 @@ kotlin {
                 implementation(libs.material3.adaptive)
 
                 implementation(libs.bundles.koin.common)
+                implementation(libs.kotlinx.datetime)
+
+
+                implementation(libs.supabase.auth.kt) // Add this line
+
 
 
 

@@ -12,6 +12,11 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.supabase.auth.kt) // Add this line
+
+
                 // Add KMP dependencies here
             }
         }

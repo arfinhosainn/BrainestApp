@@ -25,7 +25,7 @@ class ChatDetailViewModel(
 
     val messageTextFieldState = TextFieldState()
 
-    private var currentUserId: String = "" // Will be set from auth
+    private var currentUserId: String = ""
     private val pageSize = 20
     private var currentPage = 0
 

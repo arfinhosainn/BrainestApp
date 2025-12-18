@@ -25,8 +25,11 @@ kotlin {
 
                 implementation(libs.koin.core)
 
+                implementation(libs.kotlinx.datetime)
 
+                implementation(libs.kotlinx.serialization.json)
 
+                implementation(libs.supabase.auth.kt) // Add this line
 
 
 
@@ -36,6 +39,9 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+                implementation(libs.kotlinx.datetime) // ADD THIS
+
+
 
 
 

@@ -29,7 +29,8 @@ core-splashscreen = "1.2.0"
 # Kotlinx
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.9.0"
-kotlinx-datetime = "0.7.1"
+kotlinx-datetime = "0.6.1"  # Changed from "0.7.1"
+
 
 # Third party
 koin = "4.1.1"
@@ -45,7 +46,7 @@ coil-network = "3.3.0"
 moko = "0.20.1"
 buildkonfig = "0.17.1"
 kermit = "2.0.6"
-supabase = "3.1.4"
+supabase = "3.2.6"
 composeAuth = "3.2.6"
 
 
@@ -130,6 +131,7 @@ touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 
 #Supabase
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
 compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth", version.ref = "composeAuth" }
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
 realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }

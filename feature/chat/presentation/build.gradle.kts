@@ -30,6 +30,7 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
 
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.json)
 
 
             }

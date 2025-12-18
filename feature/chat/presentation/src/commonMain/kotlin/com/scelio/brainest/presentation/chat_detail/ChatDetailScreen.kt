@@ -40,7 +40,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ChatDetailScreen(
-    chatId: String,
+    chatId: String?,
     userId: String,
     viewModel: ChatDetailViewModel = koinViewModel(),
     modifier: Modifier = Modifier
@@ -51,10 +51,11 @@ fun ChatDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Set user and load chat once
-    LaunchedEffect(chatId, userId) {
+    LaunchedEffect(userId, chatId) {
         viewModel.setUserId(userId)
         viewModel.onAction(ChatDetailAction.OnSelectChat(chatId))
     }
+
 
     // Listen to one-off events (errors / new message)
     LaunchedEffect(Unit) {

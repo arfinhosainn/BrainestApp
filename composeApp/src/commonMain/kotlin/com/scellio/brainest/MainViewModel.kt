@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val supabaseClient: SupabaseClient
@@ -39,13 +42,26 @@ class MainViewModel(
             initialValue = MainState()
         )
 
+    // ✅ Move to IO dispatcher
     private fun checkInitialAuthState() {
-        val session = supabaseClient.auth.currentSessionOrNull()
-        _state.update {
-            it.copy(
-                isCheckingAuth = false,
-                isLoggedIn = session != null
-            )
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val session = supabaseClient.auth.currentSessionOrNull()
+                _state.update {
+                    it.copy(
+                        isCheckingAuth = false,
+                        isLoggedIn = session != null
+                    )
+                }
+            } catch (e: Exception) {
+                println("Error checking auth state: ${e.message}")
+                _state.update {
+                    it.copy(
+                        isCheckingAuth = false,
+                        isLoggedIn = false
+                    )
+                }
+            }
         }
     }
 

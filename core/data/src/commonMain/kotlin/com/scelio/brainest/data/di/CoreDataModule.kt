@@ -37,6 +37,10 @@ val coreDataModule = module {
             requestTimeout = 60.seconds // 60 seconds
             install(Auth) {
                 flowType = FlowType.PKCE
+                autoSaveToStorage = true
+                autoLoadFromStorage = true
+                alwaysAutoRefresh = true
+
             }
             install(Postgrest)
             defaultSerializer = KotlinXSerializer(Json {

@@ -7,7 +7,8 @@ import com.scelio.brainest.domain.models.MessageMetadata
 import com.scelio.brainest.presentation.model.ChatItemUi
 import com.scelio.brainest.presentation.model.ChatMessageUi
 import com.scelio.brainest.presentation.model.MessageMetadataUi
-import com.scelio.brainest.presentation.util.DateUtils
+import com.scelio.brainest.presentation.util.DateTimeFormatter
+import com.scelio.brainest.presentation.util.UiText
 
 fun Chat.toUi(
     lastMessage: ChatMessage? = null
@@ -16,7 +17,7 @@ fun Chat.toUi(
         id = id,
         title = title,
         lastMessage = lastMessage?.content,
-        timestamp = DateUtils.formatMessageTime(lastActivityAt),
+        timestamp = lastActivityAt, // Pass Instant directly
         model = model
     )
 }
@@ -26,7 +27,7 @@ fun ChatWithLastMessage.toUi(): ChatItemUi {
         id = chat.id,
         title = chat.title,
         lastMessage = lastMessage?.content,
-        timestamp = DateUtils.formatMessageTime(chat.lastActivityAt),
+        timestamp = chat.lastActivityAt, // Pass Instant directly
         model = chat.model
     )
 }
@@ -36,12 +37,13 @@ fun ChatMessage.toUi(): ChatMessageUi {
         id = id,
         content = content,
         isFromUser = role == "user",
-        timestamp = DateUtils.formatMessageTime(createdAt),
+        timestamp = UiText.DynamicString(
+            DateTimeFormatter.formatTime(createdAt)
+        ),
         imageUrl = imageUrl,
         metadata = metadata?.toUi()
     )
 }
-
 fun MessageMetadata.toUi(): MessageMetadataUi {
     return MessageMetadataUi(
         model = model,

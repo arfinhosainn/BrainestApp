@@ -4,24 +4,13 @@ data class SendMessageRequest(
     val chatId: String,
     val userId: String,
     val content: String,
-
-    // Legacy single image (for backward compatibility)
     val imageUrl: String? = null,
-
-    // NEW: Support for multiple images (as byte arrays to be uploaded)
     val images: List<ByteArray>? = null,
-
-    // NEW: Support for image URLs (if already uploaded)
     val imageUrls: List<String>? = null,
-
-    // Document support
     val fileId: String? = null,
     val fileName: String? = null,
     val fileContent: ByteArray? = null
 ) {
-    /**
-     * Helper to get all image URLs (combines single and multiple)
-     */
     fun getAllImageUrls(): List<String> {
         val urls = mutableListOf<String>()
         imageUrl?.let { urls.add(it) }

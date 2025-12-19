@@ -23,6 +23,7 @@ kotlin {
                 implementation(libs.bundles.ktor.common)
                 implementation(libs.koin.core)
                 implementation(libs.supabase.postgrest.kt)
+                implementation(libs.supabase.storage)
 
 
 

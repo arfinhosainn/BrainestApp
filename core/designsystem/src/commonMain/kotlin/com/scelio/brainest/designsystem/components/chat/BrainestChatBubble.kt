@@ -42,7 +42,7 @@ fun BrainestChatBubble(
     Column(
         modifier = modifier
             .then(
-                if(onLongClick != null) {
+                if (onLongClick != null) {
                     Modifier.combinedClickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = ripple(
@@ -61,10 +61,10 @@ fun BrainestChatBubble(
             )
             .background(color)
             .padding(
-                start = if(trianglePosition == TrianglePosition.LEFT) {
+                start = if (trianglePosition == TrianglePosition.LEFT) {
                     padding + triangleSize
                 } else padding,
-                end = if(trianglePosition == TrianglePosition.RIGHT) {
+                end = if (trianglePosition == TrianglePosition.RIGHT) {
                     padding + triangleSize
                 } else padding,
                 top = padding,
@@ -107,7 +107,7 @@ fun BrainestChatBubbleLeftPreview() {
     BrainestTheme(darkTheme = true) {
         BrainestChatBubble(
             messageContent = "Hello world, this is a longer message that hopefully spans" +
-                    "over multiple lines so we can see how the preview would look like for that as well.",
+                    " over multiple lines so we can see how the preview would look like for that as well.",
             sender = "Brian",
             formattedDateTime = "Friday 2:20pm",
             trianglePosition = TrianglePosition.LEFT,
@@ -122,7 +122,7 @@ fun BrainestChatBubbleRightPreview() {
     BrainestTheme {
         BrainestChatBubble(
             messageContent = "Hello world, this is a longer message that hopefully spans" +
-                    "over multiple lines so we can see how the preview would look like for that as well.",
+                    " over multiple lines so we can see how the preview would look like for that as well.",
             sender = "Brian",
             formattedDateTime = "Friday 2:20pm",
             trianglePosition = TrianglePosition.RIGHT,

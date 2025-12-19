@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,7 +35,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.scelio.brainest.presentation.chat_detail.components.MessageBox
+import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -113,11 +114,11 @@ fun ChatDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = if (msg.isFromUser) Arrangement.End else Arrangement.Start
                     ) {
-                        MessageBox(
-                            message = msg.content,
-                            isUserMessage = msg.isFromUser,
-                            modifier = Modifier.widthIn(max = 280.dp)
-                        )
+//                        MessageInputBox(
+//                            message = msg.content,
+//                            isUserMessage = msg.isFromUser,
+//                            modifier = Modifier.widthIn(max = 280.dp)
+//                        )
                     }
                 }
 
@@ -155,7 +156,7 @@ fun ChatDetailScreen(
                     onClick = { viewModel.onAction(ChatDetailAction.OnSendMessageClick) },
                     enabled = state.canSendMessage
                 ) {
-                    Icon(Icons.Default.Send, contentDescription = "Send")
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                 }
             }
 

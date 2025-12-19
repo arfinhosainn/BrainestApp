@@ -41,6 +41,9 @@ fun ChatMessage.toUi(): ChatMessageUi {
             DateTimeFormatter.formatTime(createdAt)
         ),
         imageUrl = imageUrl,
+        imageUrls = imageUrls,
+        fileId = fileId,
+        fileName = fileName,
         metadata = metadata?.toUi()
     )
 }

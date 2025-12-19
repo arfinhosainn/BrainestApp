@@ -21,7 +21,7 @@ sealed class ContentDto {
     data class Image(
         val type: String = "input_image",
         @SerialName("image_url")
-        val imageUrl: String
+        val imageUrl: String? = null
     ) : ContentDto()
 
     @Serializable

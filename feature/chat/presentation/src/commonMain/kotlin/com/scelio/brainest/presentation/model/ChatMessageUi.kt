@@ -9,7 +9,6 @@ data class ChatMessageUi(
     val timestamp: UiText,
 
     val imageUrl: String? = null,
-
     val imageUrls: List<String>? = null,
 
     val fileId: String? = null,

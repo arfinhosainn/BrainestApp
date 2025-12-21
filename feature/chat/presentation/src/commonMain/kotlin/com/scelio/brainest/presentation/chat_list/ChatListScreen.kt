@@ -78,7 +78,7 @@ fun ChatListScreen(
             modifier = Modifier.fillMaxSize().padding(padding)
         ) {
             items(state.chats) { chat ->
-                Text(chat.title) // replace with your row UI
+                Text(chat.title)
             }
         }
     }

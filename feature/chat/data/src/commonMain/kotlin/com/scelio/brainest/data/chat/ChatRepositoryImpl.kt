@@ -18,6 +18,7 @@ import com.scelio.brainest.domain.util.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -69,7 +70,8 @@ class ChatRepositoryImpl(
             ?: error("Chat not found: ${request.chatId}")
         val chat = chatEntity.toDomain()
 
-        val now = Clock.System.now()
+        // ✅ FIX: Capture user message timestamp
+        val userMessageTime = Clock.System.now()
 
         // Create and save user message locally
         val userMessage = ChatMessage(
@@ -77,7 +79,7 @@ class ChatRepositoryImpl(
             chatId = request.chatId,
             content = request.content,
             role = MessageRoles.USER,
-            createdAt = now,
+            createdAt = userMessageTime,  // Use captured timestamp
             senderId = request.userId,
             imageUrl = request.imageUrl,
             fileId = request.fileId
@@ -96,10 +98,11 @@ class ChatRepositoryImpl(
             }
         }
 
-        // Get recent messages for context
+        // Get recent messages for context - SORTED BY TIMESTAMP
         val allEntities = chatDao.getMessagesByChatId(request.chatId)
         val recentDomainMessages = allEntities
             .map { it.toDomain() }
+            .sortedBy { it.createdAt.toEpochMilliseconds() }  // Ensure chronological order
             .takeLast(20)
 
         val history = ConversationHistory(
@@ -116,13 +119,26 @@ class ChatRepositoryImpl(
         val result = openAI.chat(openAiRequest)
         val assistantText = result.extractedOutputText()
 
+        // ✅ FIX: Ensure AI message timestamp is AFTER user message
+        // Add a small delay to ensure ordering
+        delay(10) // 10ms delay to ensure different timestamp
+        val aiMessageTime = Clock.System.now()
+
+        // Double-check: AI message must be after user message
+        val finalAiTime = if (aiMessageTime <= userMessageTime) {
+            // If somehow AI time is not after user time, force it to be 1ms later
+            Instant.fromEpochMilliseconds(userMessageTime.toEpochMilliseconds() + 1)
+        } else {
+            aiMessageTime
+        }
+
         // Create and save assistant message locally
         val assistantMessage = ChatMessage(
             id = Uuid.random().toString(),
             chatId = request.chatId,
             content = assistantText,
             role = MessageRoles.ASSISTANT,
-            createdAt = Instant.fromEpochSeconds(result.created ?: 0L),
+            createdAt = finalAiTime,  // ✅ Use local timestamp, not OpenAI's
             senderId = "assistant",
             metadata = MessageMetadata(
                 model = result.model,
@@ -137,7 +153,7 @@ class ChatRepositoryImpl(
         val count = chatDao.getMessageCount(request.chatId)
         chatDao.updateChatStats(
             chatId = request.chatId,
-            timestampMs = now.toEpochMilliseconds(),
+            timestampMs = finalAiTime.toEpochMilliseconds(),
             messageCount = count
         )
 
@@ -170,7 +186,9 @@ class ChatRepositoryImpl(
 
     override suspend fun getChatHistory(chatId: String): ConversationHistory {
         // Read from local DB (offline-first)
-        val messages = chatDao.getMessagesByChatId(chatId).map { it.toDomain() }
+        val messages = chatDao.getMessagesByChatId(chatId)
+            .map { it.toDomain() }
+            .sortedBy { it.createdAt.toEpochMilliseconds() }  // Ensure chronological order
 
         // Optionally sync from Supabase in background to get any missing messages
         coroutineScope.launch(Dispatchers.IO) {

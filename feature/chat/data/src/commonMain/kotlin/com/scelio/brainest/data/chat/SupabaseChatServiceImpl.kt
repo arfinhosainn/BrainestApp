@@ -1,8 +1,11 @@
 package com.scelio.brainest.data.chat
 
+import com.scelio.brainest.data.logging.KermitLogger
+import com.scelio.brainest.data.mappers.SupabaseChatDto
 import com.scelio.brainest.data.mappers.toDomain
 import com.scelio.brainest.data.mappers.toSupabaseDto
 import com.scelio.brainest.domain.chat.SupabaseChatService
+import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.models.Chat
 import com.scelio.brainest.domain.models.ChatMessage
 import com.scelio.brainest.domain.util.DataError
@@ -22,9 +25,18 @@ class SupabaseChatServiceImpl(
 
     override suspend fun syncChat(chat: Chat): EmptyResult<DataError.Remote> {
         return try {
-            supabase.from("chats").upsert(chat.toSupabaseDto())
+            val response = supabase.from("chats").upsert(chat.toSupabaseDto())
+//            println("Sync successful: $response")
+            KermitLogger.info("Sync Successful")
             Result.Success(Unit)
+
+        } catch (e: RestException) {
+//            println("Supabase RestException: ${e.description} (Code: ${e.statusCode})")
+            KermitLogger.error("Supabase RestException: ${e.description} (Code: ${e.statusCode})")
+
+            Result.Failure(e.toDataError())
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Failure(e.toDataError())
         }
     }
@@ -42,14 +54,17 @@ class SupabaseChatServiceImpl(
         return try {
             val chats = supabase.from("chats")
                 .select {
+                    // Must match the EXACT column name in Supabase (snake_case)
                     filter { eq("user_id", userId) }
                     order(column = "last_activity_at", order = Order.DESCENDING)
                 }
-                .decodeList<com.scelio.brainest.data.mappers.SupabaseChatDto>()
+                .decodeList<SupabaseChatDto>() // This will fail if DTO doesn't match SQL
                 .map { it.toDomain() }
+            KermitLogger.info("Fetch Chats Detailed")
 
             Result.Success(chats)
         } catch (e: Exception) {
+            KermitLogger.error("Fetch Chats Detailed Error", e)
             Result.Failure(e.toDataError())
         }
     }

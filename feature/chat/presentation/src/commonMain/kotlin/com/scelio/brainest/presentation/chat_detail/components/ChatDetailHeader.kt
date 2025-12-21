@@ -1,14 +1,21 @@
-package com.scelio.brainest.presentation.chat_list.components
+package com.scelio.brainest.presentation.chat_detail.components
+
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -16,23 +23,22 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import brainest.feature.chat.presentation.generated.resources.Res
-import brainest.feature.chat.presentation.generated.resources.ic_settings
 import com.scelio.brainest.designsystem.BrainestTheme
-import org.jetbrains.compose.resources.painterResource
+import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatListHeader(
-    scrollState: LazyListState, // Pass scroll state
-    onSettingsClicked: () -> Unit,
+fun ChatDetailHeader(
+    scrollState: LazyListState,
+    onCloseClick: () -> Unit,
 ) {
     val scrollProgress = remember(scrollState.firstVisibleItemScrollOffset) {
         min(1f, scrollState.firstVisibleItemScrollOffset / 300f)
@@ -55,17 +61,28 @@ fun ChatListHeader(
     TopAppBar(
         title = {
             Text(
-                text = "History",
-                style = MaterialTheme.typography.headlineMedium,
+                text = "Ask Anything",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = FontFamily.Serif
             )
         },
         actions = {
-            IconButton(onClick = onSettingsClicked) {
+            IconButton(
+                onClick = onCloseClick,
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(32.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                )
+            ) {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_settings),
-                    contentDescription = "Settings",
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.extended.textSecondary
                 )
             }
         },
@@ -82,7 +99,7 @@ fun ChatListHeader(
 @Composable
 fun PreviewChatListHeader() {
     BrainestTheme(darkTheme = true) {
-        ChatListHeader(scrollState = remember { LazyListState() }, onSettingsClicked = {})
+        ChatDetailHeader(scrollState = remember { LazyListState() }, onCloseClick = {})
     }
 
 }

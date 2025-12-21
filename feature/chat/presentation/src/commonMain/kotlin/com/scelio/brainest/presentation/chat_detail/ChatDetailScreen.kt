@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.components.chat.BrainestChatBubble
+import com.scelio.brainest.presentation.chat_detail.components.ChatDetailHeader
 import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
+import com.scelio.brainest.presentation.chat_list.components.ChatListHeader
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -53,6 +55,7 @@ fun ChatDetailScreen(
                 is ChatDetailEvent.OnError -> {
                     snackbarHostState.showSnackbar(event.error.toString())
                 }
+
                 ChatDetailEvent.OnNewMessage -> {
                 }
             }
@@ -61,7 +64,7 @@ fun ChatDetailScreen(
 
     LaunchedEffect(state.messages.size) {
         if (state.messages.isNotEmpty()) {
-            listState.animateScrollToItem(0)  // Scroll to index 0 (newest message)
+            listState.animateScrollToItem(0)
         }
     }
 
@@ -78,6 +81,12 @@ fun ChatDetailScreen(
     }
 
     Scaffold(
+        topBar = {
+            ChatDetailHeader(
+                scrollState = listState,
+                onCloseClick = { /* handle */ },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Column(
@@ -86,7 +95,6 @@ fun ChatDetailScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // Messages list
             LazyColumn(
                 state = listState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -95,7 +103,10 @@ fun ChatDetailScreen(
             ) {
                 if (state.isLoading) {
                     item {
-                        Box(Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.CenterStart) {
+                        Box(
+                            Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                         }
                     }

@@ -4,6 +4,7 @@ package com.scelio.brainest.presentation.chat_detail.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,6 +77,13 @@ fun MessageInputBox(
     )
 
 
+    val inputFieldBackground = if (isSystemInDarkTheme()) {
+        MaterialTheme.colorScheme.surfaceVariant
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+
+
     Column(modifier = Modifier.padding(horizontal = 12.022.dp, vertical = 10.dp)) {
         // Document preview
         if (selectedDocument != null) {
@@ -100,7 +108,7 @@ fun MessageInputBox(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().background(Color.Transparent),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -116,8 +124,8 @@ fun MessageInputBox(
                     .weight(1f)
                     .heightIn(min = 44.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .background(inputFieldBackground)
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
                 enabled = enabled,
                 textStyle = TextStyle(
                     fontFamily = FontFamily.SansSerif,

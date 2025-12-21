@@ -3,6 +3,7 @@ package com.scelio.brainest.data.mappers
 
 import com.scelio.brainest.domain.models.Chat
 import com.scelio.brainest.domain.models.ChatMessage
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
@@ -12,39 +13,37 @@ private val json = Json { ignoreUnknownKeys = true }
 @Serializable
 data class SupabaseChatDto(
     val id: String,
+    @SerialName("user_id")
     val userId: String,
     val title: String,
     val model: String,
+    @SerialName("system_prompt")
     val systemPrompt: String? = null,
+    @SerialName("created_at")
     val createdAt: Long,
+    @SerialName("last_activity_at")
     val lastActivityAt: Long,
+    @SerialName("message_count")
     val messageCount: Int
 )
 
 @Serializable
 data class SupabaseMessageDto(
     val id: String,
-    val chatId: String,
+    @SerialName("chat_id") val chatId: String,
     val content: String,
     val role: String,
-    val createdAt: Long,
-    val senderId: String,
-
-    // Legacy single image
-    val imageUrl: String? = null,
-
-    // NEW: Multiple images as JSON array
-    val imageUrls: String? = null,  // JSON: ["url1", "url2"]
-
-    val fileId: String? = null,
-
-    // NEW: File name
-    val fileName: String? = null,
-
+    @SerialName("created_at") val createdAt: Long,
+    @SerialName("sender_id") val senderId: String,
+    @SerialName("image_url") val imageUrl: String? = null,
+    @SerialName("image_urls") val imageUrls: String? = null,
+    @SerialName("file_id") val fileId: String? = null,
+    @SerialName("file_name") val fileName: String? = null,
     val metadata: String? = null
 )
 
-// Domain to Supabase
+
+
 fun Chat.toSupabaseDto() = SupabaseChatDto(
     id = id,
     userId = userId,
@@ -57,7 +56,6 @@ fun Chat.toSupabaseDto() = SupabaseChatDto(
 )
 
 fun ChatMessage.toSupabaseDto(): SupabaseMessageDto {
-    // Convert imageUrls list to JSON string
     val imageUrlsJson = imageUrls?.let { urls ->
         try {
             json.encodeToString(urls)
@@ -83,7 +81,6 @@ fun ChatMessage.toSupabaseDto(): SupabaseMessageDto {
     )
 }
 
-// Supabase to Domain
 fun SupabaseChatDto.toDomain() = Chat(
     id = id,
     userId = userId,
@@ -96,7 +93,6 @@ fun SupabaseChatDto.toDomain() = Chat(
 )
 
 fun SupabaseMessageDto.toDomain(): ChatMessage {
-    // Parse imageUrls JSON if present
     val parsedImageUrls = imageUrls?.let {
         try {
             json.decodeFromString<List<String>>(it)

@@ -3,29 +3,19 @@ package com.scelio.brainest.presentation.chat_detail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +25,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.scelio.brainest.designsystem.components.chat.BrainestChatBubble
 import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
@@ -51,42 +42,36 @@ fun ChatDetailScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Set user and load chat once
     LaunchedEffect(userId, chatId) {
         viewModel.setUserId(userId)
         viewModel.onAction(ChatDetailAction.OnSelectChat(chatId))
     }
 
-
-    // Listen to one-off events (errors / new message)
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is ChatDetailEvent.OnError -> {
-                    // Assuming you have UiText.asString(context)
                     snackbarHostState.showSnackbar(event.error.toString())
                 }
-
                 ChatDetailEvent.OnNewMessage -> {
-                    // Optional: scroll handled below
                 }
             }
         }
     }
 
-    // Auto-scroll to the bottom when messages change (good for testing AI reply)
     LaunchedEffect(state.messages.size) {
         if (state.messages.isNotEmpty()) {
-            listState.animateScrollToItem(state.messages.lastIndex)
+            listState.animateScrollToItem(0)  // Scroll to index 0 (newest message)
         }
     }
 
-    // Pagination: when user reaches the top, load older messages
     LaunchedEffect(listState) {
         snapshotFlow {
-            listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
-        }.collectLatest { atTop ->
-            if (atTop && state.messages.isNotEmpty()) {
+            val layoutInfo = listState.layoutInfo
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index == layoutInfo.totalItemsCount - 1
+        }.collectLatest { atBottom ->
+            if (atBottom && state.messages.isNotEmpty()) {
                 viewModel.onAction(ChatDetailAction.OnScrollToTop)
             }
         }
@@ -104,22 +89,27 @@ fun ChatDetailScreen(
             // Messages list
             LazyColumn(
                 state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                reverseLayout = true
             ) {
-                items(state.messages) { msg ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (msg.isFromUser) Arrangement.End else Arrangement.Start
-                    ) {
-//                        MessageInputBox(
-//                            message = msg.content,
-//                            isUserMessage = msg.isFromUser,
-//                            modifier = Modifier.widthIn(max = 280.dp)
-//                        )
+                if (state.isLoading) {
+                    item {
+                        Box(Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.CenterStart) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        }
                     }
+                }
+
+                items(
+                    items = state.messages,
+                    key = { it.id }
+                ) { msg ->
+                    BrainestChatBubble(
+                        messageContent = msg.content,
+                        isFromUser = msg.isFromUser,
+                        formattedDateTime = msg.timestamp.asString()
+                    )
                 }
 
                 if (state.isPaginationLoading) {
@@ -133,37 +123,25 @@ fun ChatDetailScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // Input row (uses the VM TextFieldState)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = viewModel.messageTextFieldState.text.toString(),
-                    onValueChange = { newText ->
-                        viewModel.messageTextFieldState.edit {
-                            replace(0, length, newText)
-                        }
-                    },
-                    modifier = Modifier.weight(1f),
-                    label = { Text("Type a message") },
-                    enabled = !state.isLoading
-                )
-
-                Spacer(Modifier.width(8.dp))
-
-                Button(
-                    onClick = { viewModel.onAction(ChatDetailAction.OnSendMessageClick) },
-                    enabled = state.canSendMessage
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
-                }
-            }
-
-            if (state.isLoading) {
-                Spacer(Modifier.height(8.dp))
-                Text("Waiting for assistant...", style = MaterialTheme.typography.bodySmall)
-            }
+            MessageInputBox(
+                textFieldState = viewModel.messageTextFieldState,
+                selectedImages = emptyList(),
+                selectedDocument = null,
+                enabled = !state.isLoading,
+                onSendMessage = {
+                    if (state.canSendMessage) {
+                        viewModel.onAction(ChatDetailAction.OnSendMessageClick)
+                    }
+                },
+                onImageSelected = { /* TODO: Handle image selection */ },
+                onImageRemoved = { /* TODO: Handle image removal */ },
+                onDocumentSelected = { /* TODO: Handle document selection */ },
+                onDocumentCleared = { /* TODO: Handle document clear */ },
+                onGalleryClick = { /* TODO: Handle gallery click */ },
+                onCameraClick = { /* TODO: Handle camera click */ },
+                onDocumentClick = { /* TODO: Handle document click */ },
+                onMicClick = { /* TODO: Handle mic click */ }
+            )
         }
     }
 }

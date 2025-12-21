@@ -1,15 +1,19 @@
 package com.scelio.brainest.designsystem.components.chat
 
+
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -25,93 +29,103 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-
+@OptIn(ExperimentalFoundationApi::class) // Required for combinedClickable in KMP
 @Composable
 fun BrainestChatBubble(
     messageContent: String,
-    sender: String,
+    isFromUser: Boolean,
     formattedDateTime: String,
-    trianglePosition: TrianglePosition,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.extended.surfaceHigher,
+    color: Color? = null,
     messageStatus: @Composable (() -> Unit)? = null,
     triangleSize: Dp = 16.dp,
     onLongClick: (() -> Unit)? = null
 ) {
     val padding = 12.dp
-    Column(
-        modifier = modifier
-            .then(
-                if (onLongClick != null) {
-                    Modifier.combinedClickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = ripple(
-                            color = MaterialTheme.colorScheme.extended.surfaceOutline
-                        ),
-                        onLongClick = onLongClick,
-                        onClick = {}
-                    )
-                } else Modifier
-            )
-            .clip(
-                ChatBubbleShape(
-                    trianglePosition = trianglePosition,
-                    triangleSize = triangleSize
-                )
-            )
-            .background(color)
-            .padding(
-                start = if (trianglePosition == TrianglePosition.LEFT) {
-                    padding + triangleSize
-                } else padding,
-                end = if (trianglePosition == TrianglePosition.RIGHT) {
-                    padding + triangleSize
-                } else padding,
-                top = padding,
-                bottom = padding
-            ),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    val trianglePosition = if (isFromUser) TrianglePosition.RIGHT else TrianglePosition.LEFT
+    val bubbleColor = color ?: if (isFromUser) {
+        MaterialTheme.colorScheme.extended.accentGreen
+    } else {
+        MaterialTheme.colorScheme.extended.surfaceHigher
+    }
+
+    // Use BoxWithConstraints to get available width in a Multiplatform-safe way
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val maxBubbleWidth = maxWidth * 0.75f // 75% of the available parent width
+
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = if (isFromUser) Arrangement.End else Arrangement.Start
         ) {
-            Text(
-                text = sender,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.extended.textSecondary,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(20.dp))
-            Text(
-                text = formattedDateTime,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.extended.textSecondary,
-            )
+            Column(
+                modifier = Modifier
+                    .widthIn(max = maxBubbleWidth) // Limit bubble width based on constraints
+                    .then(
+                        if (onLongClick != null) {
+                            Modifier.combinedClickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = ripple(
+                                    color = MaterialTheme.colorScheme.extended.surfaceOutline
+                                ),
+                                onLongClick = onLongClick,
+                                onClick = {}
+                            )
+                        } else Modifier
+                    )
+                    .clip(
+                        ChatBubbleShape(
+                            trianglePosition = trianglePosition,
+                            triangleSize = triangleSize
+                        )
+                    )
+                    .background(bubbleColor)
+                    .padding(
+                        start = if (trianglePosition == TrianglePosition.LEFT) {
+                            padding + triangleSize
+                        } else padding,
+                        end = if (trianglePosition == TrianglePosition.RIGHT) {
+                            padding + triangleSize
+                        } else padding,
+                        top = padding,
+                        bottom = padding
+                    ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = messageContent,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.extended.textPrimary
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = if (isFromUser) Arrangement.End else Arrangement.Start
+                ) {
+                    Text(
+                        text = formattedDateTime,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.extended.textSecondary,
+                    )
+                    if (messageStatus != null) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        messageStatus()
+                    }
+                }
+            }
         }
-        Text(
-            text = messageContent,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.extended.textPrimary,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        messageStatus?.invoke()
     }
 }
+
+// ... Previews remain the same ...
 
 @Composable
 @Preview
 fun BrainestChatBubbleLeftPreview() {
     BrainestTheme(darkTheme = true) {
         BrainestChatBubble(
-            messageContent = "Hello world, this is a longer message that hopefully spans" +
-                    " over multiple lines so we can see how the preview would look like for that as well.",
-            sender = "Brian",
+            messageContent = "Hello world, this is a longer message that hopefully spans over multiple lines so we can see how the preview would look like for that as well.",
+            isFromUser = true, // Bot message - shows on left
             formattedDateTime = "Friday 2:20pm",
-            trianglePosition = TrianglePosition.LEFT,
-            color = MaterialTheme.colorScheme.extended.accentGreen
         )
     }
 }
@@ -121,11 +135,9 @@ fun BrainestChatBubbleLeftPreview() {
 fun BrainestChatBubbleRightPreview() {
     BrainestTheme {
         BrainestChatBubble(
-            messageContent = "Hello world, this is a longer message that hopefully spans" +
-                    " over multiple lines so we can see how the preview would look like for that as well.",
-            sender = "Brian",
+            messageContent = "Hello world, this is a longer message that hopefully spans over multiple lines so we can see how the preview would look like for that as well.",
+            isFromUser = false, // User message - shows on right
             formattedDateTime = "Friday 2:20pm",
-            trianglePosition = TrianglePosition.RIGHT,
         )
     }
 }

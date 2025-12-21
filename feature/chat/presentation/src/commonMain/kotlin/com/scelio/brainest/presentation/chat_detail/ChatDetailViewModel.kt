@@ -6,12 +6,16 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.chat.ChatRepository
+import com.scelio.brainest.domain.models.ChatMessage
 import com.scelio.brainest.domain.models.SendMessageRequest
 import com.scelio.brainest.presentation.mappers.toUi
+import com.scelio.brainest.presentation.model.ChatMessageUi
 import com.scelio.brainest.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class ChatDetailViewModel(
     private val chatRepository: ChatRepository
@@ -121,6 +125,7 @@ class ChatDetailViewModel(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun sendMessage() {
         val currentChatId = _state.value.chatUi?.id ?: return
         val messageContent = messageTextFieldState.text.toString().trim()
@@ -128,24 +133,40 @@ class ChatDetailViewModel(
         if (messageContent.isEmpty() || _state.value.isLoading) return
 
         viewModelScope.launch {
-            _state.update { it.copy(canSendMessage = false, isLoading = true) }
+            val userMessageUi = ChatMessageUi(
+                id = Uuid.random().toString(), // Temp ID
+                content = messageContent,
+                isFromUser = true,
+                timestamp = UiText.DynamicString("Just now"),
+                isLoading = false
+            )
+
+            _state.update {
+                it.copy(
+                    // We add it to the start because index 0 = bottom of screen
+                    messages = listOf(userMessageUi) + it.messages,
+                    isLoading = true,
+                    canSendMessage = false
+                )
+            }
+
+            messageTextFieldState.clearText()
 
             try {
-                messageTextFieldState.clearText()
-
                 val request = SendMessageRequest(
                     chatId = currentChatId,
                     userId = currentUserId,
                     content = messageContent
                 )
 
+                // 4. API Call
                 val assistantMessage = chatRepository.sendMessage(request)
 
                 val history = chatRepository.getChatHistory(currentChatId)
                 val updatedMessages = history.messages
                     .takeLast(pageSize * (currentPage + 1))
                     .map { it.toUi() }
-                    .reversed()
+                    .reversed() // Maintain newest-at-index-0 for reverseLayout
 
                 _state.update {
                     it.copy(
@@ -153,30 +174,21 @@ class ChatDetailViewModel(
                         isLoading = false
                     )
                 }
-
                 _events.send(ChatDetailEvent.OnNewMessage)
 
             } catch (e: Exception) {
-                messageTextFieldState.edit {
-                    append(messageContent)
-                }
-
                 _state.update {
                     it.copy(
+                        messages = it.messages.filter { msg -> msg.id != userMessageUi.id },
                         canSendMessage = true,
                         isLoading = false
                     )
                 }
-
-                _events.send(
-                    ChatDetailEvent.OnError(
-                        UiText.DynamicString(e.message ?: "Failed to send message")
-                    )
-                )
+                messageTextFieldState.edit { append(messageContent) }
+                _events.send(ChatDetailEvent.OnError(UiText.DynamicString(e.message ?: "Failed to send")))
             }
         }
     }
-
     private fun loadMoreMessages() {
         val currentChatId = _state.value.chatUi?.id ?: return
 

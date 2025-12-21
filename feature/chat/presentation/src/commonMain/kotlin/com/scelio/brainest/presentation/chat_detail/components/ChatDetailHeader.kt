@@ -87,7 +87,7 @@ fun ChatDetailHeader(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = headerColor, // Dynamic color
+            containerColor = headerColor,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = if (isSystemInDarkTheme()) Color.White else Color.Black
         )

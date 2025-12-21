@@ -81,6 +81,7 @@ fun ChatDetailScreen(
     }
 
     Scaffold(
+
         topBar = {
             ChatDetailHeader(
                 scrollState = listState,
@@ -88,15 +89,15 @@ fun ChatDetailScreen(
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { padding ->
+    ) { innerPadding ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(padding)
                 .padding(16.dp)
         ) {
             LazyColumn(
                 state = listState,
+                contentPadding = innerPadding,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 reverseLayout = true

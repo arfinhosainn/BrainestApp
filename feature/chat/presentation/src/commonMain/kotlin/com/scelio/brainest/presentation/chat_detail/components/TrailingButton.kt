@@ -2,6 +2,7 @@ package com.scelio.brainest.presentation.chat_detail.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,11 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.ic_arrow_up
 import brainest.feature.chat.presentation.generated.resources.ic_mic
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
- fun TrailingButton(
+fun TrailingButton(
     hasContent: Boolean,
     enabled: Boolean,
     onSendClick: () -> Unit,
@@ -24,20 +26,24 @@ import org.jetbrains.compose.resources.painterResource
 ) {
     if (hasContent) {
         IconButton(
+            modifier = Modifier.size(30.dp),
             onClick = onSendClick,
             enabled = enabled,
             colors = IconButtonDefaults.iconButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.secondaryContainer
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
             )
         ) {
             Icon(
-                imageVector = Icons.Filled.KeyboardArrowUp,
+                modifier = Modifier.size(15.dp),
+
+                painter = painterResource(Res.drawable.ic_arrow_up),
                 contentDescription = "Send message"
             )
         }
     } else {
         IconButton(
+            modifier = Modifier.size(30.dp),
             onClick = onMicClick,
             enabled = enabled,
             colors = IconButtonDefaults.iconButtonColors(
@@ -45,9 +51,10 @@ import org.jetbrains.compose.resources.painterResource
             )
         ) {
             Icon(
+
                 painter = painterResource(Res.drawable.ic_mic),
                 contentDescription = "Record voice",
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(15.dp)
             )
         }
     }

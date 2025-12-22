@@ -16,6 +16,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(projects.feature.chat.domain)
+                implementation(projects.core.data)
+
 
 
                 // Add KMP dependencies here

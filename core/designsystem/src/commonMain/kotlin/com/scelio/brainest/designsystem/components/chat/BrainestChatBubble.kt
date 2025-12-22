@@ -44,12 +44,11 @@ fun BrainestChatBubble(
     val padding = 12.dp
     val trianglePosition = if (isFromUser) TrianglePosition.RIGHT else TrianglePosition.LEFT
     val bubbleColor = color ?: if (isFromUser) {
-        MaterialTheme.colorScheme.extended.accentGreen
+        MaterialTheme.colorScheme.extended.chatUserBubble
     } else {
-        MaterialTheme.colorScheme.extended.surfaceHigher
+        Color.Transparent
     }
 
-    // Use BoxWithConstraints to get available width in a Multiplatform-safe way
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val maxBubbleWidth = maxWidth * 0.75f // 75% of the available parent width
 
@@ -116,7 +115,6 @@ fun BrainestChatBubble(
     }
 }
 
-// ... Previews remain the same ...
 
 @Composable
 @Preview
@@ -124,7 +122,7 @@ fun BrainestChatBubbleLeftPreview() {
     BrainestTheme(darkTheme = true) {
         BrainestChatBubble(
             messageContent = "Hello world, this is a longer message that hopefully spans over multiple lines so we can see how the preview would look like for that as well.",
-            isFromUser = true, // Bot message - shows on left
+            isFromUser = true,
             formattedDateTime = "Friday 2:20pm",
         )
     }
@@ -133,10 +131,10 @@ fun BrainestChatBubbleLeftPreview() {
 @Composable
 @Preview
 fun BrainestChatBubbleRightPreview() {
-    BrainestTheme {
+    BrainestTheme(darkTheme = false) {
         BrainestChatBubble(
             messageContent = "Hello world, this is a longer message that hopefully spans over multiple lines so we can see how the preview would look like for that as well.",
-            isFromUser = false, // User message - shows on right
+            isFromUser = false,
             formattedDateTime = "Friday 2:20pm",
         )
     }

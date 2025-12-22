@@ -107,7 +107,7 @@ val LightExtendedColors = ExtendedColors(
     overlay = BrainestBase1000Alpha80,          // 80% black overlay
 
     // Chat bubbles - From your chat screen
-    chatUserBubble = BrainestTertiary,          // Light beige for user messages
+    chatUserBubble = BrainestBase0,          // Light beige for user messages
     chatAIBubble = BrainestBase0,               // White for AI messages
 
     // Feature colors
@@ -223,7 +223,7 @@ val LightColorScheme = lightColorScheme(
     onErrorContainer = BrainestErrorDark,
 
     // Background & Surface - From your light mode design
-    background = Color(0xFFF5F5F5),             // Light gray background
+    background = BrainestTertiary,             // Light gray background
     onBackground = BrainestBase1000,
     surface = BrainestBase0,                    // White surface
     onSurface = BrainestBase1000,

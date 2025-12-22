@@ -26,12 +26,10 @@ class SupabaseChatServiceImpl(
     override suspend fun syncChat(chat: Chat): EmptyResult<DataError.Remote> {
         return try {
             val response = supabase.from("chats").upsert(chat.toSupabaseDto())
-//            println("Sync successful: $response")
             KermitLogger.info("Sync Successful")
             Result.Success(Unit)
 
         } catch (e: RestException) {
-//            println("Supabase RestException: ${e.description} (Code: ${e.statusCode})")
             KermitLogger.error("Supabase RestException: ${e.description} (Code: ${e.statusCode})")
 
             Result.Failure(e.toDataError())
@@ -54,7 +52,6 @@ class SupabaseChatServiceImpl(
         return try {
             val chats = supabase.from("chats")
                 .select {
-                    // Must match the EXACT column name in Supabase (snake_case)
                     filter { eq("user_id", userId) }
                     order(column = "last_activity_at", order = Order.DESCENDING)
                 }

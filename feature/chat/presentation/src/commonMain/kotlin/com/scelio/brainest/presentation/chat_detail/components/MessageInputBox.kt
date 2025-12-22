@@ -1,8 +1,6 @@
 package com.scelio.brainest.presentation.chat_detail.components
 
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-private val LightCreameRed = Color(0xFFFFF5F5)
 
 @Composable
 fun MessageInputBox(
@@ -70,12 +67,6 @@ fun MessageInputBox(
         }
     }
 
-    val animatedBackgroundColor by animateColorAsState(
-        targetValue = LightCreameRed,
-        animationSpec = tween(300),
-        label = "backgroundColor"
-    )
-
 
     val inputFieldBackground = if (isSystemInDarkTheme()) {
         MaterialTheme.colorScheme.surfaceVariant
@@ -85,7 +76,6 @@ fun MessageInputBox(
 
 
     Column(modifier = Modifier.padding(horizontal = 12.022.dp, vertical = 10.dp)) {
-        // Document preview
         if (selectedDocument != null) {
             DocumentPreview(
                 document = selectedDocument,

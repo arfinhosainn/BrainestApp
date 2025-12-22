@@ -35,7 +35,7 @@ fun TrailingButton(
             )
         ) {
             Icon(
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(15.dp),
 
                 painter = painterResource(Res.drawable.ic_arrow_up),
                 contentDescription = "Send message"
@@ -54,7 +54,7 @@ fun TrailingButton(
 
                 painter = painterResource(Res.drawable.ic_mic),
                 contentDescription = "Record voice",
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(15.dp)
             )
         }
     }

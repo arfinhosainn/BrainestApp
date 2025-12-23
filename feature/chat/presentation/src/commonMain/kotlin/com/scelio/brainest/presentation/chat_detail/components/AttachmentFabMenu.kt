@@ -17,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +32,7 @@ import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.ic_camera
 import brainest.feature.chat.presentation.generated.resources.ic_document
 import brainest.feature.chat.presentation.generated.resources.ic_gallery
-import brainest.feature.chat.presentation.generated.resources.ic_mic
+import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -159,9 +158,11 @@ fun AttachmentFabMenu(
 @Preview
 @Composable
 fun PreviewAttachmentFabMenu() {
-    AttachmentFabMenu(
-        onGalleryClick = {},
-        onCameraClick = {},
-        onDocumentClick = {}
-    )
+    BrainestTheme {
+        AttachmentFabMenu(
+            onGalleryClick = {},
+            onCameraClick = {},
+            onDocumentClick = {}
+        )
+    }
 }

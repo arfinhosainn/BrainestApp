@@ -6,5 +6,9 @@ import com.scelio.brainest.presentation.model.ChatMessageUi
 sealed interface ChatListAction {
     data object OnFabClick : ChatListAction
     data object OnRefresh : ChatListAction
+
+
     data class OnChatClick(val chatId: String) : ChatListAction
+    data class OnDeleteChat(val chatId: String) : ChatListAction
+    data class OnSearchQueryChange(val query: String) : ChatListAction
 }

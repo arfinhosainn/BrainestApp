@@ -36,6 +36,8 @@ class ChatListViewModel(
                     _events.send(ChatListEvent.NavigateToChat(action.chatId))
                 }
             }
+
+            else -> {}
         }
     }
 

@@ -24,7 +24,7 @@ val BrainestBase400 = Color(0xFFBDBDBD)           // Medium light gray
 val BrainestBase500 = Color(0xFF9E9E9E)           // Medium gray
 val BrainestBase600 = Color(0xFF757575)           // Medium dark gray
 val BrainestBase700 = Color(0xFF616161)           // Dark gray
-val BrainestBase800 = Color(0xFF424242)           // Darker gray
+val BrainestBase800 = Color(0xFF1A1816)           // Darker gray
 val BrainestBase900 = Color(0xFF212121)           // Very dark gray
 val BrainestBase1000 = Color(0xFF000000)          // Pure black
 

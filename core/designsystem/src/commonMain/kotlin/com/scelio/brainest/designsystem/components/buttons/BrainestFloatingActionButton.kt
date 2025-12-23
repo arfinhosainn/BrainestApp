@@ -4,13 +4,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.BrainestTheme
-import kotlinx.serialization.json.JsonNull.content
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -22,15 +23,16 @@ fun BrainestFloatingActionButton(
     FloatingActionButton(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(15.dp),
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
+        contentColor = Color.White,
+        elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
         content = content
     )
 }
 
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun BrainestFloatingActionButtonPreview() {
     BrainestTheme {
         BrainestFloatingActionButton(
@@ -43,3 +45,21 @@ fun BrainestFloatingActionButtonPreview() {
         }
     }
 }
+
+
+@Composable
+@Preview(showBackground = true)
+fun BrainestFloatingActionDarkButtonPreview() {
+    BrainestTheme(darkTheme = true) {
+        BrainestFloatingActionButton(
+            onClick = {}
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null
+            )
+        }
+    }
+}
+
+

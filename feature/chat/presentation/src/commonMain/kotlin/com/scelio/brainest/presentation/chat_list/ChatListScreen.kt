@@ -1,5 +1,7 @@
 package com.scelio.brainest.presentation.chat_list
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,18 +11,20 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.scelio.brainest.designsystem.BrainestTheme
+import androidx.compose.ui.unit.dp
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.improve_style
 import com.scelio.brainest.designsystem.components.buttons.BrainestFloatingActionButton
 import com.scelio.brainest.presentation.chat_list.components.ChatListHeader
+import com.scelio.brainest.presentation.chat_list.components.ChatListItem
 import kotlinx.coroutines.flow.collectLatest
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -58,7 +62,7 @@ fun ChatListScreen(
     val listState = rememberLazyListState()
 
     Scaffold(
-        snackbarHost = {SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             ChatListHeader(
                 scrollState = listState,
@@ -75,28 +79,20 @@ fun ChatListScreen(
     ) { padding ->
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize().padding(padding)
+            modifier = Modifier.fillMaxSize().padding(padding),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(16.dp)
         ) {
             items(state.chats) { chat ->
-                Text(chat.title)
+                ChatListItem(
+                    chat = chat,
+                    leadingIcon = painterResource(Res.drawable.improve_style),
+                    onClick = { /* Handle click */ },
+                    onDelete = { /* Handle delete */ }
+                )
             }
         }
     }
 }
 
-
-@Preview
-@Composable
-fun PreviewChatListScreen() {
-
-
-    BrainestTheme(darkTheme = true) {
-        ChatListScreen(
-            state = ChatListState(),
-            onAction = {},
-            snackbarHostState = SnackbarHostState()
-        )
-    }
-
-}
 

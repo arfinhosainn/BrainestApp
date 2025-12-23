@@ -55,8 +55,6 @@ import brainest.feature.chat.presentation.generated.resources.arrow_right
 import brainest.feature.chat.presentation.generated.resources.improve_style
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.model.ChatItemUi
-import com.scelio.brainest.presentation.model.ChatMessageUi
-import com.scelio.brainest.presentation.model.MessageStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -64,7 +62,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.roundToInt
 
 @Composable
-fun ChatListItemUi(
+fun ChatListItem(
     chat: ChatItemUi,
     onClick: () -> Unit,
     onDelete: () -> Unit,
@@ -73,8 +71,8 @@ fun ChatListItemUi(
     iconTint: Color = Color.Unspecified,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    fontFamily: FontFamily = FontFamily.Default,
-    fontWeight: FontWeight = FontWeight.Normal,
+    fontFamily: FontFamily? = MaterialTheme.typography.bodyMedium.fontFamily,
+    fontWeight: FontWeight = FontWeight.Medium,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     cornerRadius: Dp = 20.dp,
@@ -200,4 +198,33 @@ fun ChatListItemUi(
         }
     }
 }
+
+
+@Preview
+@Composable
+private fun ChatListItemUiPreview() {
+    BrainestTheme {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+        ) {
+            ChatListItem(
+                chat = ChatItemUi(
+                    id = "1",
+                    title = "How to improve my UI design skills?",
+                    lastMessage = "You should practice daily...",
+                    timestamp = kotlin.time.Clock.System.now(),
+                    model = "GPT-4",
+                    unreadCount = 2,
+                    isSelected = false
+                ),
+                leadingIcon = painterResource(Res.drawable.improve_style),
+                onClick = { /* Handle click */ },
+                onDelete = { /* Handle delete */ }
+            )
+        }
+    }
+}
+
 

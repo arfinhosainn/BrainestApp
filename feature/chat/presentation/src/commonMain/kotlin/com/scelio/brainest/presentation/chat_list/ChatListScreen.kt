@@ -24,6 +24,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.improve_style
 import com.scelio.brainest.designsystem.components.buttons.BrainestFloatingActionButton
@@ -40,8 +44,19 @@ fun ChatListRoot(
     onNavigateToChat: (String) -> Unit,
     viewModel: ChatListViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            println("🔄 ChatListRoot: Screen resumed, refreshing chats")
+            viewModel.onAction(ChatListAction.OnRefresh)
+        }
+    }
+
+
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->

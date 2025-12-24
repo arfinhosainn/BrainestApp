@@ -37,9 +37,43 @@ class ChatListViewModel(
                 }
             }
 
-            else -> {}
+            is ChatListAction.OnDeleteChat -> {
+                deleteChat(action.chatId)
+
+            }
+
+            is ChatListAction.OnSearchQueryChange -> {
+
+            }
         }
     }
+
+
+    private fun deleteChat(chatId: String) {
+        viewModelScope.launch {
+            try {
+                _state.update {
+                    it.copy(chats = it.chats.filter { chat -> chat.id != chatId })
+                }
+                chatRepository.deleteChat(chatId)
+
+                val userId = authService.currentUserId()
+                if (!userId.isNullOrBlank()) {
+                    val chats = chatRepository.getUserChats(userId)
+                        .map { it.chat.toUi() }
+                    _state.update { it.copy(chats = chats) }
+                }
+            } catch (e: Exception) {
+                loadChats()
+                _events.send(
+                    ChatListEvent.ShowError(
+                        UiText.DynamicString(e.message ?: "Failed to delete chat")
+                    )
+                )
+            }
+        }
+    }
+
 
     private fun loadChats() {
         viewModelScope.launch {

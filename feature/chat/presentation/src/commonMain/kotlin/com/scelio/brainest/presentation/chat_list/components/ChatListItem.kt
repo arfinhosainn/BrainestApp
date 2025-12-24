@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.arrow_right
+import brainest.feature.chat.presentation.generated.resources.ic_delete
 import brainest.feature.chat.presentation.generated.resources.improve_style
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.extended
@@ -84,7 +85,7 @@ fun ChatListItem(
 
     var offsetX by remember { mutableFloatStateOf(0f) }
     val deleteButtonWidth = with(LocalDensity.current) { 80.dp.toPx() }
-    val swipeThreshold = -deleteButtonWidth * 0.5f
+    val swipeThreshold = -deleteButtonWidth * 0.2f
 
     val draggableState = rememberDraggableState { delta ->
         val newOffset = offsetX + delta
@@ -107,7 +108,7 @@ fun ChatListItem(
                     .fillMaxWidth()
                     .height(56.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.errorContainer,
+                        color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(cornerRadius)
                     )
                     .padding(horizontal = 20.dp)
@@ -122,9 +123,9 @@ fun ChatListItem(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        painter = painterResource(Res.drawable.ic_delete),
                         contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = Color.White,
                         modifier = Modifier.size(24.dp)
                     )
                 }

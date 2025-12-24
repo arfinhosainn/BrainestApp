@@ -53,10 +53,9 @@ class ChatRepositoryImpl(
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.syncChat(chat)) {
                 is Result.Success -> {
-                    // Successfully synced
+
                 }
                 is Result.Failure -> {
-                    // Log error but don't fail the operation
                     println("Failed to sync chat to Supabase: ${result.error}")
                 }
             }
@@ -70,10 +69,8 @@ class ChatRepositoryImpl(
             ?: error("Chat not found: ${request.chatId}")
         val chat = chatEntity.toDomain()
 
-        // ✅ FIX: Capture user message timestamp
         val userMessageTime = Clock.System.now()
 
-        // Create and save user message locally
         val userMessage = ChatMessage(
             id = Uuid.random().toString(),
             chatId = request.chatId,
@@ -86,7 +83,6 @@ class ChatRepositoryImpl(
         )
         chatDao.insertMessage(userMessage.toEntity())
 
-        // Sync user message to Supabase in background
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.syncMessage(userMessage)) {
                 is Result.Success -> {
@@ -98,7 +94,6 @@ class ChatRepositoryImpl(
             }
         }
 
-        // Get recent messages for context - SORTED BY TIMESTAMP
         val allEntities = chatDao.getMessagesByChatId(request.chatId)
         val recentDomainMessages = allEntities
             .map { it.toDomain() }
@@ -119,20 +114,16 @@ class ChatRepositoryImpl(
         val result = openAI.chat(openAiRequest)
         val assistantText = result.extractedOutputText()
 
-        // ✅ FIX: Ensure AI message timestamp is AFTER user message
-        // Add a small delay to ensure ordering
+
         delay(10) // 10ms delay to ensure different timestamp
         val aiMessageTime = Clock.System.now()
 
-        // Double-check: AI message must be after user message
         val finalAiTime = if (aiMessageTime <= userMessageTime) {
-            // If somehow AI time is not after user time, force it to be 1ms later
             Instant.fromEpochMilliseconds(userMessageTime.toEpochMilliseconds() + 1)
         } else {
             aiMessageTime
         }
 
-        // Create and save assistant message locally
         val assistantMessage = ChatMessage(
             id = Uuid.random().toString(),
             chatId = request.chatId,
@@ -157,7 +148,6 @@ class ChatRepositoryImpl(
             messageCount = count
         )
 
-        // Sync assistant message and updated chat to Supabase in background
         coroutineScope.launch(Dispatchers.IO) {
             when (val syncResult = supabaseService.syncMessage(assistantMessage)) {
                 is Result.Success -> {
@@ -168,7 +158,6 @@ class ChatRepositoryImpl(
                 }
             }
 
-            // Re-fetch updated chat and sync
             chatDao.getChat(request.chatId)?.toDomain()?.let { updatedChat ->
                 when (val chatSyncResult = supabaseService.syncChat(updatedChat)) {
                     is Result.Success -> {
@@ -190,7 +179,6 @@ class ChatRepositoryImpl(
             .map { it.toDomain() }
             .sortedBy { it.createdAt.toEpochMilliseconds() }  // Ensure chronological order
 
-        // Optionally sync from Supabase in background to get any missing messages
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.fetchChatMessages(chatId)) {
                 is Result.Success -> {
@@ -259,10 +247,8 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun deleteChat(chatId: String) {
-        // Delete locally first
         chatDao.deleteChat(chatId)
 
-        // Sync deletion to Supabase in background
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.deleteChat(chatId)) {
                 is Result.Success -> {

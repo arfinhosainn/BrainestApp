@@ -1,6 +1,7 @@
 package com.scelio.brainest.presentation.components
 
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,11 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.ic_search
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
@@ -56,7 +59,7 @@ fun SearchBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(brainest.feature.chat.presentation.generated.resources.Res.drawable.ic_search),
+                painter = painterResource(Res.drawable.ic_search),
                 contentDescription = "Search",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(20.dp)
@@ -73,8 +76,9 @@ fun SearchBar(
                     },
                 textStyle = TextStyle(
                     fontSize = 16.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Search
@@ -85,14 +89,19 @@ fun SearchBar(
                     }
                 ),
                 decorationBox = { innerTextField ->
-                    if (searchQuery.isEmpty() && !isFocused) {
-                        Text(
-                            text = "Search conversations...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
-                        )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = "Search conversations...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f)
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
             )
         }
@@ -102,10 +111,21 @@ fun SearchBar(
 @Preview(showBackground = true)
 @Composable
 fun PreviewSearchBar() {
-
     BrainestTheme {
-        SearchBar(searchQuery = "",
-            onSearchQueryChange = {})
+        SearchBar(
+            searchQuery = "",
+            onSearchQueryChange = {}
+        )
+    }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewSearchBarWithText() {
+    BrainestTheme {
+        SearchBar(
+            searchQuery = "My search query",
+            onSearchQueryChange = {}
+        )
     }
 }

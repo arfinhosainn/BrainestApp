@@ -43,10 +43,39 @@ class ChatListViewModel(
             }
 
             is ChatListAction.OnSearchQueryChange -> {
+                updateSearchQuery(action.query)
 
             }
         }
     }
+
+
+    private fun updateSearchQuery(query: String) {
+        _state.update { it.copy(searchText = query) }
+
+        viewModelScope.launch {
+            val userId = authService.currentUserId()
+            if (userId.isNullOrBlank()) return@launch
+
+            try {
+                val chats = if (query.isBlank()) {
+                    chatRepository.getUserChats(userId)
+                } else {
+                    chatRepository.searchChats(userId, query)
+                }.map { it.chat.toUi() }
+
+                _state.update { it.copy(chats = chats) }
+            } catch (e: Exception) {
+                _events.send(
+                    ChatListEvent.ShowError(
+                        UiText.DynamicString(e.message ?: "Failed to search chats")
+                    )
+                )
+            }
+        }
+    }
+
+
 
 
     private fun deleteChat(chatId: String) {

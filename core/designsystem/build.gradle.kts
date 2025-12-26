@@ -18,6 +18,9 @@ kotlin {
 
                 implementation(projects.core.presentation)
 
+                implementation(libs.katex.core)
+
+
                 implementation(compose.components.resources)
 
                 implementation(compose.components.uiToolingPreview)

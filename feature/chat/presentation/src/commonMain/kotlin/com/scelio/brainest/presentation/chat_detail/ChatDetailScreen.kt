@@ -28,10 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.components.chat.BrainestChatBubble
-import com.scelio.brainest.designsystem.extended
 import com.scelio.brainest.presentation.chat_detail.components.ChatDetailHeader
 import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
-import com.scelio.brainest.presentation.chat_list.components.ChatListHeader
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 

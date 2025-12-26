@@ -48,6 +48,7 @@ buildkonfig = "0.17.1"
 kermit = "2.0.6"
 supabase = "3.2.6"
 composeAuth = "3.2.6"
+katexCore = "0.3.2"
 
 
 
@@ -129,6 +130,9 @@ sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sql
 #Logging
 touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
+#Katex
+katex-core = { module = "io.github.darriousliu:katex-core", version.ref = "katexCore" }
+
 
 #Supabase
 supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
@@ -186,7 +190,6 @@ convention-cmp-library = { id = "com.scelio.brainest.convention.cmp.library", ve
 convention-cmp-feature = { id = "com.scelio.brainest.convention.cmp.feature", version = "unspecified" }
 convention-buildkonfig = { id = "com.scelio.brainest.convention.buildkonfig", version = "unspecified" }
 convention-room = { id = "com.scelio.brainest.convention.room", version = "unspecified" }
-
 
 
 

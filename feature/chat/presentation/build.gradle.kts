@@ -33,6 +33,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
 
                 implementation(libs.coil.compose)
+                implementation(libs.katex.core)
 
 
             }

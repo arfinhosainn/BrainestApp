@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -35,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.chat.chat_math.ContentSegment
-import com.scelio.brainest.designsystem.components.chat.chat_math.InlineMathText
+import com.scelio.brainest.designsystem.components.chat.chat_math.InlineMath
 import com.scelio.brainest.designsystem.components.chat.chat_math.ListType
 import com.scelio.brainest.designsystem.components.chat.chat_math.intToRoman
 import com.scelio.brainest.designsystem.components.chat.chat_math.parseContentSegments
@@ -43,7 +44,6 @@ import com.scelio.brainest.designsystem.extended
 import io.github.darriousliu.katex.core.MTMathView
 import io.github.darriousliu.katex.core.MTMathViewMode
 import io.github.darriousliu.katex.core.MTTextAlignment
-
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -66,14 +66,13 @@ fun BrainestChatBubble(
         Color.Transparent
     }
 
-    // Define text colors
     val textColor = MaterialTheme.colorScheme.extended.textPrimary
 
-    // Parse content into segments (memoized)
     val segments = remember(messageContent) { parseContentSegments(messageContent) }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val maxBubbleWidth = maxWidth * 0.75f // 75% of the available parent width
+
+        val maxBubbleWidth = if (isFromUser) maxWidth * 0.6f else maxWidth
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -97,7 +96,6 @@ fun BrainestChatBubble(
                     .clip(
                         ChatBubbleShape(
                             trianglePosition = trianglePosition,
-                            triangleSize = triangleSize
                         )
                     )
                     .background(bubbleColor)
@@ -113,7 +111,6 @@ fun BrainestChatBubble(
                     ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // --- RENDER CONTENT SEGMENTS ---
                 Column(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
@@ -125,7 +122,7 @@ fun BrainestChatBubble(
                                     2 -> 18.sp
                                     else -> 16.sp
                                 }
-                                InlineMathText(
+                                InlineMath(
                                     text = segment.text,
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontSize = fontSize,
@@ -137,7 +134,7 @@ fun BrainestChatBubble(
                             }
 
                             is ContentSegment.TextWithInlineMathSegment -> {
-                                InlineMathText(
+                                InlineMath(
                                     text = segment.originalText,
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = textColor,
@@ -146,7 +143,6 @@ fun BrainestChatBubble(
                             }
 
                             is ContentSegment.DisplayMathSegment -> {
-                                // Scrollable container for block math
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -154,7 +150,7 @@ fun BrainestChatBubble(
                                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                                             shape = RoundedCornerShape(8.dp)
                                         )
-                                        .padding(8.dp)
+                                        .padding(15.dp)
                                         .horizontalScroll(rememberScrollState()),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -185,7 +181,7 @@ fun BrainestChatBubble(
                                         color = textColor,
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
-                                    InlineMathText(
+                                    InlineMath(
                                         text = segment.text,
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = textColor,
@@ -195,12 +191,13 @@ fun BrainestChatBubble(
                             }
 
                             is ContentSegment.CodeBlockSegment -> {
-                                // Simple render for code blocks as plain text for now
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .background(
-                                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                            color = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                                alpha = 0.5f
+                                            ),
                                             shape = RoundedCornerShape(4.dp)
                                         )
                                         .padding(8.dp)
@@ -215,7 +212,6 @@ fun BrainestChatBubble(
                             }
 
                             is ContentSegment.TableSegment -> {
-                                // Placeholder for tables (omitted as requested)
                                 Text(
                                     text = "[Table content]",
                                     style = MaterialTheme.typography.bodySmall,
@@ -231,7 +227,6 @@ fun BrainestChatBubble(
                     }
                 }
 
-                // --- TIMESTAMP AND STATUS ---
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -255,24 +250,41 @@ fun BrainestChatBubble(
 
 @Composable
 @Preview
-fun BrainestChatBubbleLeftPreview() {
-    BrainestTheme(darkTheme = true) {
-        BrainestChatBubble(
-            messageContent = "Here is an equation: $$ x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} $$",
-            isFromUser = false,
-            formattedDateTime = "Friday 2:20pm",
-        )
-    }
-}
+fun BrainestChatMathFlowPreview() {
+    BrainestTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(if (isSystemInDarkTheme()) Color.Black else Color.White)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            val x = "x"
 
-@Composable
-@Preview
-fun BrainestChatBubbleRightPreview() {
-    BrainestTheme(darkTheme = false) {
-        BrainestChatBubble(
-            messageContent = "Solve for $ x $ in the equation above.",
-            isFromUser = false,
-            formattedDateTime = "Friday 2:20pm",
-        )
+            // 1. USER MESSAGE
+            BrainestChatBubble(
+                messageContent = "Solve the math $3x - 7 = n$ for $x$.",
+                isFromUser = true,
+                formattedDateTime = "2:45pm",
+            )
+
+            // 2. AI RESPONSE
+            BrainestChatBubble(
+                messageContent = """
+                    To solve for '$x$' in the equation $3x - 7 = n$, follow these steps:
+                    
+                    1. Add 7 to both sides of the equation:
+                    $$ 3x = n + 7 $$
+                    
+                    2. Divide both sides by 3 to isolate $x$:
+                    $$ x = \frac{n + 7}{3} $$
+                    
+                    Therefore, the solution for $x$ is expressed as:
+                    $$ x = \frac{1}{3}n + \frac{7}{3} $$
+                """.trimIndent(),
+                isFromUser = false,
+                formattedDateTime = "2:45pm",
+            )
+        }
     }
 }

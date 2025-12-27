@@ -14,6 +14,8 @@ import com.scelio.brainest.domain.models.ConversationHistory
 import com.scelio.brainest.domain.models.CreateChatRequest
 import com.scelio.brainest.domain.models.MessageMetadata
 import com.scelio.brainest.domain.models.SendMessageRequest
+import com.scelio.brainest.domain.util.DataError
+import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,13 +50,13 @@ class ChatRepositoryImpl(
 
         // 1. Save to local DB first (offline-first)
         chatDao.insertChat(chat.toEntity())
-
         // 2. Sync to Supabase in background
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.syncChat(chat)) {
                 is Result.Success -> {
 
                 }
+
                 is Result.Failure -> {
                     println("Failed to sync chat to Supabase: ${result.error}")
                 }
@@ -76,7 +78,7 @@ class ChatRepositoryImpl(
             chatId = request.chatId,
             content = request.content,
             role = MessageRoles.USER,
-            createdAt = userMessageTime,  // Use captured timestamp
+            createdAt = userMessageTime,
             senderId = request.userId,
             imageUrl = request.imageUrl,
             fileId = request.fileId
@@ -88,6 +90,7 @@ class ChatRepositoryImpl(
                 is Result.Success -> {
                     // Successfully synced
                 }
+
                 is Result.Failure -> {
                     println("Failed to sync user message: ${result.error}")
                 }
@@ -153,6 +156,7 @@ class ChatRepositoryImpl(
                 is Result.Success -> {
                     // Successfully synced
                 }
+
                 is Result.Failure -> {
                     println("Failed to sync assistant message: ${syncResult.error}")
                 }
@@ -163,6 +167,7 @@ class ChatRepositoryImpl(
                     is Result.Success -> {
                         // Successfully synced
                     }
+
                     is Result.Failure -> {
                         println("Failed to sync updated chat: ${chatSyncResult.error}")
                     }
@@ -190,6 +195,7 @@ class ChatRepositoryImpl(
                         }
                     }
                 }
+
                 is Result.Failure -> {
                     println("Failed to fetch messages from Supabase: ${result.error}")
                 }
@@ -220,6 +226,7 @@ class ChatRepositoryImpl(
                         chatDao.insertChat(remoteChat.toEntity())
                     }
                 }
+
                 is Result.Failure -> {
                     println("Failed to fetch chats from Supabase: ${result.error}")
                 }
@@ -239,6 +246,7 @@ class ChatRepositoryImpl(
                 is Result.Success -> {
                     // Successfully synced
                 }
+
                 is Result.Failure -> {
                     println("Failed to sync title update: ${result.error}")
                 }
@@ -254,6 +262,7 @@ class ChatRepositoryImpl(
                 is Result.Success -> {
                     // Successfully synced
                 }
+
                 is Result.Failure -> {
                     println("Failed to sync chat deletion: ${result.error}")
                 }
@@ -271,6 +280,7 @@ class ChatRepositoryImpl(
                 is Result.Success -> {
                     // Successfully synced
                 }
+
                 is Result.Failure -> {
                     println("Failed to sync message deletion: ${result.error}")
                 }
@@ -288,7 +298,7 @@ class ChatRepositoryImpl(
     }
 
 
-    suspend fun syncFromSupabase(userId: String): com.scelio.brainest.domain.util.EmptyResult<com.scelio.brainest.domain.util.DataError.Remote> {
+    suspend fun syncFromSupabase(userId: String): EmptyResult<DataError.Remote> {
         return when (val chatsResult = supabaseService.fetchUserChats(userId)) {
             is Result.Success -> {
                 chatsResult.data.forEach { chat ->
@@ -301,6 +311,7 @@ class ChatRepositoryImpl(
                                 chatDao.insertMessage(message.toEntity())
                             }
                         }
+
                         is Result.Failure -> {
                             return Result.Failure(messagesResult.error)
                         }
@@ -308,6 +319,7 @@ class ChatRepositoryImpl(
                 }
                 Result.Success(Unit)
             }
+
             is Result.Failure -> Result.Failure(chatsResult.error)
         }
     }

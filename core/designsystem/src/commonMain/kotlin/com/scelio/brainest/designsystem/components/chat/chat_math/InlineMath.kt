@@ -1,6 +1,8 @@
 package com.scelio.brainest.designsystem.components.chat.chat_math
 
-
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.Text
@@ -15,15 +17,19 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.darriousliu.katex.core.MTMathView
 import io.github.darriousliu.katex.core.MTMathViewMode
 import io.github.darriousliu.katex.core.MTTextAlignment
+import io.github.darriousliu.katex.mathdisplay.parse.MTMathListBuilder
+import io.github.darriousliu.katex.mathdisplay.parse.MTParseError
 
 @Composable
-fun InlineMathText(
+fun InlineMath(
     text: String,
     style: TextStyle,
     color: Color,
@@ -46,6 +52,13 @@ fun InlineMathText(
         return
     }
 
+    val mathListCache = remember(text) {
+        tokens.filterIsInstance<InlineToken.Math>().associate { token ->
+            val error = MTParseError()
+            token.latex to MTMathListBuilder.buildFromString(token.latex, error)
+        }
+    }
+
     val measureCache = remember(mathFontSize, density.density, density.fontScale) {
         mutableMapOf<String, IntSize>()
     }
@@ -60,21 +73,33 @@ fun InlineMathText(
                     mathMeasures[idx] = cached
                 } else {
                     val placeables = subcompose("measure-math-$idx") {
+                        val mList = mathListCache[token.latex]
                         MTMathView(
-                            latex = token.latex,
+                            mathList = mList,
                             fontSize = mathFontSize,
                             textColor = mathColor,
-                            mode = MTMathViewMode.KMTMathViewModeText,
+                            mode = MTMathViewMode.KMTMathViewModeDisplay,
                             textAlignment = MTTextAlignment.KMTTextAlignmentCenter,
-                            displayErrorInline = true,
-                            errorFontSize = mathFontSize
+                            // CRITICAL: Ensure the view has enough space to actually render during measurement
+                            modifier = Modifier.widthIn(min = 10.dp).heightIn(min = 10.dp)
                         )
                     }.map { measurable ->
-                        measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+                        measurable.measure(Constraints())
                     }
+
                     val w = placeables.maxOfOrNull { it.width } ?: 0
                     val h = placeables.maxOfOrNull { it.height } ?: 0
-                    val size = IntSize(w, h)
+
+                    val minWidthPx = (mathFontSize.toPx() * 0.6f).toInt()
+
+                    val paddingBufferPx = (4 * density.density).toInt()
+
+                    val finalWidth = maxOf(w + paddingBufferPx, minWidthPx)
+
+                    val finalHeight = maxOf(h, mathFontSize.toPx().toInt())
+
+
+                    val size = IntSize(finalWidth, finalHeight)
                     mathMeasures[idx] = size
                     measureCache[token.latex] = size
                 }
@@ -93,25 +118,25 @@ fun InlineMathText(
 
                     val sizePx = mathMeasures[idx] ?: IntSize.Zero
                     val widthSp =
-                        ((sizePx.width.toFloat()) / (density.density * density.fontScale)).sp
+                        (sizePx.width.toFloat() / (density.density * density.fontScale)).sp
                     val heightSp =
-                        ((sizePx.height.toFloat()) / (density.density * density.fontScale)).sp
+                        (sizePx.height.toFloat() / (density.density * density.fontScale)).sp
 
                     inlineContent[id] = InlineTextContent(
                         placeholder = Placeholder(
                             width = widthSp,
                             height = heightSp,
-                            placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
+                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
                         )
                     ) {
+
                         MTMathView(
-                            latex = token.latex,
+                            mathList = mathListCache[token.latex],
                             fontSize = mathFontSize,
                             textColor = mathColor,
                             mode = MTMathViewMode.KMTMathViewModeText,
                             textAlignment = MTTextAlignment.KMTTextAlignmentCenter,
-                            displayErrorInline = true,
-                            errorFontSize = mathFontSize
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
@@ -128,9 +153,7 @@ fun InlineMathText(
                 softWrap = true,
                 overflow = TextOverflow.Visible
             )
-        }.map { measurable ->
-            measurable.measure(constraints)
-        }
+        }.map { it.measure(constraints) }
 
         val width = textPlaceables.maxOfOrNull { it.width } ?: 0
         val height = textPlaceables.maxOfOrNull { it.height } ?: 0

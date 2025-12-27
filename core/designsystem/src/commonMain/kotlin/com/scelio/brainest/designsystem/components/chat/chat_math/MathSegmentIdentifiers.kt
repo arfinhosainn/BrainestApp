@@ -1,9 +1,6 @@
 package com.scelio.brainest.designsystem.components.chat.chat_math
 
 
-// Content model for parsed segments
-
-
 /**
  * Detect if a line is potentially part of a markdown table,
  * either a header, separator, or data row.
@@ -83,12 +80,6 @@ fun extractTable(lines: List<String>, startIndex: Int): Pair<String, Int> {
 
 
 
-
-
-
-
-
-
 fun intToRoman(num: Int): String {
     val values = intArrayOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
     val literals = arrayOf("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
@@ -146,12 +137,15 @@ fun preprocessMathContent(content: String): String {
 }
 
 // Fix common quirks inside math content only
- fun sanitizeLatexInsideDelimiters(latex: String): String {
+fun sanitizeLatexInsideDelimiters(latex: String): String {
     var s = latex.trim()
-    // Turn "\ %67" into "\%67"
+    // 1. Turn "\ %67" into "\%67"
     s = s.replace(Regex("""\\\s+%"""), """\%""")
-    // Escape bare % to avoid LaTeX comment
-    s = s.replace(Regex("""(?<!\(KATEX_INLINE_CLOSE%)"""), """\%""")
+
+    // 2. Escape actual bare % characters so they don't act as comments
+    // Only replace '%' if it's not already escaped by '\'
+    s = s.replace(Regex("""(?<!\\)%"""), """\%""")
+
     return s
 }
 

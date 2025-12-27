@@ -33,6 +33,7 @@ import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 
+@Suppress("ParamsComparedByRef")
 @Composable
 fun ChatDetailScreen(
     chatId: String?,

@@ -52,7 +52,7 @@ fun RenderTextWithInlineMath(
             when (piece) {
                 is DisplayPiece.Text -> {
                     if (piece.text.isNotEmpty()) {
-                        InlineMathText(
+                        InlineMath(
                             text = piece.text,
                             style = baseStyle,
                             color = textColor,

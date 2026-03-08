@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
+import com.scelio.brainest.designsystem.Nunito
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
@@ -75,7 +76,8 @@ fun OnboardingStepLayout(
             // Title Section
             Text(
                 text = title,
-                style = Typography.titleLarge.copy(
+                style = TextStyle(
+                    fontFamily = Nunito,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.ExtraBold,
                     lineHeight = 36.sp,
@@ -89,8 +91,10 @@ fun OnboardingStepLayout(
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = subtitle,
-                    style = Typography.bodyMedium.copy(
+                    style = TextStyle(
                         fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = Nunito,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     ),
                     textAlign = TextAlign.Center,
@@ -155,7 +159,7 @@ private fun OnboardingStepTemplatePreview() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                repeat(5) { index ->
+                repeat(5) { _ ->
                     SelectionOption(
                         label = "6 to 12 months",
                         isSelected = true,

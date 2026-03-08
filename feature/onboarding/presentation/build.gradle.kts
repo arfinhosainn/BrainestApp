@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.convention.kmp.library)
+    alias(libs.plugins.convention.cmp.library)
 }
 
 kotlin {
@@ -12,6 +12,14 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.jetbrains.compose.navigation)
+
+
+
+
 
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)

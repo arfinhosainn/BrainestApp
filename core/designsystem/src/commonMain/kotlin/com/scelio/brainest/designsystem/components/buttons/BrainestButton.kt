@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.extended
@@ -38,6 +40,7 @@ enum class BrainestButtonStyle {
 fun BrainestButton(
     text: String,
     onClick: () -> Unit,
+    textStyles: TextStyle = TextStyle(),
     modifier: Modifier = Modifier,
     style: BrainestButtonStyle = BrainestButtonStyle.PRIMARY,
     enabled: Boolean = true,
@@ -116,7 +119,7 @@ fun BrainestButton(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = modifier.padding(6.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -127,22 +130,33 @@ fun BrainestButton(
                 strokeWidth = 1.5.dp,
                 color = Color.Black
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(
-                    8.dp,
-                    Alignment.CenterHorizontally
-                ),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.alpha(
-                    if (isLoading) 0f else 1f
-                )
+            Box(
+                modifier = Modifier
+                    .alpha(if (isLoading) 0f else 1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                leadingIcon?.invoke()
+                // Leading icon (positioned at start)
+                if (leadingIcon != null) {
+                    Box(
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        leadingIcon()
+                    }
+                }
+                // Text (centered)
                 Text(
                     text = text,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = textStyles
                 )
-                trailingIcon?.invoke()
+                // Trailing icon (positioned at end)
+                if (trailingIcon != null) {
+                    Box(
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        trailingIcon()
+                    }
+                }
             }
         }
     }
@@ -152,7 +166,7 @@ fun BrainestButton(
 @Preview
 fun BrainestPrimaryButtonPreview() {
     BrainestTheme(
-        darkTheme = true
+        darkTheme = false
     ) {
         BrainestButton(
             text = "Hello world!",
@@ -164,6 +178,7 @@ fun BrainestPrimaryButtonPreview() {
                     contentDescription = null
                 )
             }
+
         )
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.brainest.presentation.navigation.OnboardingGraphRoutes
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
 import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
@@ -51,7 +52,7 @@ fun App(
                 startDestination = if (state.isLoggedIn) {
                     ChatGraphRoutes.Graph
                 } else {
-                    AuthGraphRoutes.Graph
+                    OnboardingGraphRoutes.Graph
                 }
             )
         }

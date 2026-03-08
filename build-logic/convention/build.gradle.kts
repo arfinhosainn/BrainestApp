@@ -40,35 +40,35 @@ gradlePlugin {
     plugins {
         register("androidApplication") {
             id = "com.scelio.brainest.convention.android.application"
-            implementationClass = "AndroidApplicationConventionPlugin"
+            implementationClass = "com.scelio.brainest.AndroidApplicationConventionPlugin"
         }
         register("androidComposeApplication") {
             id = "com.scelio.brainest.convention.android.application.compose"
-            implementationClass = "AndroidApplicationComposeConventionPlugin"
+            implementationClass = "com.scelio.brainest.AndroidApplicationComposeConventionPlugin"
         }
         register("cmpApplication") {
             id = "com.scelio.brainest.convention.cmp.application"
-            implementationClass = "CmpApplicationConventionPlugin"
+            implementationClass = "com.scelio.brainest.CmpApplicationConventionPlugin"
         }
         register("kmpLibrary") {
             id = "com.scelio.brainest.convention.kmp.library"
-            implementationClass = "KmpLibraryConventionPlugin"
+            implementationClass = "com.scelio.brainest.KmpLibraryConventionPlugin"
         }
         register("cmpLibrary") {
             id = "com.scelio.brainest.convention.cmp.library"
-            implementationClass = "CmpLibraryConventionPlugin"
+            implementationClass = "com.scelio.brainest.CmpLibraryConventionPlugin"
         }
         register("cmpFeature") {
             id = "com.scelio.brainest.convention.cmp.feature"
-            implementationClass = "CmpFeatureConventionPlugin"
+            implementationClass = "com.scelio.brainest.CmpFeatureConventionPlugin"
         }
         register("buildKonfig") {
             id = "com.scelio.brainest.convention.buildkonfig"
-            implementationClass = "BuildKonfigConventionPlugin"
+            implementationClass = "com.scelio.brainest.BuildKonfigConventionPlugin"
         }
         register("room") {
             id = "com.scelio.brainest.convention.room"
-            implementationClass = "RoomConventionPlugin"
+            implementationClass = "com.scelio.brainest.RoomConventionPlugin"
         }
     }
 }

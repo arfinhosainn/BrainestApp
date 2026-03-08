@@ -2,7 +2,7 @@ package com.scelio.brainest.designsystem
 
 import androidx.compose.ui.graphics.Color
 
-val BrainestPrimary = Color(0xFFEA5B29)           // Primary brand color (Orange)
+val BrainestPrimary = Color(0xFF2D2D3A)         // Primary brand color (Orange)
 val BrainestSecondary = Color(0xFFEFECE6)         // Secondary (Light beige)
 val BrainestTertiary = Color(0xFFF6F2EF)          // Tertiary (Very light beige)
 val BrainestQuaternary = Color(0xFFF9F6EF)        // Quaternary (Softest beige)

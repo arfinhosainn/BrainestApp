@@ -1,4 +1,4 @@
-package com.brainest.presentation.introduction
+package com.brainest.presentation.introduction.about_learner
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

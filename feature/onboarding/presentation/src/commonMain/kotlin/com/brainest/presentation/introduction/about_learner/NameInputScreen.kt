@@ -1,4 +1,4 @@
-package com.brainest.presentation.introduction
+package com.brainest.presentation.introduction.about_learner
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

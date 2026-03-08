@@ -1,4 +1,5 @@
-package com.brainest.presentation.introduction
+package com.brainest.presentation.introduction.goals
+
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -18,45 +19,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.brainest.presentation.introduction.about_learner.SelectionOptionData
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.brainest.presentation.introduction.components.SelectionOption
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-/**
- * Data class representing a single selectable option.
- *
- * @param id Unique identifier for database storage
- * @param label Display text for the option
- * @param icon Optional icon composable
- */
-data class SelectionOptionData(
+
+data class SelectGradeOption(
     val id: String,
     val label: String,
     val icon: @Composable (() -> Unit)? = null
 )
 
-/**
- * A selection screen that uses the OnboardingStepTemplate.
- * Displays a list of selectable options with single-selection behavior.
- *
- * @param title The main title text
- * @param options List of selectable options
- * @param selectedOptionId Currently selected option id (for controlled state)
- * @param onOptionSelected Callback when an option is selected, returns the selected option id
- * @param onContinueClicked Callback when continue button is clicked
- * @param currentStep Current step number (for progress indicator)
- * @param totalSteps Total number of steps (for progress indicator)
- * @param modifier Modifier for the screen
- * @param subtitle Optional subtitle text
- * @param stepLabel Optional label for step counter (e.g., "Dog's personality", "Step")
- * @param accentColor Color for selected state
- */
+
 @Composable
-fun SelectionScreen(
+fun GoalScreen(
     title: String,
-    options: List<SelectionOptionData>,
+    options: List<SelectGradeOption>,
     selectedOptionId: String?,
     onOptionSelected: (String) -> Unit,
     onContinueClicked: () -> Unit,
@@ -101,14 +82,14 @@ fun SelectionScreen(
     }
 }
 
-// Preview with sample data
+
 @Preview
 @Composable
 private fun SelectionScreenPreview() {
     val sampleOptions = listOf(
-        SelectionOptionData(
-            id = "younger_than_6_months",
-            label = "Younger than 6 months",
+        SelectGradeOption(
+            id = "improve_grades",
+            label = "Improve My Grades",
             icon = {
                 Box(
                     modifier = Modifier
@@ -117,9 +98,9 @@ private fun SelectionScreenPreview() {
                 )
             }
         ),
-        SelectionOptionData(
-            id = "6_to_12_months",
-            label = "6 to 12 months",
+        SelectGradeOption(
+            id = "prepare_exams",
+            label = "Prepare for Exams",
             icon = {
                 Box(
                     modifier = Modifier
@@ -128,9 +109,9 @@ private fun SelectionScreenPreview() {
                 )
             }
         ),
-        SelectionOptionData(
-            id = "1_to_2_years",
-            label = "1 to 2 years",
+        SelectGradeOption(
+            id = "learn_new_skills",
+            label = "Learn New Skills",
             icon = {
                 Box(
                     modifier = Modifier
@@ -139,9 +120,9 @@ private fun SelectionScreenPreview() {
                 )
             }
         ),
-        SelectionOptionData(
-            id = "2_to_7_years",
-            label = "2 to 7 years",
+        SelectGradeOption(
+            id = "stay_consistent",
+            label = "Stay Consistent Daily",
             icon = {
                 Box(
                     modifier = Modifier
@@ -150,9 +131,9 @@ private fun SelectionScreenPreview() {
                 )
             }
         ),
-        SelectionOptionData(
-            id = "over_7_years",
-            label = "Over 7 years",
+        SelectGradeOption(
+            id = "get_ahead",
+            label = "Get Ahead of Class",
             icon = {
                 Box(
                     modifier = Modifier
@@ -166,10 +147,11 @@ private fun SelectionScreenPreview() {
     BrainestTheme {
         var selectedId by remember { mutableStateOf<String?>(null) }
 
-        SelectionScreen(
-            title = "Choose your dog's age:",
-            stepLabel = "Dog's personality",
-            currentStep = 2,
+        GoalScreen(
+            title = "What's your main goal?",
+            subtitle = "We'll build a plan that gets you there",
+            stepLabel = "Your Profile",
+            currentStep = 3,
             totalSteps = 5,
             options = sampleOptions,
             onOptionSelected = { selectedId = it },
@@ -183,32 +165,42 @@ private fun SelectionScreenPreview() {
 @Composable
 private fun SelectionScreenWithSelectionPreview() {
     val sampleOptions = listOf(
-        SelectionOptionData(
-            id = "option_1",
-            label = "Option 1",
+        SelectGradeOption(
+            id = "improve_grades",
+            label = "Improve My Grades",
             icon = null
         ),
-        SelectionOptionData(
-            id = "option_2",
-            label = "Option 2",
+        SelectGradeOption(
+            id = "prepare_exams",
+            label = "Prepare for Exams",
             icon = null
         ),
-        SelectionOptionData(
-            id = "option_3",
-            label = "Option 3",
+        SelectGradeOption(
+            id = "learn_new_skills",
+            label = "Learn New Skills",
+            icon = null
+        ),
+        SelectGradeOption(
+            id = "stay_consistent",
+            label = "Stay Consistent Daily",
+            icon = null
+        ),
+        SelectGradeOption(
+            id = "get_ahead",
+            label = "Get Ahead of Class",
             icon = null
         )
     )
 
     BrainestTheme {
-        var selectedId by remember { mutableStateOf<String?>("option_2") }
+        var selectedId by remember { mutableStateOf<String?>("prepare_exams") }
 
-        SelectionScreen(
-            title = "Select an option:",
-            subtitle = "Choose the best option for you",
-            stepLabel = "Step",
-            currentStep = 1,
-            totalSteps = 3,
+        GoalScreen(
+            title = "What's your main goal?",
+            subtitle = "We'll build a plan that gets you there",
+            stepLabel = "Your Profile",
+            currentStep = 3,
+            totalSteps = 5,
             options = sampleOptions,
             onOptionSelected = { selectedId = it },
             onContinueClicked = { /* Navigate next */ },

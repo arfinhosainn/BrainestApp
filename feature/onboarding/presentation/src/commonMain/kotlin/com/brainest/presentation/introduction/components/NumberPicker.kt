@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
-import com.scelio.brainest.designsystem.Nunito
+import com.scelio.brainest.designsystem.BricolageGrotesq
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -33,12 +33,12 @@ fun NumberPicker(
     itemHeight: Int = 80,
     visibleItemsCount: Int = 3,
     selectedTextStyle: TextStyle = TextStyle(
-        fontFamily = Nunito,
+        fontFamily = BricolageGrotesq,
         fontWeight = FontWeight.ExtraBold,
         fontSize = 64.sp
     ),
     unselectedTextStyle: TextStyle = TextStyle(
-        fontFamily = Nunito,
+        fontFamily = BricolageGrotesq,
         fontWeight = FontWeight.SemiBold,
         fontSize = 40.sp
     ),

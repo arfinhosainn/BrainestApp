@@ -17,6 +17,9 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
                 implementation(libs.jetbrains.compose.navigation)
 
+                implementation(libs.compottie)
+                implementation(libs.compottie.resources)
+
 
 
 

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
-import com.scelio.brainest.designsystem.Nunito
+import com.scelio.brainest.designsystem.BricolageGrotesq
 import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun NameInputScreen(
@@ -75,7 +75,7 @@ fun NameInputScreen(
                     onDone = { if (canContinue) onContinueClicked() }
                 ),
                 textStyle = TextStyle(
-                    fontFamily = Nunito,
+                    fontFamily = BricolageGrotesq,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 28.sp,
                     color = Color(0xFF2C201F)
@@ -91,7 +91,7 @@ fun NameInputScreen(
                                 Text(
                                     text = placeholder,
                                     style = TextStyle(
-                                        fontFamily = Nunito,
+                                        fontFamily = BricolageGrotesq,
                                         fontWeight = FontWeight.ExtraBold,
                                         fontSize = 28.sp,
                                         color = Color(0xFFBDBDBD) // Light gray for placeholder

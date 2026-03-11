@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
-import com.scelio.brainest.designsystem.Nunito
+import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
@@ -77,7 +77,7 @@ fun OnboardingStepLayout(
             Text(
                 text = title,
                 style = TextStyle(
-                    fontFamily = Nunito,
+                    fontFamily = BricolageGrotesq,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.ExtraBold,
                     lineHeight = 36.sp,
@@ -94,7 +94,7 @@ fun OnboardingStepLayout(
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        fontFamily = Nunito,
+                        fontFamily = BricolageGrotesq,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     ),
                     textAlign = TextAlign.Center,

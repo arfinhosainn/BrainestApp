@@ -49,6 +49,8 @@ kermit = "2.0.6"
 supabase = "3.2.6"
 composeAuth = "3.2.6"
 katexCore = "0.3.2"
+compottie = "2.1.0"
+
 
 
 
@@ -146,6 +148,11 @@ realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt", version.r
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil-network" }
 
+# Compotie
+compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+
+
 #Permission handling
 moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
@@ -172,6 +179,9 @@ jetbrains-compose-material-icons-core = { module = "org.jetbrains.compose.materi
 jetbrains-compose-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icons" }
 jetbrains-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-jetbrains" }
 jetbrains-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-jetbrains" }
+
+
+
 
 jetbrains-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "compose-lifecycle" }
 jetbrains-lifecycle-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "compose-lifecycle" }

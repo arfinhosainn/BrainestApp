@@ -1,4 +1,4 @@
-package com.brainest.presentation.introduction.challenges
+package com.brainest.presentation.introduction.personalization
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background

@@ -2,6 +2,7 @@ package com.scellio.brainest.di
 
 import com.scelio.brainest.data.di.chatDataModule
 import com.scelio.brainest.data.di.coreDataModule
+import com.brainest.presentation.di.onboardingPresentationModule
 import com.scelio.brainest.presentation.di.authPresentationModule
 import com.scelio.brainest.presentation.di.chatPresentationModule
 import com.scelio.brainest.presentation.di.corePresentationModule
@@ -16,6 +17,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             authPresentationModule,
             corePresentationModule,
             chatPresentationModule,
+            onboardingPresentationModule,
             appModule,
             chatDataModule
 

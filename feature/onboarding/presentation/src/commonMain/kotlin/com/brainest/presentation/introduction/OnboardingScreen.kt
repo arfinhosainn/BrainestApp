@@ -90,14 +90,14 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
                     )
 
                     Spacer(Modifier.height(90.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(
                             text = currentStep.title,
                             style = Typography.titleLarge,
                             fontWeight = FontWeight.ExtraBold,
-                            fontSize = 25.sp,
+                            fontSize = 28.sp,
                             lineHeight = 50.sp,
-                            textAlign = TextAlign.Start,
+                            textAlign = TextAlign.Center,
                             color = Color(0xFF2C201F)
 
                         )
@@ -110,7 +110,7 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
                             style = Typography.bodySmall,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
-                            textAlign = TextAlign.Start
+                            textAlign = TextAlign.Center
                         )
 
                     }

@@ -3,6 +3,7 @@ package com.scellio.brainest.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.brainest.presentation.navigation.OnboardingGraphRoutes
 import com.brainest.presentation.navigation.onboardingGraph
 import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
 import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
@@ -33,7 +34,14 @@ fun NavigationRoot(
             navController = navController
         )
         onboardingGraph(
-            navController = navController
+            navController = navController,
+            onFinishOnboarding = {
+                navController.navigate(AuthGraphRoutes.Graph) {
+                    popUpTo(OnboardingGraphRoutes.Graph) {
+                        inclusive = true
+                    }
+                }
+            }
         )
     }
 }

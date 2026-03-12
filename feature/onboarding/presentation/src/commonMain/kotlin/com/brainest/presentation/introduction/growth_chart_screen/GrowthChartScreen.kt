@@ -60,7 +60,7 @@ fun GrowthChartScreen(
             .fillMaxWidth()
             .background(Color(0xFFF5E9E1))
             .padding(horizontal = 24.dp)
-            .padding(top = 48.dp, bottom = 36.dp),
+            .padding(top = 60.dp, bottom = 36.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
 

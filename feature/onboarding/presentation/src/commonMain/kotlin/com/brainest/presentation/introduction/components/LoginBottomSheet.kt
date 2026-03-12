@@ -135,3 +135,12 @@ fun PreviewLoginSheet() {
 
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewDarkLoginSheet() {
+    BrainestTheme(darkTheme = true) {
+        LoginBottomSheet(onDismiss = {})
+
+    }
+}

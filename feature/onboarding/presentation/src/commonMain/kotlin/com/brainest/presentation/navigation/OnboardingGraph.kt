@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.brainest.presentation.introduction.OnboardingScreen
+import com.brainest.presentation.introduction.IntroductionScreen
 import com.brainest.presentation.introduction.UserReviewScreen
 import com.brainest.presentation.introduction.WelcomeScreen
 import com.brainest.presentation.introduction.about_learner.GradeScreen
@@ -64,7 +64,7 @@ fun NavGraphBuilder.onboardingGraph(
                 )
             }
         ) {
-            OnboardingScreen(
+            IntroductionScreen(
                 onFinishOnboarding = {
                     navController.navigate(OnboardingGraphRoutes.Name)
                 }
@@ -139,7 +139,7 @@ fun NavGraphBuilder.onboardingGraph(
                 options = goalOptions,
                 selectedOptionId = state.goalId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.GoalSelected(it)) },
-                onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Challenges) }
+                onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Growth) }
             )
         }
 
@@ -227,13 +227,13 @@ fun NavGraphBuilder.onboardingGraph(
                 options = languageOptions,
                 selectedOptionId = state.languageId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.LanguageSelected(it)) },
-                onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Growth) }
+                onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Review) }
             )
         }
 
         composable<OnboardingGraphRoutes.Growth> {
             GrowthChartScreen(
-                onContinueClick = { navController.navigate(OnboardingGraphRoutes.Review) }
+                onContinueClick = { navController.navigate(OnboardingGraphRoutes.Challenges) }
             )
         }
 

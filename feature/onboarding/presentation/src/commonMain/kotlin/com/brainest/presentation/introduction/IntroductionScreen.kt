@@ -1,8 +1,6 @@
 package com.brainest.presentation.introduction
 
 
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,41 +40,28 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-val AnticipateEasing = Easing { fraction ->
-    val tension = 2.0f // Increase this number for a more exaggerated pull-back
-    fraction * fraction * ((tension + 1) * fraction - tension)
-}
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
+fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { onboardingPages.size })
     val scope = rememberCoroutineScope()
-    val easingToUse = AnticipateEasing // Built-in Compose easing
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5E9E1))
     ) {
-//        Image(
-//            imageVector = vectorResource(Res.drawable.background), // Or your general background
-//            contentDescription = null,
-//            modifier = Modifier.fillMaxSize(),
-//            contentScale = ContentScale.Crop
-//        )
-
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
         ) {
-
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
                 val currentStep = onboardingPages[page]
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -83,27 +69,26 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Animating Image
                     Image(
                         imageVector = vectorResource(currentStep.imageRes),
                         contentDescription = "",
                     )
-
                     Spacer(Modifier.height(90.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         Text(
                             text = currentStep.title,
                             style = Typography.titleLarge,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 28.sp,
-                            lineHeight = 50.sp,
+                            lineHeight = 28.sp,
                             textAlign = TextAlign.Center,
                             color = Color(0xFF2C201F)
-
                         )
-
                     }
-                    Spacer(modifier =Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Text(
                             text = currentStep.description,
@@ -112,9 +97,7 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center
                         )
-
                     }
-
                 }
             }
 
@@ -126,7 +109,7 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 28.dp, vertical = 50.dp),
+                        .padding(horizontal = 28.dp, vertical = 28.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(35.dp))
@@ -136,25 +119,8 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
                             if (pagerState.currentPage < onboardingPages.lastIndex) {
                                 scope.launch {
 
-                                    val easingToUse = if (pagerState.currentPage == 0) {
-                                        Easing { fraction ->
-                                            val tension = 0.5f
-                                            val t = fraction - 0.5f
-                                            t * t * ((tension + 1) * t + tension) + 1.0f
-                                        }
-                                    } else {
-                                        Easing { fraction ->
-                                            val tension = 2.0f
-                                            fraction * fraction * ((tension + 1) * fraction - tension)
-                                        }
-                                    }
-
                                     pagerState.animateScrollToPage(
-                                        page = pagerState.currentPage + 1,
-                                        animationSpec = tween(
-                                            durationMillis = 1000,
-                                            easing = easingToUse
-                                        )
+                                        page = pagerState.currentPage + 1
                                     )
                                 }
                             } else {
@@ -186,6 +152,6 @@ fun OnboardingScreen(onFinishOnboarding: () -> Unit) {
 @Composable
 fun PreviewOnboardingScreen() {
     BrainestTheme {
-        OnboardingScreen(onFinishOnboarding = {})
+        IntroductionScreen(onFinishOnboarding = {})
     }
 }

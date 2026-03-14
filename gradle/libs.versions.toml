@@ -156,6 +156,10 @@ compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "comp
 #Permission handling
 moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
+moko-permissions-notifications = { module = "dev.icerock.moko:permissions-notifications", version.ref = "moko" }
+moko-permissions-Camera = { module = "dev.icerock.moko:permissions-camera", version.ref = "moko" }
+moko-permissions-Microphone = { module = "dev.icerock.moko:permissions-microphone", version.ref = "moko" }
+
 
 
 android-desugarJdkLibs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }

@@ -44,4 +44,7 @@ sealed interface OnboardingGraphRoutes {
 
     @Serializable
     data object Review : OnboardingGraphRoutes
+
+    @Serializable
+    data object Permissions : OnboardingGraphRoutes
 }

@@ -21,13 +21,16 @@ kotlin {
                 implementation(libs.compottie)
                 implementation(libs.compottie.resources)
 
-
-
-
-
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)
                 implementation(projects.feature.chat.domain)
+
+
+
+                api(libs.moko.permissions)
+                api(libs.moko.permissions.compose)
+                implementation(libs.jetbrains.lifecycle.viewmodel)
+                implementation(libs.jetbrains.lifecycle.compose)
             }
         }
 

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import brainest.feature.onboarding.presentation.generated.resources.Res
 import brainest.feature.onboarding.presentation.generated.resources.getstarted
 import com.brainest.presentation.introduction.components.LoginBottomSheet
+import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -127,5 +128,8 @@ fun WelcomeScreen(
 @Preview
 @Composable
 fun WelcomeScreenPreview() {
-    WelcomeScreen()
+    BrainestTheme (darkTheme = true){
+        WelcomeScreen()
+
+    }
 }

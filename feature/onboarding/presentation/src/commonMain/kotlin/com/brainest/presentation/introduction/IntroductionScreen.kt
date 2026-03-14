@@ -151,7 +151,7 @@ fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
 @Preview
 @Composable
 fun PreviewOnboardingScreen() {
-    BrainestTheme {
+    BrainestTheme(darkTheme = true) {
         IntroductionScreen(onFinishOnboarding = {})
     }
 }

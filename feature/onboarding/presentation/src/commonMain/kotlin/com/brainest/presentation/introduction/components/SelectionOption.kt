@@ -35,20 +35,6 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-/**
- * A selectable option component that displays an icon, label, and selection indicator.
- *
- * @param label The text label to display
- * @param isSelected Whether this option is currently selected
- * @param onClick Callback when the option is clicked
- * @param modifier Modifier for the component
- * @param icon Optional composable to display as the leading icon
- * @param selectedColor The color to use when selected (default: success green)
- * @param unselectedBorderColor The border color when unselected
- * @param backgroundColor The background color when selected
- * @param textStyle The text style for the label
- * @param selectionId A unique identifier for this option (for database collection)
- */
 @Composable
 fun SelectionOption(
     label: String,
@@ -58,7 +44,7 @@ fun SelectionOption(
     icon: @Composable (() -> Unit)? = null,
     selectedColor: Color = BrainestSuccess,
     unselectedBorderColor: Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    backgroundColor: Color = Color.White,
     selectedBackgroundColor: Color = Color.White,
     textStyle: TextStyle = Typography.bodyLarge,
     selectionId: String = label // Default to label, but can be customized for database storage
@@ -87,7 +73,7 @@ fun SelectionOption(
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        color = animatedBackgroundColor,
+        color = Color.White,
         border = BorderStroke(borderWidth, animatedBorderColor),
         shadowElevation = if (isSelected) 4.dp else 0.dp
     ) {
@@ -107,8 +93,9 @@ fun SelectionOption(
             Text(
                 text = label,
                 style = textStyle,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
+                color = Color.Black,
+                modifier = Modifier.weight(1f),
+
             )
 
             // Selection Indicator

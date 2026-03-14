@@ -126,8 +126,8 @@ private fun PreviewSelectSubjectScreen() {
         MultiSelectOptionData("psychology", "Psychology")
     )
 
-    BrainestTheme {
-        var selectedIds by remember { mutableStateOf(setOf("come")) }
+    BrainestTheme(darkTheme = true) {
+        var selectedIds by remember { mutableStateOf(setOf("biology")) }
 
         SelectSubjectScreen(
             title = "What subjects are you studying?",

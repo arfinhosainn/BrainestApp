@@ -244,7 +244,7 @@ private fun LanguageSelectionScreenWithSelectionPreview() {
         LanguageData(id = "malay", label = "🇲🇾  Malay", icon = null)
     )
 
-    BrainestTheme {
+    BrainestTheme (darkTheme = true){
         var selectedId by remember { mutableStateOf<String?>("english") }
 
         LanguageSelectionScreen(

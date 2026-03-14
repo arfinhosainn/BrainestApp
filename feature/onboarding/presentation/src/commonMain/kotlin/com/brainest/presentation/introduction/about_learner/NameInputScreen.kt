@@ -123,7 +123,7 @@ fun NameInputScreen(
 @Preview
 @Composable
 private fun NameInputEmptyScreenPreview() {
-    BrainestTheme {
+    BrainestTheme(darkTheme = true) {
         var name by remember { mutableStateOf("") }
 
         NameInputScreen(

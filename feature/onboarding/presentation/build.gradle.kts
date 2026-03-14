@@ -22,6 +22,7 @@ kotlin {
                 implementation(libs.compottie.resources)
 
                 implementation(projects.core.domain)
+                implementation(projects.core.presentation)
                 implementation(projects.core.designsystem)
                 implementation(projects.feature.chat.domain)
 

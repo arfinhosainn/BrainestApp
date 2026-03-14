@@ -181,7 +181,7 @@ fun GrowthChartScreen(
 @Preview
 @Composable
 fun PreviewGrowthChartScreen() {
-    BrainestTheme {
+    BrainestTheme(darkTheme = true) {
         GrowthChartScreen()
     }
 }

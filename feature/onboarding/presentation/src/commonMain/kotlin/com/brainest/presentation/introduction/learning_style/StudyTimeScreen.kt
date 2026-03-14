@@ -168,7 +168,7 @@ private fun StudyTimeScreenWithSelectionPreview() {
         StudyTimeData(id = "night", label = "Night (9PM - 12AM)", icon = null)
     )
 
-    BrainestTheme {
+    BrainestTheme(darkTheme = true) {
         var selectedId by remember { mutableStateOf<String?>("evening") }
 
         StudyTimeScreen(

@@ -97,7 +97,7 @@ fun OnboardingStepLayout(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         fontFamily = BricolageGrotesq,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        color = Color(0xFF2C201F)
                     ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()

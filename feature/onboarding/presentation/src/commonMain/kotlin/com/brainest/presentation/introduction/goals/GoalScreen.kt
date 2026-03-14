@@ -144,7 +144,7 @@ private fun SelectionScreenPreview() {
         )
     )
 
-    BrainestTheme {
+    BrainestTheme(darkTheme = true) {
         var selectedId by remember { mutableStateOf<String?>(null) }
 
         GoalScreen(

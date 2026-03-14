@@ -73,7 +73,7 @@ private fun StudyHoursScreenPreview() {
 @Preview
 @Composable
 private fun StudyHoursScreenWithDifferentValuePreview() {
-    BrainestTheme {
+    BrainestTheme (darkTheme = true){
         var hours by remember { mutableIntStateOf(5) }
 
         StudyHoursScreen(

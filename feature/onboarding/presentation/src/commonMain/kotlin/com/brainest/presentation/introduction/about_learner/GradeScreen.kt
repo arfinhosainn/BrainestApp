@@ -82,83 +82,6 @@ fun GradeScreen(
 
 
 
-@Preview
-@Composable
-private fun SelectionScreenPreview() {
-    val sampleOptions = listOf(
-        SelectionOptionData(
-            id = "elementary",
-            label = "Elementary (Grade 1-5)",
-            icon = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.LightGray, CircleShape)
-                )
-            }
-        ),
-        SelectionOptionData(
-            id = "middle_school",
-            label = "Middle School (Grade 6-8)",
-            icon = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.LightGray, CircleShape)
-                )
-            }
-        ),
-        SelectionOptionData(
-            id = "high_school",
-            label = "High School (Grade 9-12)",
-            icon = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.LightGray, CircleShape)
-                )
-            }
-        ),
-        SelectionOptionData(
-            id = "undergraduate",
-            label = "Undergraduate",
-            icon = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.LightGray, CircleShape)
-                )
-            }
-        ),
-        SelectionOptionData(
-            id = "postgraduate",
-            label = "Postgraduate",
-            icon = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.LightGray, CircleShape)
-                )
-            }
-        )
-    )
-
-    BrainestTheme {
-        var selectedId by remember { mutableStateOf<String?>(null) }
-
-        GradeScreen(
-            title = "What's your grade level?",
-            subtitle = "We'll tailor your learning path accordingly",
-            stepLabel = "Your Profile",
-            currentStep = 2,
-            totalSteps = 5,
-            options = sampleOptions,
-            onOptionSelected = { selectedId = it },
-            onContinueClicked = { /* Navigate next */ },
-            selectedOptionId = selectedId
-        )
-    }
-}
 
 @Preview
 @Composable
@@ -207,3 +130,53 @@ private fun SelectionScreenWithSelectionPreview() {
         )
     }
 }
+
+
+@Preview
+@Composable
+private fun SelectionScreenWithSelectionPreviewDark() {
+    val sampleOptions = listOf(
+        SelectionOptionData(
+            id = "elementary",
+            label = "Elementary (Grade 1-5)",
+            icon = null
+        ),
+        SelectionOptionData(
+            id = "middle_school",
+            label = "Middle School (Grade 6-8)",
+            icon = null
+        ),
+        SelectionOptionData(
+            id = "high_school",
+            label = "High School (Grade 9-12)",
+            icon = null
+        ),
+        SelectionOptionData(
+            id = "undergraduate",
+            label = "Undergraduate",
+            icon = null
+        ),
+        SelectionOptionData(
+            id = "postgraduate",
+            label = "Postgraduate",
+            icon = null
+        )
+    )
+
+    BrainestTheme(darkTheme = true) {
+        var selectedId by remember { mutableStateOf<String?>("high_school") }
+
+        GradeScreen(
+            title = "What's your grade level?",
+            subtitle = "We'll tailor your learning path accordingly",
+            stepLabel = "Your Profile",
+            currentStep = 2,
+            totalSteps = 5,
+            options = sampleOptions,
+            onOptionSelected = { selectedId = it },
+            onContinueClicked = { /* Navigate next */ },
+            selectedOptionId = selectedId
+        )
+    }
+}
+

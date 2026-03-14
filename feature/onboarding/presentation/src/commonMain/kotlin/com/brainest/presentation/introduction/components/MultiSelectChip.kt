@@ -59,7 +59,7 @@ fun MultiSelectChip(
     )
 
     val animatedContentColor by animateColorAsState(
-        targetValue = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurface,
+        targetValue = if (isSelected) Color.Black else Color.Black,
         animationSpec = tween(durationMillis = 200),
         label = "multiselect_content_animation"
     )

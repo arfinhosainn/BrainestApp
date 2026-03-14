@@ -3,14 +3,29 @@ package com.brainest.presentation.navigation
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.arabic
+import brainest.feature.onboarding.presentation.generated.resources.chinese
+import brainest.feature.onboarding.presentation.generated.resources.english
+import brainest.feature.onboarding.presentation.generated.resources.french
+import brainest.feature.onboarding.presentation.generated.resources.german
+import brainest.feature.onboarding.presentation.generated.resources.spanish
 import com.brainest.presentation.introduction.IntroductionScreen
 import com.brainest.presentation.introduction.UserReviewScreen
 import com.brainest.presentation.introduction.WelcomeScreen
@@ -33,6 +48,7 @@ import com.brainest.presentation.onboarding.OnboardingAction
 import com.brainest.presentation.onboarding.OnboardingFlowSteps
 import com.brainest.presentation.onboarding.OnboardingStepId
 import com.brainest.presentation.onboarding.OnboardingViewModel
+import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 
 fun NavGraphBuilder.onboardingGraph(
@@ -315,10 +331,100 @@ private val studyTimeOptions = listOf(
 )
 
 private val languageOptions = listOf(
-    LanguageData(id = "english", label = "English"),
-    LanguageData(id = "arabic", label = "Arabic"),
-    LanguageData(id = "french", label = "French"),
-    LanguageData(id = "spanish", label = "Spanish"),
-    LanguageData(id = "german", label = "German"),
-    LanguageData(id = "chinese", label = "Chinese")
+    LanguageData(
+        id = "english",
+        label = "English",
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.LightGray, CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.english),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        }),
+    LanguageData(
+        id = "arabic",
+        label = "Arabic",
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.LightGray, CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.arabic),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        }),
+    LanguageData(
+        id = "french",
+        label = "French",
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.LightGray, CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.french),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        }),
+    LanguageData(
+        id = "spanish",
+        label = "Spanish",
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.LightGray, CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.spanish),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        }),
+    LanguageData(
+        id = "german",
+        label = "German",
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.LightGray, CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.german),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        }),
+    LanguageData(
+        id = "chinese",
+        label = "Chinese",
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.LightGray, CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.chinese),
+                    contentDescription = "",
+                    tint = Color.Unspecified
+                )
+            }
+        })
 )

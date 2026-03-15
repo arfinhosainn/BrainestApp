@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.onboarding.OnboardingSyncer
 import com.scelio.brainest.domain.util.onFailure
 import com.scelio.brainest.domain.util.onSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class EmailVerificationViewModel(
     private val authService: AuthService,
+    private val onboardingSyncer: OnboardingSyncer,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -50,6 +52,10 @@ class EmailVerificationViewModel(
                 .verifyEmail(deepLinkUrl)
                 .onSuccess {
                     _state.update { it.copy(isVerifying = false, isVerified = true) }
+                    val userId = authService.currentUserId()
+                    if (userId != null) {
+                        onboardingSyncer.sync(userId)
+                    }
                 }
                 .onFailure { _ ->
                     _state.update { it.copy(isVerifying = false, isVerified = false) }

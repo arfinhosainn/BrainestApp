@@ -15,6 +15,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
 
                 implementation(projects.feature.auth.domain)
+                implementation(projects.feature.onboarding.domain)
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)
                 implementation(projects.core.presentation)

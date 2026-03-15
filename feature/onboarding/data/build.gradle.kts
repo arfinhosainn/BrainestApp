@@ -19,6 +19,8 @@ kotlin {
                 implementation(projects.feature.onboarding.domain)
                 implementation(projects.feature.onboarding.database)
                 implementation(libs.koin.core)
+                implementation(libs.supabase.postgrest.kt)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 

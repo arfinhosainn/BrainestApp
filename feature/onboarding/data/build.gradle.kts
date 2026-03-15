@@ -16,13 +16,15 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
 
                 implementation(projects.core.domain)
-                implementation(projects.feature.chat.domain)
-                implementation(projects.feature.chat.database)
+                implementation(projects.feature.onboarding.domain)
+                implementation(projects.feature.onboarding.database)
+                implementation(libs.koin.core)
             }
         }
 
         androidMain {
             dependencies {
+                implementation(libs.koin.android)
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.

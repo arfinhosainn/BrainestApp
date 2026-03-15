@@ -12,6 +12,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+
+                api(libs.datastore.preferences)
+                api(libs.datastore)
                 // Add KMP dependencies here
             }
         }

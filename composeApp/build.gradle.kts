@@ -26,6 +26,7 @@ kotlin {
 
             implementation(projects.feature.auth.domain)
             implementation(projects.feature.auth.presentation)
+            implementation(projects.feature.onboarding.data)
             implementation(projects.feature.onboarding.presentation)
 
             implementation(projects.feature.chat.data)

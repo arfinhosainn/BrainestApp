@@ -2,6 +2,7 @@ package com.scellio.brainest
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.scelio.brainest.domain.onboarding.OnboardingSyncer
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -19,7 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val supabaseClient: SupabaseClient
+    private val supabaseClient: SupabaseClient,
+    private val onboardingSyncer: OnboardingSyncer
 ) : ViewModel() {
 
     private val eventChannel = Channel<MainEvent>()
@@ -75,6 +77,12 @@ class MainViewModel(
                                 isCheckingAuth = false,
                                 isLoggedIn = true
                             )
+                        }
+                        viewModelScope.launch(Dispatchers.IO) {
+                            val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id
+                            if (userId != null) {
+                                onboardingSyncer.sync(userId)
+                            }
                         }
                     }
 

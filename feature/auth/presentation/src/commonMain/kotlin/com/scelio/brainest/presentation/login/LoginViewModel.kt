@@ -7,6 +7,7 @@ import brainest.feature.auth.presentation.generated.resources.Res
 import brainest.feature.auth.presentation.generated.resources.error_email_not_verified
 import brainest.feature.auth.presentation.generated.resources.error_invalid_credentials
 import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.onboarding.OnboardingSyncer
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.onFailure
 import com.scelio.brainest.domain.util.onSuccess
@@ -28,7 +29,8 @@ import kotlinx.coroutines.launch
 
 
 class LoginViewModel(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val onboardingSyncer: OnboardingSyncer
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -122,6 +124,7 @@ class LoginViewModel(
                             isLoggingIn = false
                         )
                     }
+                    onboardingSyncer.sync(authInfo.user.id)
                     eventChannel.send(LoginEvent.Success)
                 }
                 .onFailure { error ->

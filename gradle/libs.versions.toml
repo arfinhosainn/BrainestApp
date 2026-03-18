@@ -2,7 +2,7 @@
 # Build tools
 agp = "8.13.1"
 composeBom = "2025.11.01"
-kotlin = "2.2.0"
+kotlin = "2.3.0"
 ksp = "2.2.20-2.0.2"
 
 androidDesugarJdkLibs = "2.1.5"

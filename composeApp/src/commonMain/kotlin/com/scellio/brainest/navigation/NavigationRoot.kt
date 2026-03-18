@@ -1,6 +1,7 @@
 package com.scellio.brainest.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.brainest.presentation.navigation.OnboardingGraphRoutes
@@ -14,11 +15,13 @@ import com.scelio.brainest.presentation.navigation.chatGraph
 @Composable
 fun NavigationRoot(
     navController: NavHostController,
-    startDestination: Any
+    startDestination: Any,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
         authGraph(
             navController = navController,

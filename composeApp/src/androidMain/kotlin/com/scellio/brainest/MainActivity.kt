@@ -14,6 +14,10 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         setContent {
+
+
+
+
             App()
         }
     }

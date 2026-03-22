@@ -41,12 +41,12 @@ import com.scelio.brainest.designsystem.BricolageGrotesq
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-private val ColorAccentBar = Color(0xFFC0392B)
-private val ColorBrandBrown = Color(0xFF9A4611)
+private val ColorAccentBar = Color(0xFF33CA67)
+private val ColorBrandBrown = Color(0xFF33CA67)
 private val ColorTextDark = Color(0xFF1A1A1A)
-private val ColorTextMuted = Color(0xFF9E8577)
+private val ColorTextMuted = Color(0xFFD8F5E2)
 private val ColorBeigeBg = Color(0xFFF2EBE1)
-private val ColorIconBg = Color(0xFFEDE3D8)
+private val ColorIconBg = Color(0xFFD8F5E2)
 private val ColorCardBg = Color(0xFFFBF8F5)
 private val ColorDivider = Color(0xFFEDE3D8)
 
@@ -68,7 +68,7 @@ fun FlashcardItem(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = ColorCardBg),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -96,7 +96,7 @@ fun FlashcardItem(
                     Column {
                         Text(
                             text = category.uppercase(),
-                            color = ColorBrandBrown,
+                            color = Color.Black,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 2.5.sp
@@ -123,7 +123,7 @@ fun FlashcardItem(
                         Icon(
                             imageVector = vectorResource(Res.drawable.ic_flashcard),
                             contentDescription = null,
-                            tint = ColorAccentBar,
+                            tint = Color.Black,
                             modifier = Modifier
                                 .size(26.dp)
                         )
@@ -187,7 +187,7 @@ fun FlashcardItem(
                             text = "Last played",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
-                            color = ColorTextMuted
+                            color = Color.Black
                         )
                         Text(
                             text = lastPlayed,

@@ -101,6 +101,8 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 jetbrains-compose-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "compose-multiplatform" }
 jetbrains-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 
+
+
 # Koin
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -214,6 +216,10 @@ convention-cmp-feature = { id = "com.scelio.brainest.convention.cmp.feature", ve
 convention-buildkonfig = { id = "com.scelio.brainest.convention.buildkonfig", version = "unspecified" }
 convention-room = { id = "com.scelio.brainest.convention.room", version = "unspecified" }
 
+
+
+#hotswan
+hotswan-compiler = { id = "com.github.skydoves.compose.hotswan.compiler", version = "1.0.12" }
 
 
 

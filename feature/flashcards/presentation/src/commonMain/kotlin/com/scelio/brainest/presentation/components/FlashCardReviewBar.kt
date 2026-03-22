@@ -1,11 +1,9 @@
 package com.scelio.brainest.presentation.components
 
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -40,51 +37,6 @@ private val ColorDontKnowAccent    = Color(0xFF9E9E9E)   // grey number
 private val ColorKnowButton        = Color(0xFF66E060)   // bright green CTA
 private val ColorDontKnowButton    = Color(0xFFE8E8E8)   // soft grey CTA
 
-// ---------------------------------------------------------------------------
-// Count tile
-// ---------------------------------------------------------------------------
-
-
-@Composable
-fun ReviewCountTile(
-    count:           Int,
-    label:           String,
-    backgroundColor: Color,
-    countColor:      Color,
-    labelColor:      Color,
-    modifier:        Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(vertical = 16.dp, horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text       = count.toString(),
-            fontSize   = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color      = countColor
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text       = label,
-            fontSize   = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.sp,
-            color      = labelColor
-        )
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Full review action bar  (count tiles + action buttons)
-// ---------------------------------------------------------------------------
-
 
 @Composable
 fun FlashCardReviewBar(
@@ -100,29 +52,6 @@ fun FlashCardReviewBar(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-        // ── Count tiles row ───────────────────────────────────────────────
-        Row(
-            modifier              = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ReviewCountTile(
-                count           = dontKnowCount,
-                label           = "DON'T KNOW",
-                backgroundColor = ColorDontKnowBackground,
-                countColor      = ColorDontKnowAccent,
-                labelColor      = ColorDontKnowAccent,
-                modifier        = Modifier.weight(1f)
-            )
-            ReviewCountTile(
-                count           = knowCount,
-                label           = "KNOW",
-                backgroundColor = ColorKnowBackground,
-                countColor      = ColorKnowAccent,
-                labelColor      = ColorKnowAccent,
-                modifier        = Modifier.weight(1f)
-            )
-        }
 
         // ── Action buttons row ────────────────────────────────────────────
         Row(

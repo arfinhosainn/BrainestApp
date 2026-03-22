@@ -12,6 +12,7 @@ import com.brainest.presentation.navigation.OnboardingGraphRoutes
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
 import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
+import com.scelio.brainest.presentation.navigation.FlashcardsGraphRoutes
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import com.scellio.brainest.navigation.BrainestBottomNavigationBar
 import com.scellio.brainest.navigation.DeepLinkListener
@@ -53,7 +54,19 @@ fun App(
             Scaffold(
                 bottomBar = {
                     if (state.isLoggedIn) {
-                        BrainestBottomNavigationBar()
+                        BrainestBottomNavigationBar(
+                            onItemSelected = { index ->
+                                when (index) {
+                                    1 -> navController.navigate(ChatGraphRoutes.Graph) {
+                                        launchSingleTop = true
+                                    }
+                                    3 -> navController.navigate(FlashcardsGraphRoutes.Graph) {
+                                        launchSingleTop = true
+                                    }
+                                    else -> Unit
+                                }
+                            }
+                        )
                     }
                 }
             ) { innerPadding ->

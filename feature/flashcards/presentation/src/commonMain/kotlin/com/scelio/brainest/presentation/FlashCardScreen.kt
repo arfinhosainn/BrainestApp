@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Refresh
@@ -19,8 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,6 +38,7 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
+import com.scelio.brainest.flashcards.domain.Flashcard
 import com.scelio.brainest.presentation.components.FlashCardContent
 import com.scelio.brainest.presentation.components.FlashCardCounters
 import com.scelio.brainest.presentation.components.SwipeCard
@@ -48,20 +52,48 @@ private val ColorDontKnowAccent = Color(0xFFF8D7DA)
 private val ColorKnowButton = Color(0xFF33CA67)
 private val ColorDontKnowButton = Color(0xFFE8E8E8)
 
-data class FlashCard(
-    val question: String,
-    val answer: String
-)
-
 @Composable
 fun FlashCardScreen(
-    cards: List<FlashCard>,
+    cards: List<Flashcard>,
     error: String?,
-    onRetry: () -> Unit = {}
+    onRetry: () -> Unit = {},
+    onCardKnown: (Flashcard) -> Unit = {},
+    onCardUnknown: (Flashcard) -> Unit = {},
+    onSessionFinished: (knownCount: Int, unknownCount: Int, totalSwiped: Int) -> Unit = { _, _, _ -> }
 ) {
     var currentIndex by remember { mutableIntStateOf(0) }
     var knowCount by remember { mutableIntStateOf(0) }
     var dontKnowCount by remember { mutableIntStateOf(0) }
+    var hasReportedCompletion by remember { mutableStateOf(false) }
+
+    val markDontKnow = {
+        if (currentIndex < cards.size) {
+            val card = cards[currentIndex]
+            dontKnowCount++
+            onCardUnknown(card)
+            currentIndex++
+        }
+    }
+
+    val markKnow = {
+        if (currentIndex < cards.size) {
+            val card = cards[currentIndex]
+            knowCount++
+            onCardKnown(card)
+            currentIndex++
+        }
+    }
+
+    LaunchedEffect(currentIndex, cards.size) {
+        if (!hasReportedCompletion && cards.isNotEmpty() && currentIndex >= cards.size) {
+            hasReportedCompletion = true
+            onSessionFinished(
+                knowCount,
+                dontKnowCount,
+                knowCount + dontKnowCount
+            )
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -119,13 +151,11 @@ fun FlashCardScreen(
                                     SwipeCard(
                                         // Swipe LEFT  = Don't Know
                                         onSwipeLeft = {
-                                            dontKnowCount++
-                                            if (currentIndex < cards.size) currentIndex++
+                                            markDontKnow()
                                         },
                                         // Swipe RIGHT = Know
                                         onSwipeRight = {
-                                            knowCount++
-                                            if (currentIndex < cards.size) currentIndex++
+                                            markKnow()
                                         }
                                     ) {
                                         FlashCardContent(
@@ -198,11 +228,11 @@ fun FlashCardScreen(
                 ) {
                     BrainestButton(
                         text = "Don't Know",
-                        onClick = {},
+                        onClick = { markDontKnow() },
                         modifier = Modifier.weight(1f).height(60.dp),
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.ExitToApp,
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = "",
                                 modifier = Modifier.size(20.dp),
                             )
@@ -218,7 +248,7 @@ fun FlashCardScreen(
 
                     BrainestButton(
                         text = "Know",
-                        onClick = {},
+                        onClick = { markKnow() },
                         modifier = Modifier.weight(1f).height(60.dp),
                         leadingIcon = {
                             Icon(
@@ -243,11 +273,11 @@ fun FlashCardScreen(
 }
 
 private val sampleCards = listOf(
-    FlashCard("What is the capital of France?", "Paris"),
-    FlashCard("What is 2 + 2?", "4"),
-    FlashCard("Who wrote Romeo and Juliet?", "William Shakespeare"),
-    FlashCard("What is the speed of light?", "299,792,458 m/s"),
-    FlashCard("What is H2O?", "Water"),
+    Flashcard("1", "sample-deck", "What is the capital of France?", "Paris", 0),
+    Flashcard("2", "sample-deck", "What is 2 + 2?", "4", 1),
+    Flashcard("3", "sample-deck", "Who wrote Romeo and Juliet?", "William Shakespeare", 2),
+    Flashcard("4", "sample-deck", "What is the speed of light?", "299,792,458 m/s", 3),
+    Flashcard("5", "sample-deck", "What is H2O?", "Water", 4),
 )
 
 @Preview(name = "Full Screen", showBackground = true)

@@ -5,6 +5,7 @@ import com.scelio.brainest.data.chat.ChatRepositoryImpl
 import com.scelio.brainest.data.chat.OpenAIApiService
 import com.scelio.brainest.data.chat.OpenAIApiServiceImpl
 import com.scelio.brainest.data.chat.SupabaseChatServiceImpl
+import com.plcoding.feature.chat.data.BuildKonfig
 import com.scelio.brainest.database.BrainestChatDatabase
 import com.scelio.brainest.database.ChatDao
 import com.scelio.brainest.database.DatabaseFactory
@@ -28,7 +29,7 @@ val chatDataModule = module {
 
     // API Key
     single(named("openai_api_key")) {
-        "your-openai-api-key-here"
+        BuildKonfig.API_KEY
     }
 
     // OpenAI Service

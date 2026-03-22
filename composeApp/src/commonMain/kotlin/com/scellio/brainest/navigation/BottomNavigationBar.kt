@@ -13,7 +13,7 @@ import brainest.composeapp.generated.resources.ic_home
 import brainest.composeapp.generated.resources.ic_scan
 import brainest.composeapp.generated.resources.ic_settings
 import com.scelio.brainest.designsystem.components.navbar.ButtonData
-import com.scelio.brainest.designsystem.components.navbar.SimpleNavigationBar
+import com.scelio.brainest.designsystem.components.navbar.BottomNavigationBar
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -30,7 +30,7 @@ fun BrainestBottomNavigationBar(
         ButtonData("Settings", icon = vectorResource(Res.drawable.ic_settings)),
     )
 
-    SimpleNavigationBar(
+    BottomNavigationBar(
         buttons = buttons,
         selectedIndex = selectedIndex,
         onItemSelected = { selectedIndex = it },

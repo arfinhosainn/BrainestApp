@@ -19,11 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.scelio.brainest.presentation.FlashCard
+import com.scelio.brainest.flashcards.domain.Flashcard
 
 @Composable
 fun FlashCardContent(
-    card: FlashCard,
+    card: Flashcard,
     cardIndex: Int,
     isInteractive: Boolean = true
 ) {
@@ -59,7 +59,7 @@ fun FlashCardContent(
                         )
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = card.question,
+                            text = card.front,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -95,7 +95,7 @@ fun FlashCardContent(
                         )
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = card.answer,
+                            text = card.back,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )

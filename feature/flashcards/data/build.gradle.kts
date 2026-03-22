@@ -16,8 +16,13 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
 
                 implementation(projects.core.domain)
-                implementation(projects.feature.chat.domain)
-                implementation(projects.feature.chat.database)
+                implementation(projects.feature.flashcards.domain)
+
+                implementation(libs.koin.core)
+                implementation(libs.supabase.postgrest.kt)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.bundles.ktor.common)
             }
         }
 

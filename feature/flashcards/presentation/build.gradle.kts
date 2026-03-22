@@ -16,10 +16,13 @@ kotlin {
 
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)
-                implementation(projects.feature.chat.domain)
+                implementation(projects.feature.flashcards.domain)
 
                 implementation(compose.components.resources)
 
+                implementation(libs.bundles.koin.common)
+                implementation(libs.jetbrains.compose.navigation)
+                implementation(libs.kotlinx.serialization.json)
 
                 implementation(compose.components.uiToolingPreview)
 

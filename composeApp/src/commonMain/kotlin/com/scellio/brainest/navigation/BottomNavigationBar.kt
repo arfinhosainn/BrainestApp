@@ -18,7 +18,8 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun BrainestBottomNavigationBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onItemSelected: (Int) -> Unit = {}
 ) {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -33,7 +34,10 @@ fun BrainestBottomNavigationBar(
     BottomNavigationBar(
         buttons = buttons,
         selectedIndex = selectedIndex,
-        onItemSelected = { selectedIndex = it },
+        onItemSelected = {
+            selectedIndex = it
+            onItemSelected(it)
+        },
         modifier = modifier,
     )
 }

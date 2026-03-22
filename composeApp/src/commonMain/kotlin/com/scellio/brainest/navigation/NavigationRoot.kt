@@ -10,6 +10,7 @@ import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
 import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
 import com.scelio.brainest.presentation.navigation.authGraph
 import com.scelio.brainest.presentation.navigation.chatGraph
+import com.scelio.brainest.presentation.navigation.flashcardsGraph
 
 @Suppress("ParamsComparedByRef")
 @Composable
@@ -34,6 +35,9 @@ fun NavigationRoot(
             }
         )
         chatGraph(
+            navController = navController
+        )
+        flashcardsGraph(
             navController = navController
         )
         onboardingGraph(

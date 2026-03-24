@@ -38,7 +38,7 @@ fun HomeHeader(
                 onSettingsClick = onSettingsClick,
                 onNotificationsClick = onNotificationsClick,
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
             ProfileStatsOverlay(
                 decks = decks,

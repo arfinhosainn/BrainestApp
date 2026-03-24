@@ -23,7 +23,7 @@ fun ProfileStatsOverlay(
     modifier: Modifier = Modifier
 ) {
     val cardHeight = 88.dp       // approximate stats card height
-    val turtleHeight = 260.dp
+    val turtleHeight = 200.dp
     // Total box height = turtle height + visible portion of card (80%).
     val totalHeight = turtleHeight + (cardHeight * 0.80f)
 

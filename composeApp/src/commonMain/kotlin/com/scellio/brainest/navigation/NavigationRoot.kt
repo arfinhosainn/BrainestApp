@@ -7,10 +7,11 @@ import androidx.navigation.compose.NavHost
 import com.brainest.presentation.navigation.OnboardingGraphRoutes
 import com.brainest.presentation.navigation.onboardingGraph
 import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
-import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
+import com.scelio.brainest.presentation.navigation.HomeGraphRoutes
 import com.scelio.brainest.presentation.navigation.authGraph
 import com.scelio.brainest.presentation.navigation.chatGraph
 import com.scelio.brainest.presentation.navigation.flashcardsGraph
+import com.scelio.brainest.presentation.navigation.homeGraph
 
 @Suppress("ParamsComparedByRef")
 @Composable
@@ -27,13 +28,14 @@ fun NavigationRoot(
         authGraph(
             navController = navController,
             onLoginSuccess = {
-                navController.navigate(ChatGraphRoutes.Graph) {
+                navController.navigate(HomeGraphRoutes.Graph) {
                     popUpTo(AuthGraphRoutes.Graph) {
                         inclusive = true
                     }
                 }
             }
         )
+        homeGraph()
         chatGraph(
             navController = navController
         )

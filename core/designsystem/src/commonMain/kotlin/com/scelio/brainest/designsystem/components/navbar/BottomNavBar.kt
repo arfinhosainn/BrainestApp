@@ -65,7 +65,7 @@ fun BottomNavigationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(BarHeight + FabSize / 2),
+            .height(BarHeight),
         contentAlignment = Alignment.BottomCenter,
     ) {
         Box(
@@ -126,9 +126,9 @@ fun BottomNavigationBar(
 
         Box(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = 30.dp)
-                .size(FabSize)
+            .align(Alignment.TopCenter)
+            .offset(y = 5.dp)
+            .size(FabSize)
                 .shadow(elevation = FabElevation, shape = CircleShape, clip = false)
                 .clip(CircleShape)
                 .background(Color.Black)

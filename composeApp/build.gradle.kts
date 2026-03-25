@@ -37,6 +37,7 @@ kotlin {
             implementation(projects.feature.flashcards.data)
             implementation(projects.feature.flashcards.domain)
             implementation(projects.feature.flashcards.presentation)
+            implementation(projects.feature.home.presentation)
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.bundles.koin.common)
             implementation(libs.supabase.postgrest.kt)

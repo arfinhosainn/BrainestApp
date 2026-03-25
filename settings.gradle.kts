@@ -63,3 +63,8 @@ include(":feature:flashcards:database")
 include(":feature:flashcards:domain")
 include(":feature:flashcards:presentation")
 
+include(":feature:home")
+include(":feature:home:data")
+include(":feature:home:database")
+include(":feature:home:domain")
+include(":feature:home:presentation")

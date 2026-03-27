@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +26,7 @@ import brainest.feature.home.presentation.generated.resources.ic_bronze
 import brainest.feature.home.presentation.generated.resources.ic_lesson
 import brainest.feature.home.presentation.generated.resources.ic_vocab
 import brainest.feature.home.presentation.generated.resources.ic_yellow_fire
+import com.scelio.brainest.designsystem.components.vip.vipcard.VipUpgradeCard
 
 @Composable
 fun HomeScreen(
@@ -54,6 +53,7 @@ fun HomeScreen(
             onNotificationsClick = onNotificationsClick,
         )
         Spacer(modifier = Modifier.height(24.dp))
+
         ConsecutiveStudyDaysCard(
             modifier = Modifier.padding(horizontal = 16.dp),
             days = listOf(
@@ -91,6 +91,10 @@ fun HomeScreen(
                 ),
             ),
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        VipUpgradeCard(
+            modifier = Modifier.padding(16.dp)
         )
     }
 }

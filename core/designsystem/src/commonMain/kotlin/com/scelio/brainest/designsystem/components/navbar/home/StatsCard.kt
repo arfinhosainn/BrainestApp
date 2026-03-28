@@ -26,7 +26,7 @@ fun StatsCard(
     others: Int,
     modifier: Modifier = Modifier
 ) {
-    val cardGreen = Color(0xFF3DBE72)
+    val cardGreen = Color(0xFF35C27F)
 
     Row(
         modifier = modifier

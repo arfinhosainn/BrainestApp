@@ -7,13 +7,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import brainest.composeapp.generated.resources.Res
-import brainest.composeapp.generated.resources.ic_chat
-import brainest.composeapp.generated.resources.ic_flash
+import brainest.composeapp.generated.resources.ic_cards
 import brainest.composeapp.generated.resources.ic_home
 import brainest.composeapp.generated.resources.ic_scan
-import brainest.composeapp.generated.resources.ic_settings
-import com.scelio.brainest.designsystem.components.navbar.ButtonData
+import brainest.composeapp.generated.resources.ic_stars
 import com.scelio.brainest.designsystem.components.navbar.BottomNavigationBar
+import com.scelio.brainest.designsystem.components.navbar.ButtonData
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -25,10 +24,9 @@ fun BrainestBottomNavigationBar(
 
     val buttons = listOf(
         ButtonData("Home", icon = vectorResource(Res.drawable.ic_home)),
-        ButtonData("Chat", icon = vectorResource(Res.drawable.ic_chat)),
         ButtonData("Scan", icon = vectorResource(Res.drawable.ic_scan)),
-        ButtonData("Flash&Quiz", icon = vectorResource(Res.drawable.ic_flash)),
-        ButtonData("Settings", icon = vectorResource(Res.drawable.ic_settings)),
+        ButtonData("Chat", icon = vectorResource(Res.drawable.ic_stars)),
+        ButtonData("Flash&Quiz", icon = vectorResource(Res.drawable.ic_cards)),
     )
 
     BottomNavigationBar(

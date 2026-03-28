@@ -21,7 +21,7 @@ fun HomeHeader(
     decks: Int,
     quizzes: Int,
     others: Int,
-    notificationCount: Int = 0,
+    notificationCount: Int = 10,
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
@@ -35,6 +35,7 @@ fun HomeHeader(
         Column {
             HomeTopNavBar(
                 userName = userName,
+                notificationCount = notificationCount,
                 onSettingsClick = onSettingsClick,
                 onNotificationsClick = onNotificationsClick,
             )
@@ -57,7 +58,7 @@ fun PreviewHomeHeader(){
             decks = 15,
             quizzes = 490,
             others = 23,
-            notificationCount = 2,
+            notificationCount = 10,
             onSettingsClick = { /* navigate to settings */ },
             onNotificationsClick = { /* open notifications */ },
         )

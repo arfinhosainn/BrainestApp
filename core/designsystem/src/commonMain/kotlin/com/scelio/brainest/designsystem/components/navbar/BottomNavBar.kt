@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import brainest.core.designsystem.generated.resources.Res
@@ -34,7 +35,6 @@ import brainest.core.designsystem.generated.resources.ic_cards
 import brainest.core.designsystem.generated.resources.ic_home
 import brainest.core.designsystem.generated.resources.ic_scan
 import brainest.core.designsystem.generated.resources.ic_stars
-import com.scelio.brainest.designsystem.BrainestBase700
 import com.scelio.brainest.designsystem.BrainestMath
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.vectorResource
@@ -52,7 +52,7 @@ fun BottomNavigationBar(
     modifier: Modifier = Modifier,
 ) {
     val selectedColor = BrainestMath
-    val unselectedColor = BrainestBase700
+    val unselectedColor = Color.DarkGray
 
     Box(
         modifier = modifier

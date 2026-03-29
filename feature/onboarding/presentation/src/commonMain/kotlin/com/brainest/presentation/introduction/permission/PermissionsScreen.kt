@@ -39,7 +39,6 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.presentation.permission.Permission
 import com.scelio.brainest.presentation.permission.PermissionState
 import com.scelio.brainest.presentation.permission.rememberPermissionController
@@ -181,8 +180,7 @@ fun PermissionScreenOnboarding(
                         contentDescription = null,
                         tint = Color.White
                     )
-                },
-                style = BrainestButtonStyle.PRIMARY
+                }
             )
 
             Spacer(modifier = Modifier.height(12.dp))

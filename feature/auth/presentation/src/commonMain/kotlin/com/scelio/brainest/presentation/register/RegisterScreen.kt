@@ -1,5 +1,6 @@
 package com.scelio.brainest.presentation.register
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import brainest.feature.auth.presentation.generated.resources.Res
 import brainest.feature.auth.presentation.generated.resources.email
@@ -28,11 +31,11 @@ import brainest.feature.auth.presentation.generated.resources.welcome_to_braines
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestBrandLogo
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveFormLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
 import com.scelio.brainest.designsystem.components.textfields.BrainestPasswordTextField
 import com.scelio.brainest.designsystem.components.textfields.BrainestTextField
+import com.scelio.brainest.designsystem.extended
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -142,7 +145,9 @@ fun RegisterScreen(
                     onClick = {
                         onAction(RegisterAction.OnLoginClick)
                     },
-                    style = BrainestButtonStyle.SECONDARY,
+                    backgroundColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline),
                     modifier = Modifier
                         .fillMaxWidth()
                 )

@@ -32,7 +32,6 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -67,8 +66,7 @@ fun UserReviewScreen(
                             contentDescription = null,
                             tint = Color.White
                         )
-                    },
-                    style = BrainestButtonStyle.PRIMARY
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

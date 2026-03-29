@@ -33,7 +33,6 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
@@ -172,8 +171,7 @@ fun GrowthChartScreen(
                     contentDescription = null,
                     tint = Color.White
                 )
-            },
-            style = BrainestButtonStyle.PRIMARY
+            }
         )
     }
 }

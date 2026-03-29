@@ -1,6 +1,5 @@
-package com.brainest.presentation.introduction.components
+package com.scelio.brainest.presentation.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,26 +24,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import brainest.feature.onboarding.presentation.generated.resources.Res
-import brainest.feature.onboarding.presentation.generated.resources.apple
-import brainest.feature.onboarding.presentation.generated.resources.google
-import brainest.feature.onboarding.presentation.generated.resources.mail
+import brainest.feature.flashcards.presentation.generated.resources.Res
+import brainest.feature.flashcards.presentation.generated.resources.ic_upoad
+import brainest.feature.flashcards.presentation.generated.resources.ic_voice
+import brainest.feature.flashcards.presentation.generated.resources.ic_wave
+import com.scelio.brainest.designsystem.BrainestAskAnything
+import com.scelio.brainest.designsystem.BrainestDraftEssay
+import com.scelio.brainest.designsystem.BrainestError
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginBottomSheet(
+fun UploadDocsBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     onContinueWithApple: () -> Unit = {},
-    onContinueWithGoogle: () -> Unit = {},
-    onContinueWithEmail: () -> Unit = {},
-) {
+
+    ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -61,15 +65,13 @@ fun LoginBottomSheet(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Continue with Apple
-
             BrainestButton(
-                text = "Continue with Apple",
+                text = "Record Audio",
                 onClick = onContinueWithApple,
                 modifier = modifier.fillMaxWidth(),
-                leadingIcon = {
+                trailingIcon = {
                     Icon(
-                        imageVector = vectorResource(Res.drawable.apple),
+                        imageVector = vectorResource(Res.drawable.ic_voice),
                         contentDescription = "",
                         modifier = modifier.size(20.dp),
                     )
@@ -78,20 +80,38 @@ fun LoginBottomSheet(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     fontFamily = Typography.bodyMedium.fontFamily,
-                )
+                ),
+                backgroundColor = BrainestDraftEssay
+            )
+            BrainestButton(
+                text = "Upload Audio",
+                onClick = onContinueWithApple,
+                modifier = modifier.fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        imageVector = vectorResource(Res.drawable.ic_upoad),
+                        contentDescription = "",
+                        modifier = modifier.size(20.dp),
+                    )
+                },
+
+                textStyles = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = Typography.bodyMedium.fontFamily,
+                ),
+                backgroundColor = BrainestError
             )
 
-            // Continue with Google
             BrainestButton(
-                text = "Continue with Google",
-                onClick = onContinueWithGoogle,
+                text = "Upload Documents",
+                onClick = onContinueWithApple,
                 modifier = modifier.fillMaxWidth(),
-                leadingIcon = {
+                trailingIcon = {
                     Icon(
-                        imageVector = vectorResource(Res.drawable.google),
+                        imageVector = vectorResource(Res.drawable.ic_wave),
                         contentDescription = "",
-                        modifier = modifier.size(24.dp),
-                        tint = Color.Unspecified
+                        modifier = modifier.size(20.dp),
                     )
                 },
                 textStyles = TextStyle(
@@ -99,33 +119,8 @@ fun LoginBottomSheet(
                     fontWeight = FontWeight.Medium,
                     fontFamily = Typography.bodyMedium.fontFamily,
                 ),
-                backgroundColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.extended.textSecondary,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
             )
 
-            // Continue with Email
-            BrainestButton(
-                text = "Continue with Email",
-                onClick = onContinueWithEmail,
-                modifier = modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.mail),
-                        contentDescription = "",
-                        modifier = modifier.size(22.dp),
-                        tint = Color.Unspecified
-                    )
-                },
-                textStyles = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = Typography.bodyMedium.fontFamily,
-                ),
-                backgroundColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.extended.textSecondary,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
-            )
 
         }
     }
@@ -136,7 +131,7 @@ fun LoginBottomSheet(
 @Composable
 fun PreviewLoginSheet() {
     BrainestTheme {
-        LoginBottomSheet(onDismiss = {})
+        UploadDocsBottomSheet(onDismiss = {})
 
     }
 }
@@ -145,7 +140,7 @@ fun PreviewLoginSheet() {
 @Composable
 fun PreviewDarkLoginSheet() {
     BrainestTheme(darkTheme = true) {
-        LoginBottomSheet(onDismiss = {})
+        UploadDocsBottomSheet(onDismiss = {})
 
     }
 }

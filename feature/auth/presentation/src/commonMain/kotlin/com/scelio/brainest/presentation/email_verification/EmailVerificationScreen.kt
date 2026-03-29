@@ -1,5 +1,6 @@
 package com.scelio.brainest.presentation.email_verification
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,7 +32,6 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestSuccessIcon
 import com.scelio.brainest.designsystem.components.brand.BrainestFailureIcon
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveResultLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSimpleResultLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
@@ -110,7 +111,9 @@ fun EmailVerificationScreen(
                                     onAction(EmailVerificationAction.OnCloseClick)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                style = BrainestButtonStyle.SECONDARY
+                                backgroundColor = Color.Transparent,
+                                contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
                             )
                         }
                     )

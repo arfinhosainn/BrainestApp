@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestSuccessIcon
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
 import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -103,9 +104,11 @@ fun BrainestSimpleSuccessLayoutPreview() {
                 BrainestButton(
                     text = "Resend verification email",
                     onClick = {},
-                    style = BrainestButtonStyle.SECONDARY,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    backgroundColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
                 )
             }
         )

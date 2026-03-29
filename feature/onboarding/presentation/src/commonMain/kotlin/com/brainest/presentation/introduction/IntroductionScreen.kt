@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -138,8 +137,7 @@ fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                 contentDescription = null
                             )
-                        },
-                        style = BrainestButtonStyle.PRIMARY
+                        }
                     )
                 }
             }

@@ -1,11 +1,15 @@
 package com.scelio.brainest.presentation.register_success
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import brainest.feature.auth.presentation.generated.resources.Res
 import brainest.feature.auth.presentation.generated.resources.account_successfully_created
@@ -16,10 +20,10 @@ import brainest.feature.auth.presentation.generated.resources.verification_email
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestSuccessIcon
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveResultLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSimpleResultLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
+import com.scelio.brainest.designsystem.extended
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -100,7 +104,9 @@ fun RegisterSuccessScreen(
                             .fillMaxWidth(),
                         enabled = !state.isResendingVerificationEmail,
                         isLoading = state.isResendingVerificationEmail,
-                        style = BrainestButtonStyle.SECONDARY
+                        backgroundColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
                     )
                 },
                 secondaryError = state.resendVerificationError?.asString()

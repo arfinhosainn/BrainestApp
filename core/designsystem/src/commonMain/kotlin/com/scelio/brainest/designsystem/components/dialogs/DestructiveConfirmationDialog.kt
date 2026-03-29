@@ -1,6 +1,7 @@
 package com.scelio.brainest.designsystem.components.dialogs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -25,7 +27,6 @@ import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.dismiss_dialog
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -84,12 +85,15 @@ fun DestructiveConfirmationDialog(
                     BrainestButton(
                         text = cancelButtonText,
                         onClick = onCancelClick,
-                        style = BrainestButtonStyle.SECONDARY
+                        backgroundColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
                     )
                     BrainestButton(
                         text = confirmButtonText,
                         onClick = onConfirmClick,
-                        style = BrainestButtonStyle.DESTRUCTIVE_PRIMARY
+                        backgroundColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
                     )
                 }
             }

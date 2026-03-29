@@ -2,9 +2,7 @@ package com.scelio.brainest.designsystem.components.buttons
 
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,98 +20,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-enum class BrainestButtonStyle {
-    PRIMARY,
-    DESTRUCTIVE_PRIMARY,
-    SECONDARY,
-    DESTRUCTIVE_SECONDARY,
-    TEXT
-}
-
 @Composable
 fun BrainestButton(
     text: String,
     onClick: () -> Unit,
-    textStyles: TextStyle = TextStyle(),
     modifier: Modifier = Modifier,
-    style: BrainestButtonStyle = BrainestButtonStyle.PRIMARY,
     enabled: Boolean = true,
     isLoading: Boolean = false,
+    backgroundColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    disabledBackgroundColor: Color = MaterialTheme.colorScheme.extended.disabledFill,
+    disabledContentColor: Color = MaterialTheme.colorScheme.extended.textDisabled,
+    shape: Shape = RoundedCornerShape(40.dp),
+    border: BorderStroke? = null,
+    textStyles: TextStyle = TextStyle(),
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null
-
+    trailingIcon: @Composable (() -> Unit)? = null,
+    loadingIndicatorColor: Color = contentColor
 ) {
-    val colors = when (style) {
-        BrainestButtonStyle.PRIMARY -> ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
-        )
-
-        BrainestButtonStyle.DESTRUCTIVE_PRIMARY -> ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError,
-            disabledContainerColor = MaterialTheme.colorScheme.extended.disabledFill,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
-        )
-
-        BrainestButtonStyle.SECONDARY -> ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.extended.textSecondary,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
-        )
-
-        BrainestButtonStyle.DESTRUCTIVE_SECONDARY -> ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.error,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
-        )
-
-        BrainestButtonStyle.TEXT -> ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.tertiary,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
-        )
-    }
-
-    val defaultBorderStroke = BorderStroke(
-        width = 1.dp,
-        color = MaterialTheme.colorScheme.extended.disabledOutline
+    val colors = ButtonDefaults.buttonColors(
+        containerColor = backgroundColor,
+        contentColor = contentColor,
+        disabledContainerColor = disabledBackgroundColor,
+        disabledContentColor = disabledContentColor
     )
-    val border = when {
-        style == BrainestButtonStyle.PRIMARY && !enabled -> defaultBorderStroke
-        style == BrainestButtonStyle.SECONDARY -> defaultBorderStroke
-        style == BrainestButtonStyle.DESTRUCTIVE_PRIMARY && !enabled -> defaultBorderStroke
-        style == BrainestButtonStyle.DESTRUCTIVE_SECONDARY -> {
-            val borderColor = if (enabled) {
-                MaterialTheme.colorScheme.extended.destructiveSecondaryOutline
-            } else {
-                MaterialTheme.colorScheme.extended.disabledOutline
-            }
-            BorderStroke(
-                width = 1.dp,
-                color = borderColor
-            )
-        }
-
-        else -> null
-    }
+    val resolvedTextStyle = textStyles.merge(
+        TextStyle(
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily
+        )
+    )
 
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        shape = RoundedCornerShape(40.dp),
+        shape = shape,
         colors = colors,
         border = border
     ) {
@@ -128,7 +84,7 @@ fun BrainestButton(
                         alpha = if (isLoading) 1f else 0f
                     ),
                 strokeWidth = 1.5.dp,
-                color = Color.Black
+                color = loadingIndicatorColor
             )
             Box(
                 modifier = Modifier
@@ -147,7 +103,7 @@ fun BrainestButton(
                 // Text (centered)
                 Text(
                     text = text,
-                    style = textStyles
+                    style = resolvedTextStyle
                 )
                 // Trailing icon (positioned at end)
                 if (trailingIcon != null) {
@@ -171,7 +127,6 @@ fun BrainestPrimaryButtonPreview() {
         BrainestButton(
             text = "Hello world!",
             onClick = {},
-            style = BrainestButtonStyle.PRIMARY,
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Favorite,
@@ -192,7 +147,9 @@ fun BrainestSecondaryButtonPreview() {
         BrainestButton(
             text = "Hello world!",
             onClick = {},
-            style = BrainestButtonStyle.SECONDARY
+            backgroundColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline)
         )
     }
 }
@@ -206,7 +163,8 @@ fun BrainestDestructivePrimaryButtonPreview() {
         BrainestButton(
             text = "Hello world!",
             onClick = {},
-            style = BrainestButtonStyle.DESTRUCTIVE_PRIMARY
+            backgroundColor = MaterialTheme.colorScheme.error,
+            contentColor = MaterialTheme.colorScheme.onError
         )
     }
 }
@@ -220,7 +178,9 @@ fun BrainestDestructiveSecondaryButtonPreview() {
         BrainestButton(
             text = "Hello world!",
             onClick = {},
-            style = BrainestButtonStyle.DESTRUCTIVE_SECONDARY
+            backgroundColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.error,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
         )
     }
 }
@@ -234,7 +194,8 @@ fun BrainestTextButtonPreview() {
         BrainestButton(
             text = "Hello world!",
             onClick = {},
-            style = BrainestButtonStyle.TEXT
+            backgroundColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.tertiary
         )
     }
 }

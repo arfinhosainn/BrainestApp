@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.flashcards.domain.Flashcard
 import com.scelio.brainest.presentation.components.FlashCardContent
 import com.scelio.brainest.presentation.components.FlashCardCounters
@@ -214,8 +213,7 @@ fun FlashCardScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             fontFamily = Typography.bodyMedium.fontFamily,
-                        ),
-                        style = BrainestButtonStyle.PRIMARY
+                        )
                     )
 
                 }
@@ -241,8 +239,7 @@ fun FlashCardScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             fontFamily = Typography.bodyMedium.fontFamily,
-                        ),
-                        style = BrainestButtonStyle.PRIMARY
+                        )
                     )
 
 
@@ -261,8 +258,7 @@ fun FlashCardScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             fontFamily = Typography.bodyMedium.fontFamily,
-                        ),
-                        style = BrainestButtonStyle.PRIMARY
+                        )
                     )
                 }
 

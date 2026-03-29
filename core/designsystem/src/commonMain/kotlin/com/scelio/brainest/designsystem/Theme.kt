@@ -81,58 +81,58 @@ data class ExtendedColors(
 // ============================================================================
 val LightExtendedColors = ExtendedColors(
     // Button states
-    primaryHover = Color(0xFFD64F23),          // Darker orange for hover
-    primaryPressed = Color(0xFFC24620),         // Even darker for pressed
-    destructiveHover = BrainestErrorDark,
+    primaryHover = BrainestPrimaryAlpha80,
+    primaryPressed = BrainestPrimaryAlpha60,
+    destructiveHover = BrainestError,
     destructiveSecondaryOutline = BrainestErrorLight,
-    disabledOutline = BrainestBase300,
-    disabledFill = BrainestBase200,
-    successOutline = BrainestSuccessLight,
+    disabledOutline = BrainestNeutral300,
+    disabledFill = BrainestNeutral200,
+    successOutline = BrainestPrimaryLight,
     success = BrainestSuccess,
-    onSuccess = BrainestBase0,
-    secondaryFill = BrainestSecondary,          // Light beige for secondary buttons
+    onSuccess = BrainestNeutral0,
+    secondaryFill = BrainestSecondaryLight,
 
     // Text variants - Based on your chat screens
-    textPrimary = BrainestBase1000,             // Pure black for primary text
-    textSecondary = BrainestBase700,            // Medium gray for secondary text
-    textTertiary = BrainestBase600,             // Lighter gray for tertiary text
-    textPlaceholder = BrainestBase500,          // Placeholder text
-    textDisabled = BrainestBase400,             // Disabled text
+    textPrimary = BrainestTextPrimaryLight,
+    textSecondary = BrainestTextSecondaryLight,
+    textTertiary = BrainestNeutral300,
+    textPlaceholder = BrainestNeutral300,
+    textDisabled = BrainestNeutral200,
 
     // Surface variants - Based on your designs
-    surfaceLower = Color(0xFFF5F5F5),           // Light gray background
-    surfaceHigher = BrainestBase0,              // White for elevated cards
-    surfaceOutline = BrainestBase300,           // Light gray outline
-    surfaceCard = BrainestTertiary,             // Very light beige for cards
-    overlay = BrainestBase1000Alpha80,          // 80% black overlay
+    surfaceLower = BrainestBackground,
+    surfaceHigher = BrainestSurfaceLight,
+    surfaceOutline = BrainestNeutral200,
+    surfaceCard = BrainestNeutral100,
+    overlay = BrainestOverlay,
 
     // Chat bubbles - From your chat screen
-    chatUserBubble = BrainestBase0,          // Light beige for user messages
-    chatAIBubble = BrainestBase0,               // White for AI messages
+    chatUserBubble = BrainestPrimaryLighter,
+    chatAIBubble = BrainestSurfaceLight,
 
     // Feature colors
     featureMath = BrainestMath,
     featureChat = BrainestChat,
-    featureSummarize = BrainestSummarize,
+    featureSummarize = BrainestSecondary,
     featureAskAnything = BrainestAskAnything,
     featureDraftEssay = BrainestDraftEssay,
-    featureChangeTone = BrainestChangeTone,
+    featureChangeTone = BrainestSecondary,
     featureTranslate = BrainestTranslate,
-    featureFixGrammar = BrainestFixGrammar,
-    featureParaphrase = BrainestParaphrase,
-    featureImproveText = BrainestImproveText,
+    featureFixGrammar = BrainestWarning,
+    featureParaphrase = BrainestPrimary,
+    featureImproveText = BrainestSecondary,
 
     // Accent colors with alpha
-    accentBlue = BrainestAccentBlue,
-    accentPurple = BrainestAccentPurple,
-    accentViolet = BrainestAccentViolet,
-    accentPink = BrainestAccentPink,
-    accentOrange = BrainestAccentOrange,
-    accentYellow = BrainestAccentYellow,
-    accentGreen = BrainestAccentGreen,
-    accentTeal = BrainestAccentTeal,
-    accentMint = BrainestAccentMint,
-    accentGray = BrainestAccentGray,
+    accentBlue = BrainestPrimary,
+    accentPurple = BrainestBG1,
+    accentViolet = BrainestPrimaryLight,
+    accentPink = BrainestSecondaryLight,
+    accentOrange = BrainestSecondary,
+    accentYellow = BrainestWarning,
+    accentGreen = BrainestPrimary,
+    accentTeal = BrainestBG1,
+    accentMint = BrainestPrimaryLight,
+    accentGray = BrainestNeutral300,
 )
 
 // ============================================================================
@@ -140,106 +140,106 @@ val LightExtendedColors = ExtendedColors(
 // ============================================================================
 val DarkExtendedColors = ExtendedColors(
     // Button states
-    primaryHover = Color(0xFFFF6B3D),           // Lighter orange for hover in dark
-    primaryPressed = Color(0xFFFF8559),         // Even lighter for pressed
-    destructiveHover = BrainestErrorDark,
-    destructiveSecondaryOutline = BrainestErrorLight,
-    disabledOutline = BrainestBase800,
-    disabledFill = BrainestBase900,
-    successOutline = BrainestSuccessDark,
+    primaryHover = BrainestPrimaryAlpha80,
+    primaryPressed = BrainestPrimaryAlpha60,
+    destructiveHover = BrainestError,
+    destructiveSecondaryOutline = BrainestError,
+    disabledOutline = BrainestNeutral400,
+    disabledFill = BrainestNeutral500,
+    successOutline = BrainestPrimaryLight,
     success = BrainestSuccess,
-    onSuccess = BrainestBase1000,
-    secondaryFill = BrainestBase800,            // Dark gray for secondary buttons
+    onSuccess = BrainestNeutral0,
+    secondaryFill = BrainestBG1,
 
     // Text variants - From your dark mode chat
-    textPrimary = BrainestBase0,                // White for primary text
-    textSecondary = BrainestBase400,            // Medium gray for secondary
-    textTertiary = BrainestBase500,             // Lighter gray for tertiary
-    textPlaceholder = BrainestBase600,          // Placeholder text
-    textDisabled = BrainestBase700,             // Disabled text
+    textPrimary = BrainestTextPrimaryDark,
+    textSecondary = BrainestTextSecondaryDark,
+    textTertiary = BrainestNeutral300,
+    textPlaceholder = BrainestNeutral300,
+    textDisabled = BrainestNeutral400,
 
     // Surface variants - Based on dark mode design
-    surfaceLower = BrainestBase1000,            // Pure black background
-    surfaceHigher = BrainestBase900,            // Dark gray for elevated surfaces
-    surfaceOutline = BrainestBase800,           // Outline color
-    surfaceCard = Color(0xFF1C1C1E),            // Card background (iOS dark surface)
-    overlay = BrainestBase1000Alpha80,          // 80% black overlay
+    surfaceLower = BrainestNeutral500,
+    surfaceHigher = BrainestBG1,
+    surfaceOutline = BrainestNeutral400,
+    surfaceCard = BrainestBG1,
+    overlay = BrainestOverlay,
 
     // Chat bubbles - From your dark mode chat
-    chatUserBubble = Color(0xFF2C2C2E),         // Dark gray for user messages
-    chatAIBubble = Color(0xFF1C1C1E),           // Slightly lighter for AI messages
+    chatUserBubble = BrainestBG1,
+    chatAIBubble = BrainestNeutral500,
 
     // Feature colors (same as light mode but may need adjustment)
     featureMath = BrainestMath,
     featureChat = BrainestChat,
-    featureSummarize = BrainestSummarize,
+    featureSummarize = BrainestSecondary,
     featureAskAnything = BrainestAskAnything,
     featureDraftEssay = BrainestDraftEssay,
-    featureChangeTone = BrainestChangeTone,
+    featureChangeTone = BrainestSecondary,
     featureTranslate = BrainestTranslate,
-    featureFixGrammar = BrainestFixGrammar,
-    featureParaphrase = BrainestParaphrase,
-    featureImproveText = BrainestImproveText,
+    featureFixGrammar = BrainestWarning,
+    featureParaphrase = BrainestPrimary,
+    featureImproveText = BrainestSecondary,
 
     // Accent colors with alpha
-    accentBlue = BrainestAccentBlue,
-    accentPurple = BrainestAccentPurple,
-    accentViolet = BrainestAccentViolet,
-    accentPink = BrainestAccentPink,
-    accentOrange = BrainestAccentOrange,
-    accentYellow = BrainestAccentYellow,
-    accentGreen = BrainestAccentGreen,
-    accentTeal = BrainestAccentTeal,
-    accentMint = BrainestAccentMint,
-    accentGray = BrainestAccentGray,
+    accentBlue = BrainestPrimary,
+    accentPurple = BrainestBG1,
+    accentViolet = BrainestPrimaryLight,
+    accentPink = BrainestSecondaryLight,
+    accentOrange = BrainestSecondary,
+    accentYellow = BrainestWarning,
+    accentGreen = BrainestPrimary,
+    accentTeal = BrainestBG1,
+    accentMint = BrainestPrimaryLight,
+    accentGray = BrainestNeutral300,
 )
 
 // ============================================================================
 // Material 3 Light Color Scheme
 // ============================================================================
 val LightColorScheme = lightColorScheme(
-    // Primary colors - Orange brand
+    // Primary colors - Green brand
     primary = BrainestPrimary,
-    onPrimary = BrainestBase0,
-    primaryContainer = BrainestPrimaryAlpha10,
-    onPrimaryContainer = BrainestPrimary,
+    onPrimary = BrainestNeutral0,
+    primaryContainer = BrainestPrimaryLight,
+    onPrimaryContainer = BrainestBG1,
 
-    // Secondary colors - Beige
-    secondary = BrainestBase600,
-    onSecondary = BrainestBase0,
-    secondaryContainer = BrainestSecondary,
-    onSecondaryContainer = BrainestBase900,
+    // Secondary colors - Orange
+    secondary = BrainestSecondary,
+    onSecondary = BrainestNeutral0,
+    secondaryContainer = BrainestSecondaryLight,
+    onSecondaryContainer = BrainestSecondary,
 
     // Tertiary colors
-    tertiary = BrainestPrimary,
-    onTertiary = BrainestBase0,
-    tertiaryContainer = BrainestTertiary,
-    onTertiaryContainer = BrainestBase1000,
+    tertiary = BrainestBG1,
+    onTertiary = BrainestNeutral0,
+    tertiaryContainer = BrainestPrimaryLighter,
+    onTertiaryContainer = BrainestBG1,
 
     // Error colors
     error = BrainestError,
-    onError = BrainestBase0,
+    onError = BrainestNeutral0,
     errorContainer = BrainestErrorLight,
-    onErrorContainer = BrainestErrorDark,
+    onErrorContainer = BrainestError,
 
     // Background & Surface - From your light mode design
-    background = BrainestTertiary,             // Light gray background
-    onBackground = BrainestBase1000,
-    surface = BrainestBase0,                    // White surface
-    onSurface = BrainestBase1000,
-    surfaceVariant = BrainestTertiary,          // Light beige
-    onSurfaceVariant = BrainestBase800,
+    background = BrainestBackground,
+    onBackground = BrainestTextPrimaryLight,
+    surface = BrainestSurfaceLight,
+    onSurface = BrainestTextPrimaryLight,
+    surfaceVariant = BrainestNeutral100,
+    onSurfaceVariant = BrainestNeutral400,
 
     // Outline
-    outline = BrainestBase300,
-    outlineVariant = BrainestBase200,
+    outline = BrainestNeutral200,
+    outlineVariant = BrainestNeutral100,
 
     // Scrim
-    scrim = BrainestBase1000Alpha80,
+    scrim = BrainestOverlay,
 
     // Inverse
-    inverseSurface = BrainestBase900,
-    inverseOnSurface = BrainestBase0,
+    inverseSurface = BrainestNeutral500,
+    inverseOnSurface = BrainestNeutral0,
     inversePrimary = BrainestPrimary,
 )
 
@@ -247,47 +247,47 @@ val LightColorScheme = lightColorScheme(
 // Material 3 Dark Color Scheme
 // ============================================================================
 val DarkColorScheme = darkColorScheme(
-    // Primary colors - Orange brand
+    // Primary colors - Green brand
     primary = BrainestPrimary,
-    onPrimary = BrainestBase0,
-    primaryContainer = BrainestPrimaryAlpha20,
-    onPrimaryContainer = BrainestPrimary,
+    onPrimary = BrainestNeutral0,
+    primaryContainer = BrainestBG1,
+    onPrimaryContainer = BrainestPrimaryLight,
 
     // Secondary colors
-    secondary = BrainestBase500,
-    onSecondary = BrainestBase1000,
-    secondaryContainer = BrainestBase800,
-    onSecondaryContainer = BrainestBase200,
+    secondary = BrainestSecondary,
+    onSecondary = BrainestNeutral0,
+    secondaryContainer = BrainestSecondaryLight,
+    onSecondaryContainer = BrainestNeutral500,
 
     // Tertiary colors
-    tertiary = BrainestPrimary,
-    onTertiary = BrainestBase1000,
-    tertiaryContainer = BrainestBase800,
-    onTertiaryContainer = BrainestPrimary,
+    tertiary = BrainestBG1,
+    onTertiary = BrainestNeutral0,
+    tertiaryContainer = BrainestBG1,
+    onTertiaryContainer = BrainestPrimaryLight,
 
     // Error colors
     error = BrainestError,
-    onError = BrainestBase0,
-    errorContainer = BrainestErrorDark,
-    onErrorContainer = BrainestErrorLight,
+    onError = BrainestNeutral0,
+    errorContainer = BrainestError,
+    onErrorContainer = BrainestNeutral0,
 
     // Background & Surface - From your dark mode design
-    background = BrainestBase1000,              // Pure black background
-    onBackground = BrainestBase0,
-    surface = Color(0xFF1C1C1E),                // Dark gray surface (iOS style)
-    onSurface = BrainestBase0,
-    surfaceVariant = Color(0xFF2C2C2E),         // Elevated surface
-    onSurfaceVariant = BrainestBase300,
+    background = BrainestNeutral500,
+    onBackground = BrainestNeutral0,
+    surface = BrainestNeutral500,
+    onSurface = BrainestNeutral0,
+    surfaceVariant = BrainestBG1,
+    onSurfaceVariant = BrainestNeutral200,
 
     // Outline
-    outline = BrainestBase700,
-    outlineVariant = BrainestBase800,
+    outline = BrainestNeutral400,
+    outlineVariant = BrainestNeutral500,
 
     // Scrim
-    scrim = BrainestBase1000Alpha80,
+    scrim = BrainestOverlay,
 
     // Inverse
-    inverseSurface = BrainestBase100,
-    inverseOnSurface = BrainestBase1000,
+    inverseSurface = BrainestNeutral100,
+    inverseOnSurface = BrainestNeutral500,
     inversePrimary = BrainestPrimary,
 )

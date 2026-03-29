@@ -41,8 +41,8 @@ import com.scelio.brainest.designsystem.BricolageGrotesq
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-private val ColorAccentBar = Color(0xFF33CA67)
-private val ColorBrandBrown = Color(0xFF33CA67)
+private val ColorAccentBar = Color(0xFF19C472)
+private val ColorBrandBrown = Color(0xFF19C472)
 private val ColorTextDark = Color(0xFF1A1A1A)
 private val ColorTextMuted = Color(0xFFD8F5E2)
 private val ColorBeigeBg = Color(0xFFF2EBE1)

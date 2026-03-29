@@ -1,6 +1,7 @@
 package com.scelio.brainest.presentation.login
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,11 +28,11 @@ import brainest.feature.auth.presentation.generated.resources.welcome_back
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.brand.BrainestBrandLogo
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
-import com.scelio.brainest.designsystem.components.buttons.BrainestButtonStyle
 import com.scelio.brainest.designsystem.components.layouts.BrainestAdaptiveFormLayout
 import com.scelio.brainest.designsystem.components.layouts.BrainestSnackbarScaffold
 import com.scelio.brainest.designsystem.components.textfields.BrainestPasswordTextField
 import com.scelio.brainest.designsystem.components.textfields.BrainestTextField
+import com.scelio.brainest.designsystem.extended
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -129,7 +131,9 @@ fun LoginScreen(
                 onClick = {
                     onAction(LoginAction.OnSignUpClick)
                 },
-                style = BrainestButtonStyle.SECONDARY,
+                backgroundColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.extended.disabledOutline),
                 modifier = Modifier
                     .fillMaxWidth()
             )

@@ -19,13 +19,12 @@ kotlin {
                 implementation(projects.core.presentation)
 
                 implementation(libs.katex.core)
+                implementation(libs.jetbrains.compose.material.icons.extended)
 
 
                 implementation(compose.components.resources)
 
                 implementation(compose.components.uiToolingPreview)
-
-
 
 
             }

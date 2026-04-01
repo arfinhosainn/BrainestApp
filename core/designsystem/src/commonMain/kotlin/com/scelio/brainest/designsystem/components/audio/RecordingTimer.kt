@@ -45,7 +45,7 @@ fun StopwatchTimer() {
     ) {
         Text(
             text = timeString,
-            fontSize = 25.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Medium,
             color = Color(0xFF1A1A1A),
             letterSpacing = 2.sp

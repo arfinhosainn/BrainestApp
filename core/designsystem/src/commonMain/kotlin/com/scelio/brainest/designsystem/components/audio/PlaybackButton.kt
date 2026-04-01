@@ -5,6 +5,7 @@ package com.scelio.brainest.designsystem.components.audio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
@@ -30,6 +31,7 @@ fun EchoPlaybackButton(
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
     colors: IconButtonColors,
+    iconSize: androidx.compose.ui.unit.Dp = 24.dp,
     modifier: Modifier = Modifier
 ) {
     FilledIconButton(
@@ -43,6 +45,7 @@ fun EchoPlaybackButton(
             .defaultShadow()
     ) {
         Icon(
+            modifier = Modifier.size(iconSize),
             imageVector = when (playbackState) {
                 PlaybackState.PLAYING -> Icons.Filled.Pause
                 PlaybackState.PAUSED,

@@ -43,6 +43,7 @@ fun UploadDocsBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     onContinueWithApple: () -> Unit = {},
+    onRecordAudio: () -> Unit = {},
 
     ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -67,7 +68,7 @@ fun UploadDocsBottomSheet(
 
             BrainestButton(
                 text = "Record Audio",
-                onClick = onContinueWithApple,
+                onClick = onRecordAudio,
                 modifier = modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(

@@ -40,13 +40,21 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ArcPlayback(
+    playbackState: PlaybackState,
+    onTogglePlayback: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DividedCircleCanvas(modifier = modifier)
+    DividedCircleCanvas(
+        playbackState = playbackState,
+        onTogglePlayback = onTogglePlayback,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun DividedCircleCanvas(
+    playbackState: PlaybackState,
+    onTogglePlayback: () -> Unit,
     modifier: Modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(3.3333f)
@@ -126,11 +134,11 @@ fun DividedCircleCanvas(
         }
 
         EchoPlaybackButton(
-            playbackState = PlaybackState.PAUSED,
-            onPauseClick = {},
-            onPlayClick = {},
+            playbackState = playbackState,
+            onPauseClick = onTogglePlayback,
+            onPlayClick = onTogglePlayback,
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color(0xFFFF8B2D),
+                containerColor = Color(0xFF000000),
                 contentColor = Color.White
             ),
             iconSize = 45.dp,
@@ -181,6 +189,8 @@ fun PreviewSheet() {
     BrainestTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             ArcPlayback(
+                playbackState = PlaybackState.PAUSED,
+                onTogglePlayback = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3.3333f)

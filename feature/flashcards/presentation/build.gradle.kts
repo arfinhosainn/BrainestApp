@@ -16,6 +16,7 @@ kotlin {
 
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)
+                implementation(projects.core.presentation)
                 implementation(projects.feature.flashcards.domain)
 
                 implementation(libs.jetbrains.compose.material.icons.extended)

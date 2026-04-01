@@ -28,7 +28,9 @@ fun WaveForm(
     trackColor: Color,
     trackFillColor: Color,
     playerProgress: () -> Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    useProgressFill: Boolean = true,
+    silenceThreshold: Float = 0f
 ) {
     Canvas(
         modifier = modifier
@@ -36,47 +38,74 @@ fun WaveForm(
         val amplitudeBarWidthPx = amplitudeBarWidth.toPx()
         val amplitudeBarSpacingPx = amplitudeBarSpacing.toPx()
 
-        val clipPath = Path()
+        if (useProgressFill) {
+            val clipPath = Path()
 
-        powerRatios.forEachIndexed { i, ratio ->
-            val height = ratio * size.height
+            powerRatios.forEachIndexed { i, ratio ->
+                val height = ratio * size.height
 
-            val xOffset = i * (amplitudeBarSpacingPx + amplitudeBarWidthPx)
-            val yTopStart = center.y - height / 2f
+                val xOffset = i * (amplitudeBarSpacingPx + amplitudeBarWidthPx)
+                val yTopStart = center.y - height / 2f
 
-            val topLeft = Offset(
-                x = xOffset,
-                y = yTopStart
-            )
-            val rectSize = Size(
-                width = amplitudeBarWidthPx,
-                height = height
-            )
-            val roundRect = RoundRect(
-                rect = Rect(
-                    offset = topLeft,
-                    size = rectSize
-                ),
-                cornerRadius = CornerRadius(100f)
-            )
-            clipPath.addRoundRect(roundRect)
-
-            drawRoundRect(
-                color = trackColor,
-                topLeft = topLeft,
-                size = rectSize,
-                cornerRadius = CornerRadius(100f)
-            )
-        }
-
-        clipPath(clipPath) {
-            drawRect(
-                color = trackFillColor,
-                size = Size(
-                    width = size.width * playerProgress(),
-                    height = size.height
+                val topLeft = Offset(
+                    x = xOffset,
+                    y = yTopStart
                 )
-            )
+                val rectSize = Size(
+                    width = amplitudeBarWidthPx,
+                    height = height
+                )
+                val roundRect = RoundRect(
+                    rect = Rect(
+                        offset = topLeft,
+                        size = rectSize
+                    ),
+                    cornerRadius = CornerRadius(100f)
+                )
+                clipPath.addRoundRect(roundRect)
+
+                drawRoundRect(
+                    color = trackColor,
+                    topLeft = topLeft,
+                    size = rectSize,
+                    cornerRadius = CornerRadius(100f)
+                )
+            }
+
+            clipPath(clipPath) {
+                drawRect(
+                    color = trackFillColor,
+                    size = Size(
+                        width = size.width * playerProgress(),
+                        height = size.height
+                    )
+                )
+            }
+        } else {
+            powerRatios.forEachIndexed { i, ratio ->
+                val height = ratio * size.height
+
+                val xOffset = i * (amplitudeBarSpacingPx + amplitudeBarWidthPx)
+                val yTopStart = center.y - height / 2f
+
+                val topLeft = Offset(
+                    x = xOffset,
+                    y = yTopStart
+                )
+                val rectSize = Size(
+                    width = amplitudeBarWidthPx,
+                    height = height
+                )
+
+                val barColor = if (ratio <= silenceThreshold) trackColor else trackFillColor
+
+                drawRoundRect(
+                    color = barColor,
+                    topLeft = topLeft,
+                    size = rectSize,
+                    cornerRadius = CornerRadius(100f)
+                )
+            }
         }
     }
 }

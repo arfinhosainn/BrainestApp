@@ -25,6 +25,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FlashcardsGenerateScreen(
     onStartReview: (String) -> Unit,
+    onRecordAudio: () -> Unit,
     viewModel: FlashcardsGenerateViewModel = koinViewModel()
 ) {
     var isUploadSheetVisible by remember { mutableStateOf(false) }
@@ -48,7 +49,12 @@ fun FlashcardsGenerateScreen(
     }
 
     if (isUploadSheetVisible) {
-        UploadDocsBottomSheet(onDismiss = { isUploadSheetVisible = false })
+        UploadDocsBottomSheet(
+            onDismiss = { isUploadSheetVisible = false },
+            onRecordAudio = {
+                isUploadSheetVisible = false
+                onRecordAudio()
+            }
+        )
     }
 }
-

@@ -1,6 +1,7 @@
 package com.scelio.brainest.presentation.audio
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -10,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,11 +47,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.audio.ArcPlayback
+import com.scelio.brainest.designsystem.components.audio.PlaybackState
 import com.scelio.brainest.designsystem.components.audio.WaveForm
+import com.scelio.brainest.flashcards.domain.AudioTranscriptionError
+import com.scelio.brainest.flashcards.domain.AudioTranscriptionResult
+import com.scelio.brainest.presentation.permission.Permission
+import com.scelio.brainest.presentation.permission.PermissionState
+import com.scelio.brainest.presentation.permission.rememberPermissionController
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.random.Random
+import org.koin.compose.viewmodel.koinViewModel
 
 private val AudioBackground = Color(0xFF19C472).copy(alpha = 0.1f)
 private val AudioTextPrimary = Color(0xFF1E2633)
@@ -60,19 +69,22 @@ private val AudioWaveFill = Color(0xFFFFFFFF)
 @Composable
 fun AudioRecordingScreen(
     onBackClick: () -> Unit = {},
-    onPowerClick: () -> Unit = {}
+    onPowerClick: () -> Unit = {},
+    viewModel: AudioRecordingViewModel = koinViewModel()
 ) {
-    val waveformRatios = remember {
-        (1..50).map {
-            Random.nextFloat()
-        }
-    }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val permissionController = rememberPermissionController()
+    var permissionState by remember { mutableStateOf(PermissionState.NOT_DETERMINED) }
 
     var showPlayback by remember { mutableStateOf(false) }
     val transcriptScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         showPlayback = true
+        permissionState = permissionController.requestPermission(Permission.MICROPHONE)
+        if (permissionState == PermissionState.GRANTED) {
+            viewModel.startRecording()
+        }
     }
 
     Box(
@@ -114,17 +126,48 @@ fun AudioRecordingScreen(
                                 .padding(horizontal = 30.dp, vertical = 30.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            if (state.transcript.isNotBlank()) {
+                                Text(
+                                    text = state.transcript,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = 20.sp,
+                                        lineHeight = 28.sp
+                                    ),
+                                    color = AudioTextSecondary,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = "Listening...",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = 20.sp,
+                                        lineHeight = 28.sp
+                                    ),
+                                    color = AudioTextSecondary,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+                                )
+                            }
+                        }
+
+                        if (permissionState != PermissionState.GRANTED) {
                             Text(
-                                text = "Today we discussed campaign performance, content calendar, and " +
-                                        "upcoming tasks for the next sprint. The main focus will be improving " +
-                                        "conversion rate and optimizing landing pages...",
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = 20.sp,
-                                    lineHeight = 28.sp
-                                ),
-                                color = AudioTextSecondary,
+                                text = when (permissionState) {
+                                    PermissionState.PERMANENTLY_DENIED ->
+                                        "Microphone permission is blocked. Enable it in Settings."
+                                    PermissionState.DENIED ->
+                                        "Microphone permission is needed to record audio."
+                                    PermissionState.NOT_DETERMINED ->
+                                        "Requesting microphone permission..."
+                                    PermissionState.GRANTED -> ""
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = AudioTextPrimary,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .padding(horizontal = 24.dp)
                             )
                         }
 
@@ -145,18 +188,20 @@ fun AudioRecordingScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(80.dp))
 
                     WaveForm(
                         amplitudeBarWidth = 6.dp,
                         amplitudeBarSpacing = 5.dp,
-                        powerRatios = waveformRatios,
+                        powerRatios = state.amplitudes,
                         trackColor = Color.White,
                         trackFillColor = Color(0xFF19C472),
-                        playerProgress = { 0.62f },
+                        playerProgress = { 0f },
+                        useProgressFill = false,
+                        silenceThreshold = 0.06f,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(125.dp)
+                            .height(160.dp)
                     )
                 }
             }
@@ -166,11 +211,29 @@ fun AudioRecordingScreen(
             visible = showPlayback,
             enter = slideInVertically(
                 initialOffsetY = { it },
-                animationSpec = tween(durationMillis = 420)
-            ) + fadeIn(animationSpec = tween(durationMillis = 320)),
+                animationSpec = tween(
+                    durationMillis = 520,
+                    easing = FastOutSlowInEasing
+                )
+            ) + fadeIn(
+                animationSpec = tween(
+                    durationMillis = 260,
+                    easing = FastOutSlowInEasing
+                )
+            ),
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             ArcPlayback(
+                playbackState = when (state.status) {
+                    RecordingStatus.RECORDING -> PlaybackState.PLAYING
+                    RecordingStatus.PAUSED,
+                    RecordingStatus.STOPPED -> PlaybackState.PAUSED
+                },
+                onTogglePlayback = {
+                    if (permissionState == PermissionState.GRANTED) {
+                        viewModel.togglePauseResume()
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3.3333f)
@@ -201,6 +264,7 @@ private fun AudioTopAppBar(
                 onClick = onBackClick
             )
         },
+        windowInsets = WindowInsets(0, 0, 0, 0),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Unspecified,
@@ -243,6 +307,23 @@ private fun AudioTopIconButton(
 @Composable
 private fun PreviewAudioRecordingScreen() {
     BrainestTheme {
-        AudioRecordingScreen()
+        AudioRecordingScreen(
+            viewModel = AudioRecordingViewModel(
+                NoOpAudioRecorder(),
+                object : com.scelio.brainest.flashcards.domain.AudioTranscriptionService {
+                    override suspend fun transcribeChunk(
+                        chunk: com.scelio.brainest.flashcards.domain.AudioChunkData
+                    ): com.scelio.brainest.domain.util.Result<
+                            AudioTranscriptionResult, AudioTranscriptionError
+                    > {
+                        return com.scelio.brainest.domain.util.Result.Success(
+                            com.scelio.brainest.flashcards.domain.AudioTranscriptionResult(
+                                text = "Preview transcript"
+                            )
+                        )
+                    }
+                }
+            )
+        )
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.brainest.presentation.navigation.OnboardingGraphRoutes
 import com.scelio.brainest.designsystem.BrainestTheme
@@ -52,9 +53,13 @@ fun App(
 
     BrainestTheme {
         if (!state.isCheckingAuth) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+            val hideBottomBar = currentRoute == FlashcardsGraphRoutes.AudioRecording::class.qualifiedName ||
+                currentRoute?.endsWith(".AudioRecording") == true
             Scaffold(
                 bottomBar = {
-                    if (state.isLoggedIn) {
+                    if (state.isLoggedIn && !hideBottomBar) {
                         BrainestBottomNavigationBar(
                             onItemSelected = { index ->
                                 when (index) {

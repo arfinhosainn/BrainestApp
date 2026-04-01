@@ -24,7 +24,11 @@ class BuildKonfigConventionPlugin: Plugin<Project> {
                         ?: throw IllegalStateException(
                             "Missing API_KEY property in local.properties"
                         )
+                    val deepinfraKey = gradleLocalProperties(rootDir, rootProject.providers)
+                        .getProperty("DEEPINFRA_API_KEY")
+                        ?: apiKey
                     buildConfigField(FieldSpec.Type.STRING, "API_KEY", apiKey)
+                    buildConfigField(FieldSpec.Type.STRING, "DEEPINFRA_API_KEY", deepinfraKey)
                 }
             }
         }

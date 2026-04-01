@@ -14,6 +14,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FactCheck
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +39,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @Composable
+fun ArcPlayback(
+    modifier: Modifier = Modifier
+) {
+    DividedCircleCanvas(modifier = modifier)
+}
+
+@Composable
 fun DividedCircleCanvas(
     modifier: Modifier = Modifier
         .fillMaxWidth()
@@ -37,7 +53,7 @@ fun DividedCircleCanvas(
 ) {
     BoxWithConstraints(modifier = modifier) {
         val radiusY = (maxWidth / 2f) * 0.72f
-        val rowButtonSize = 60.dp
+        val rowButtonSize = 50.dp
         val middleButtonSize = 90.dp
 
         Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = 1.05f }) {
@@ -56,38 +72,57 @@ fun DividedCircleCanvas(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth().padding(start = 25.dp, end = 25.dp, bottom = 20.dp),
+                .fillMaxWidth().padding(start = 22.dp, end = 22.dp, bottom = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            EchoPlaybackButton(
-                playbackState = PlaybackState.PLAYING,
-                onPauseClick = {},
-                onPlayClick = {},
+
+            FilledIconButton(
+                onClick = {},
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = Color(0xFF19C472),
                     contentColor = Color.White
                 ),
-                modifier = Modifier.size(rowButtonSize)
-            )
+                modifier = Modifier
+                    .size(rowButtonSize)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Cancel"
+                )
+
+            }
+
+
             Box(
                 modifier = Modifier
                     .height(rowButtonSize)
-                    .width(140.dp),
+                    .width(130.dp),
                 contentAlignment = Alignment.Center
             ) {
                 StopwatchTimer()
             }
-            EchoPlaybackButton(
-                playbackState = PlaybackState.PAUSED,
-                onPauseClick = {},
-                onPlayClick = {},
+
+            FilledIconButton(
+                onClick = {},
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = Color(0xFF19C472),
-                    contentColor = Color.White
+
+                    containerColor = Color(0xFFF84E40),
+                    contentColor = Color(0xFFFFFFFF)
+
+
                 ),
-                modifier = Modifier.size(rowButtonSize)
-            )
+                modifier = Modifier
+                    .defaultShadow().size(rowButtonSize)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Cancel"
+                )
+
+            }
+
+
         }
 
         EchoPlaybackButton(
@@ -95,9 +130,10 @@ fun DividedCircleCanvas(
             onPauseClick = {},
             onPlayClick = {},
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color(0xFF19C472),
+                containerColor = Color(0xFFFF8B2D),
                 contentColor = Color.White
             ),
+            iconSize = 45.dp,
             modifier = Modifier
                 .size(middleButtonSize)
                 .offset(
@@ -141,10 +177,10 @@ private fun DrawScope.createUpperSemicirclePath(
 
 @Preview
 @Composable
-fun PreviewSheet(){
+fun PreviewSheet() {
     BrainestTheme {
         Box(modifier = Modifier.fillMaxSize()) {
-            DividedCircleCanvas(
+            ArcPlayback(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3.3333f)

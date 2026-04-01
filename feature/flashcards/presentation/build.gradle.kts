@@ -18,6 +18,9 @@ kotlin {
                 implementation(projects.core.designsystem)
                 implementation(projects.feature.flashcards.domain)
 
+                implementation(libs.jetbrains.compose.material.icons.extended)
+
+
                 implementation(compose.components.resources)
 
                 implementation(libs.bundles.koin.common)

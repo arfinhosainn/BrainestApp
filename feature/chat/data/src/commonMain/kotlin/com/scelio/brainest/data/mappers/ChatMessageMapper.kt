@@ -2,12 +2,18 @@ package com.scelio.brainest.data.mappers
 
 import com.scelio.brainest.data.dto.ContentDto
 import com.scelio.brainest.data.dto.MessageDto
+import com.scelio.brainest.data.dto.MessageRoles
 import com.scelio.brainest.domain.models.ChatMessage
 
 fun ChatMessage.toOpenAIMessage(): MessageDto {
     val contentList = mutableListOf<ContentDto>()
 
-    contentList.add(ContentDto.Text(text = content))
+    val textContent = if (role == MessageRoles.ASSISTANT) {
+        ContentDto.OutputText(text = content)
+    } else {
+        ContentDto.Text(text = content)
+    }
+    contentList.add(textContent)
 
     imageUrls?.forEach { url ->
         contentList.add(ContentDto.Image(imageUrl = url))

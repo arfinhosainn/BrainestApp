@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
+import com.scelio.brainest.presentation.util.statusBarsPaddingIfAndroid
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -54,7 +54,7 @@ fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
+                .statusBarsPaddingIfAndroid()
         ) {
             HorizontalPager(
                 state = pagerState,

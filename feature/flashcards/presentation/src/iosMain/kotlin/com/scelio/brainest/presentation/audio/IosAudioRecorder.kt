@@ -1,21 +1,26 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package com.scelio.brainest.presentation.audio
 
 import com.scelio.brainest.flashcards.domain.AudioChunkData
 import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.alloc
+import kotlinx.cinterop.get
 import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import platform.AVFoundation.AVAudioEngine
-import platform.AVFoundation.AVAudioPCMBuffer
-import platform.AVFoundation.AVAudioSession
-import platform.AVFoundation.AVAudioSessionCategoryPlayAndRecord
-import platform.AVFoundation.AVAudioSessionModeDefault
-import platform.AVFoundation.AVAudioSessionOptionDefaultToSpeaker
-import platform.AVFoundation.AVAudioSessionOptionMixWithOthers
-import platform.AVFoundation.AVAudioTime
+import platform.AVFAudio.AVAudioEngine
+import platform.AVFAudio.AVAudioPCMBuffer
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryOptionDefaultToSpeaker
+import platform.AVFAudio.AVAudioSessionCategoryOptionMixWithOthers
+import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFAudio.AVAudioSessionModeDefault
+import platform.AVFAudio.AVAudioTime
+import platform.AVFAudio.setActive
 import platform.Foundation.NSError
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -115,10 +120,11 @@ class IosAudioRecorder(
             bus = 0u,
             bufferSize = 1024u,
             format = format
-        ) { buffer: AVAudioPCMBuffer, _: AVAudioTime? ->
+        ) { buffer: AVAudioPCMBuffer?, _: AVAudioTime? ->
+            val safeBuffer = buffer ?: return@installTapOnBus
             if (_status.value != RecordingStatus.RECORDING) return@installTapOnBus
-            appendBufferSamples(buffer)
-            _amplitude.value = bufferAmplitude(buffer)
+            appendBufferSamples(safeBuffer)
+            _amplitude.value = bufferAmplitude(safeBuffer)
         }
         hasTap = true
     }
@@ -299,7 +305,7 @@ class IosAudioRecorder(
         val session = AVAudioSession.sharedInstance()
         session.setCategory(
             category = AVAudioSessionCategoryPlayAndRecord,
-            withOptions = AVAudioSessionOptionDefaultToSpeaker or AVAudioSessionOptionMixWithOthers,
+            withOptions = AVAudioSessionCategoryOptionDefaultToSpeaker or AVAudioSessionCategoryOptionMixWithOthers,
             error = null
         )
         session.setMode(AVAudioSessionModeDefault, error = null)

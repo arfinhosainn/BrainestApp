@@ -1,6 +1,5 @@
 package com.scelio.brainest.presentation.util
 
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.HEIGHT_DP_EXPANDED_LOWER_BOUND
@@ -9,10 +8,7 @@ import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_L
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 
 @Composable
-fun currentDeviceConfiguration(): DeviceConfiguration {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    return DeviceConfiguration.fromWindowSizeClass(windowSizeClass)
-}
+expect fun currentDeviceConfiguration(): DeviceConfiguration
 
 enum class DeviceConfiguration {
     MOBILE_PORTRAIT,

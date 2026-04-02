@@ -29,7 +29,6 @@ import brainest.feature.onboarding.presentation.generated.resources.spanish
 import com.brainest.presentation.introduction.IntroductionScreen
 import com.brainest.presentation.introduction.UserReviewScreen
 import com.brainest.presentation.introduction.WelcomeScreen
-import com.brainest.presentation.introduction.permission.PermissionScreenOnboarding
 import com.brainest.presentation.introduction.about_learner.GradeScreen
 import com.brainest.presentation.introduction.about_learner.MultiSelectOptionData
 import com.brainest.presentation.introduction.about_learner.NameInputScreen
@@ -259,20 +258,6 @@ fun NavGraphBuilder.onboardingGraph(
 
             UserReviewScreen(
                 onContinueClick = {
-                    navController.navigate(OnboardingGraphRoutes.Permissions)
-                }
-            )
-        }
-
-        composable<OnboardingGraphRoutes.Permissions> {
-            val viewModel = rememberOnboardingViewModel(navController)
-
-            PermissionScreenOnboarding(
-                onAllowClick = {
-                    viewModel.onAction(OnboardingAction.Reset)
-                    onFinishOnboarding()
-                },
-                onContinue = {
                     viewModel.onAction(OnboardingAction.Reset)
                     onFinishOnboarding()
                 }

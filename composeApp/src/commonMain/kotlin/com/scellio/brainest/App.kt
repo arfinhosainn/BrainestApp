@@ -57,9 +57,18 @@ fun App(
             val currentRoute = navBackStackEntry?.destination?.route
             val hideBottomBar = currentRoute == FlashcardsGraphRoutes.AudioRecording::class.qualifiedName ||
                 currentRoute?.endsWith(".AudioRecording") == true
+            val mainGraphPrefixes = listOfNotNull(
+                HomeGraphRoutes::class.qualifiedName,
+                ChatGraphRoutes::class.qualifiedName,
+                FlashcardsGraphRoutes::class.qualifiedName
+            )
+            val isMainGraphRoute = mainGraphPrefixes.any { prefix ->
+                currentRoute?.startsWith(prefix) == true
+            }
+            val showBottomBar = (state.isLoggedIn || isMainGraphRoute) && !hideBottomBar
             Scaffold(
                 bottomBar = {
-                    if (state.isLoggedIn && !hideBottomBar) {
+                    if (showBottomBar) {
                         BrainestBottomNavigationBar(
                             onItemSelected = { index ->
                                 when (index) {

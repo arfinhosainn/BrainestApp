@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.convention.cmp.library)
-    alias(libs.plugins.hotswan.compiler)
 }
 
 kotlin {

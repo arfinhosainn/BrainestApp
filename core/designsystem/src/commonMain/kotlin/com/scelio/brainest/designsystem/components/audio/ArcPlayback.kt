@@ -9,18 +9,13 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FactCheck
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -42,11 +37,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun ArcPlayback(
     playbackState: PlaybackState,
     onTogglePlayback: () -> Unit,
+    onConfirm: () -> Unit = {},
+    onCancel: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     DividedCircleCanvas(
         playbackState = playbackState,
         onTogglePlayback = onTogglePlayback,
+        onConfirm = onConfirm,
+        onCancel = onCancel,
         modifier = modifier
     )
 }
@@ -55,6 +54,8 @@ fun ArcPlayback(
 fun DividedCircleCanvas(
     playbackState: PlaybackState,
     onTogglePlayback: () -> Unit,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(3.3333f)
@@ -86,7 +87,7 @@ fun DividedCircleCanvas(
         ) {
 
             FilledIconButton(
-                onClick = {},
+                onClick = onConfirm,
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = Color(0xFF19C472),
                     contentColor = Color.White
@@ -96,7 +97,7 @@ fun DividedCircleCanvas(
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = "Cancel"
+                    contentDescription = "Finish recording"
                 )
 
             }
@@ -112,7 +113,7 @@ fun DividedCircleCanvas(
             }
 
             FilledIconButton(
-                onClick = {},
+                onClick = onCancel,
                 colors = IconButtonDefaults.filledIconButtonColors(
 
                     containerColor = Color(0xFFF84E40),
@@ -125,7 +126,7 @@ fun DividedCircleCanvas(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Cancel"
+                    contentDescription = "Cancel recording"
                 )
 
             }
@@ -191,6 +192,8 @@ fun PreviewSheet() {
             ArcPlayback(
                 playbackState = PlaybackState.PAUSED,
                 onTogglePlayback = {},
+                onConfirm = {},
+                onCancel = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3.3333f)

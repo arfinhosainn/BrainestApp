@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,11 +38,24 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.audio.ArcPlayback
 import com.scelio.brainest.designsystem.components.audio.PlaybackState
 import com.scelio.brainest.designsystem.components.audio.WaveForm
+import com.scelio.brainest.domain.auth.AuthInfo
+import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.util.DataError
+import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.flashcards.domain.AudioChunkData
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionError
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionResult
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
+import com.scelio.brainest.flashcards.domain.Deck
+import com.scelio.brainest.flashcards.domain.Flashcard
+import com.scelio.brainest.flashcards.domain.FlashcardInput
+import com.scelio.brainest.flashcards.domain.FlashcardsGenerationError
+import com.scelio.brainest.flashcards.domain.FlashcardsGenerationService
+import com.scelio.brainest.flashcards.domain.FlashcardsRepository
+import com.scelio.brainest.flashcards.domain.SessionRecordInput
+import com.scelio.brainest.flashcards.domain.SessionSummary
+import com.scelio.brainest.flashcards.domain.StudySession
 import com.scelio.brainest.presentation.permission.Permission
 import com.scelio.brainest.presentation.permission.PermissionState
 import com.scelio.brainest.presentation.permission.rememberPermissionController
@@ -52,11 +66,11 @@ private val AudioBackground = Color(0xFF19C472).copy(alpha = 0.1f)
 private val AudioTextPrimary = Color(0xFF1E2633)
 private val AudioTextSecondary = Color.Black
 private val AudioWaveTrack = Color(0xFFD7E3F8)
-private val AudioWaveFill = Color(0xFFFFFFFF)
 
 @Composable
 fun AudioRecordingScreen(
     onBackClick: () -> Unit = {},
+    onGenerationComplete: (String) -> Unit = {},
     viewModel: AudioRecordingViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -74,6 +88,14 @@ fun AudioRecordingScreen(
         }
     }
 
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is AudioRecordingEvent.GenerationComplete -> onGenerationComplete(event.deckId)
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -85,7 +107,12 @@ fun AudioRecordingScreen(
                 .padding(bottom = 200.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AudioTopAppBar(onBackClick = onBackClick)
+            AudioTopAppBar(
+                onBackClick = {
+                    viewModel.stopRecording()
+                    onBackClick()
+                }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -161,6 +188,19 @@ fun AudioRecordingScreen(
                             )
                         }
 
+                        val generationError = state.generationError
+                        if (generationError != null) {
+                            Text(
+                                text = generationError,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFFF84E40),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(horizontal = 24.dp, vertical = 12.dp)
+                            )
+                        }
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -220,14 +260,59 @@ fun AudioRecordingScreen(
                     RecordingStatus.STOPPED -> PlaybackState.PAUSED
                 },
                 onTogglePlayback = {
-                    if (permissionState == PermissionState.GRANTED) {
+                    if (permissionState == PermissionState.GRANTED && !state.isGenerating) {
                         viewModel.togglePauseResume()
                     }
+                },
+                onConfirm = {
+                    if (permissionState == PermissionState.GRANTED && !state.isGenerating) {
+                        viewModel.finishRecordingAndGenerate()
+                    }
+                },
+                onCancel = {
+                    viewModel.stopRecording()
+                    onBackClick()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3.3333f)
             )
+        }
+
+        if (state.isGenerating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.92f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                ) {
+                    Text(
+                        text = "Generating flashcards...",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = AudioTextPrimary,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp),
+                        color = Color(0xFF19C472),
+                        trackColor = AudioWaveTrack
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "This can take a few seconds.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AudioTextSecondary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 }
@@ -250,6 +335,101 @@ private fun PreviewAudioRecordingScreen() {
                             )
                         )
                     }
+                },
+                generationService = object : FlashcardsGenerationService {
+                    override suspend fun generateFlashcards(
+                        prompt: String,
+                        count: Int
+                    ): Result<List<FlashcardInput>, FlashcardsGenerationError> {
+                        return Result.Success(emptyList())
+                    }
+                },
+                repository = object : FlashcardsRepository {
+                    override suspend fun createDeck(
+                        userId: String,
+                        title: String,
+                        sourceFilename: String?
+                    ): Result<Deck, DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun addCards(
+                        deckId: String,
+                        cards: List<FlashcardInput>
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun listDecks(
+                        userId: String
+                    ): Result<List<Deck>, DataError.Remote> {
+                        return Result.Success(emptyList())
+                    }
+
+                    override suspend fun getDeckCards(
+                        deckId: String
+                    ): Result<List<Flashcard>, DataError.Remote> {
+                        return Result.Success(emptyList())
+                    }
+
+                    override suspend fun startSession(
+                        userId: String,
+                        deckId: String,
+                        startedAt: kotlin.time.Instant
+                    ): Result<StudySession, DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun finishSession(
+                        sessionId: String,
+                        summary: SessionSummary,
+                        records: List<SessionRecordInput>
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Success(Unit)
+                    }
+                },
+                authService = object : AuthService {
+                    override suspend fun register(
+                        email: String,
+                        password: String,
+                        username: String
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun resendVerificationEmail(
+                        email: String
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun login(
+                        email: String,
+                        password: String
+                    ): Result<AuthInfo, DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun verifyEmail(
+                        deepLinkUrl: String
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun forgotPassword(
+                        email: String
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun resetPassword(
+                        deepLinkUrl: String,
+                        newPassword: String
+                    ): EmptyResult<DataError.Remote> {
+                        return Result.Failure(DataError.Remote.UNKNOWN)
+                    }
+
+                    override suspend fun currentUserId(): String? = "preview-user"
                 }
             )
         )

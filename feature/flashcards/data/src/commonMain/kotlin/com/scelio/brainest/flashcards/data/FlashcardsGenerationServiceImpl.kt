@@ -56,6 +56,50 @@ class FlashcardsGenerationServiceImpl(
             temperature = 0.3
         )
 
+        return requestFlashcards(request, count)
+    }
+
+    override suspend fun generateFlashcardsFromFile(
+        fileId: String,
+        count: Int
+    ): Result<List<FlashcardInput>, FlashcardsGenerationError> {
+        if (apiKey.isBlank() || apiKey == "your-openai-api-key-here") {
+            return Result.Failure(
+                FlashcardsGenerationError.Remote(DataError.Remote.UNAUTHORIZED)
+            )
+        }
+
+        val systemPrompt = buildSystemPrompt(count)
+        val userPrompt = """
+            Use the attached document to generate flashcards.
+            Focus on the most important concepts and definitions.
+        """.trimIndent()
+
+        val request = OpenAiResponseRequest(
+            model = "gpt-4o-mini",
+            input = listOf(
+                OpenAiMessage(
+                    role = "system",
+                    content = listOf(OpenAiContent(type = "input_text", text = systemPrompt))
+                ),
+                OpenAiMessage(
+                    role = "user",
+                    content = listOf(
+                        OpenAiContent(type = "input_file", fileId = fileId),
+                        OpenAiContent(type = "input_text", text = userPrompt)
+                    )
+                )
+            ),
+            temperature = 0.3
+        )
+
+        return requestFlashcards(request, count)
+    }
+
+    private suspend fun requestFlashcards(
+        request: OpenAiResponseRequest,
+        count: Int
+    ): Result<List<FlashcardInput>, FlashcardsGenerationError> {
         return try {
             val response = httpClient.post("$baseUrl/responses") {
                 contentType(ContentType.Application.Json)

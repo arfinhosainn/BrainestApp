@@ -42,7 +42,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun UploadDocsBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    onContinueWithApple: () -> Unit = {},
+    onUploadAudio: () -> Unit = {},
+    onUploadDocument: () -> Unit = {},
     onRecordAudio: () -> Unit = {},
 
     ) {
@@ -86,7 +87,7 @@ fun UploadDocsBottomSheet(
             )
             BrainestButton(
                 text = "Upload Audio",
-                onClick = onContinueWithApple,
+                onClick = onUploadAudio,
                 modifier = modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(
@@ -106,7 +107,7 @@ fun UploadDocsBottomSheet(
 
             BrainestButton(
                 text = "Upload Documents",
-                onClick = onContinueWithApple,
+                onClick = onUploadDocument,
                 modifier = modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(

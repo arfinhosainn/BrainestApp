@@ -33,7 +33,10 @@ fun NavGraphBuilder.flashcardsGraph(
 
         composable<FlashcardsGraphRoutes.AudioRecording> {
             AudioRecordingScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onGenerationComplete = { deckId ->
+                    navController.navigate(FlashcardsGraphRoutes.Session(deckId))
+                }
             )
         }
     }

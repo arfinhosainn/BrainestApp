@@ -6,30 +6,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,11 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,8 +37,11 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.audio.ArcPlayback
 import com.scelio.brainest.designsystem.components.audio.PlaybackState
 import com.scelio.brainest.designsystem.components.audio.WaveForm
+import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.flashcards.domain.AudioChunkData
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionError
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionResult
+import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
 import com.scelio.brainest.presentation.permission.Permission
 import com.scelio.brainest.presentation.permission.PermissionState
 import com.scelio.brainest.presentation.permission.rememberPermissionController
@@ -69,7 +57,6 @@ private val AudioWaveFill = Color(0xFFFFFFFF)
 @Composable
 fun AudioRecordingScreen(
     onBackClick: () -> Unit = {},
-    onPowerClick: () -> Unit = {},
     viewModel: AudioRecordingViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -98,7 +85,7 @@ fun AudioRecordingScreen(
                 .padding(bottom = 200.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AudioTopAppBar(onBackClick = onBackClick, onPowerClick = onPowerClick)
+            AudioTopAppBar(onBackClick = onBackClick)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -156,10 +143,13 @@ fun AudioRecordingScreen(
                                 text = when (permissionState) {
                                     PermissionState.PERMANENTLY_DENIED ->
                                         "Microphone permission is blocked. Enable it in Settings."
+
                                     PermissionState.DENIED ->
                                         "Microphone permission is needed to record audio."
+
                                     PermissionState.NOT_DETERMINED ->
                                         "Requesting microphone permission..."
+
                                     PermissionState.GRANTED -> ""
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
@@ -242,66 +232,6 @@ fun AudioRecordingScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AudioTopAppBar(
-    onBackClick: () -> Unit,
-    onPowerClick: () -> Unit
-) {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = "Audio",
-                style = MaterialTheme.typography.titleSmall,
-                color = AudioTextPrimary,
-                fontWeight = FontWeight.SemiBold
-            )
-        },
-        navigationIcon = {
-            AudioTopIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                onClick = onBackClick
-            )
-        },
-        windowInsets = WindowInsets(0, 0, 0, 0),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            scrolledContainerColor = Color.Unspecified,
-            navigationIconContentColor = Color.Unspecified,
-            titleContentColor = Color.Unspecified,
-            actionIconContentColor = Color.Unspecified
-        )
-    )
-}
-
-@Composable
-private fun AudioTopIconButton(
-    icon: ImageVector,
-    contentDescription: String,
-    onClick: () -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    Box(
-        modifier = Modifier
-            .size(36.dp)
-            .clip(CircleShape)
-            .background(Color.White)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true, radius = 20.dp),
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(18.dp),
-            tint = AudioTextPrimary
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -310,14 +240,12 @@ private fun PreviewAudioRecordingScreen() {
         AudioRecordingScreen(
             viewModel = AudioRecordingViewModel(
                 NoOpAudioRecorder(),
-                object : com.scelio.brainest.flashcards.domain.AudioTranscriptionService {
+                object : AudioTranscriptionService {
                     override suspend fun transcribeChunk(
-                        chunk: com.scelio.brainest.flashcards.domain.AudioChunkData
-                    ): com.scelio.brainest.domain.util.Result<
-                            AudioTranscriptionResult, AudioTranscriptionError
-                    > {
-                        return com.scelio.brainest.domain.util.Result.Success(
-                            com.scelio.brainest.flashcards.domain.AudioTranscriptionResult(
+                        chunk: AudioChunkData
+                    ): Result<AudioTranscriptionResult, AudioTranscriptionError> {
+                        return Result.Success(
+                            AudioTranscriptionResult(
                                 text = "Preview transcript"
                             )
                         )

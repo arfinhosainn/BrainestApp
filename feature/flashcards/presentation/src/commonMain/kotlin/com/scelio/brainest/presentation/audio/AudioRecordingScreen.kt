@@ -343,6 +343,13 @@ private fun PreviewAudioRecordingScreen() {
                     ): Result<List<FlashcardInput>, FlashcardsGenerationError> {
                         return Result.Success(emptyList())
                     }
+
+                    override suspend fun generateFlashcardsFromFile(
+                        fileId: String,
+                        count: Int
+                    ): Result<List<FlashcardInput>, FlashcardsGenerationError> {
+                        return Result.Success(emptyList())
+                    }
                 },
                 repository = object : FlashcardsRepository {
                     override suspend fun createDeck(

@@ -19,7 +19,8 @@ data class OpenAiMessage(
 @Serializable
 data class OpenAiContent(
     val type: String,
-    val text: String
+    val text: String? = null,
+    @kotlinx.serialization.SerialName("file_id") val fileId: String? = null
 )
 
 @Serializable

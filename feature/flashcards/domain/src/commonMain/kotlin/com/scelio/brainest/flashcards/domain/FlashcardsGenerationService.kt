@@ -7,4 +7,9 @@ interface FlashcardsGenerationService {
         prompt: String,
         count: Int
     ): Result<List<FlashcardInput>, FlashcardsGenerationError>
+
+    suspend fun generateFlashcardsFromFile(
+        fileId: String,
+        count: Int
+    ): Result<List<FlashcardInput>, FlashcardsGenerationError>
 }

@@ -5,10 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,10 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-
-
+import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +48,7 @@ fun AudioTopAppBar(
         },
         navigationIcon = {
             AudioTopIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
+                icon = Icons.AutoMirrored.Filled.ArrowBackIos,
                 contentDescription = "Back",
                 onClick = onBackClick
             )
@@ -68,6 +71,8 @@ private fun AudioTopIconButton(
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val layoutDirection = LocalLayoutDirection.current
+    val iconOffset = if (layoutDirection == LayoutDirection.Ltr) 1.dp else (-1).dp
     Box(
         modifier = Modifier
             .size(36.dp)
@@ -83,8 +88,17 @@ private fun AudioTopIconButton(
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(18.dp).offset(x = iconOffset),
             tint = Color(0xFF1E2633)
         )
+    }
+}
+
+
+@Preview
+@Composable
+fun PreviewAudioTopAppbar(){
+    BrainestTheme {
+        AudioTopAppBar {  }
     }
 }

@@ -1,11 +1,15 @@
 package com.scellio.brainest
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -55,8 +59,12 @@ fun App(
         if (!state.isCheckingAuth) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
+            val chatDetailRoutePrefix = ChatGraphRoutes.ChatDetailRoute::class.qualifiedName
+            val isChatDetailRoute = chatDetailRoutePrefix != null &&
+                currentRoute?.startsWith(chatDetailRoutePrefix) == true
             val hideBottomBar = currentRoute == FlashcardsGraphRoutes.AudioRecording::class.qualifiedName ||
-                currentRoute?.endsWith(".AudioRecording") == true
+                currentRoute?.endsWith(".AudioRecording") == true ||
+                isChatDetailRoute
             val mainGraphPrefixes = listOfNotNull(
                 HomeGraphRoutes::class.qualifiedName,
                 ChatGraphRoutes::class.qualifiedName,
@@ -88,6 +96,16 @@ fun App(
                     }
                 }
             ) { innerPadding ->
+                val layoutDirection = LocalLayoutDirection.current
+                val navHostPadding = if (isChatDetailRoute) {
+                    PaddingValues(
+                        start = innerPadding.calculateStartPadding(layoutDirection),
+                        end = innerPadding.calculateEndPadding(layoutDirection),
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
+                } else {
+                    innerPadding
+                }
                 NavigationRoot(
                     navController = navController,
                     startDestination = if (state.isLoggedIn) {
@@ -95,7 +113,7 @@ fun App(
                     } else {
                         OnboardingGraphRoutes.Graph
                     },
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(navHostPadding)
                 )
             }
         }

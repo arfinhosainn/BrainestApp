@@ -6,11 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.chat.ChatRepository
 import com.scelio.brainest.domain.models.CreateChatRequest
+import com.scelio.brainest.presentation.chat_list.components.ChatSystemPrompt
 import com.scelio.brainest.presentation.mappers.toUi
 import com.scelio.brainest.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+
 
 class ChatListViewModel(
     private val chatRepository: ChatRepository,
@@ -74,8 +77,6 @@ class ChatListViewModel(
             }
         }
     }
-
-
 
 
     private fun deleteChat(chatId: String) {
@@ -148,7 +149,7 @@ class ChatListViewModel(
                     CreateChatRequest(
                         userId = userId,
                         title = "New chat",
-                        systemPrompt = ""
+                        systemPrompt = ChatSystemPrompt
                     )
                 )
 

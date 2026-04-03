@@ -34,6 +34,7 @@ import com.scelio.brainest.designsystem.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.min
 
+@Suppress("FrequentlyChangingValue")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatDetailHeader(
@@ -64,7 +65,6 @@ fun ChatDetailHeader(
                 text = "Ask Anything",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Serif
             )
         },
         actions = {

@@ -21,11 +21,17 @@ import kotlinx.coroutines.launch
 data class StudySetDetailState(
     val isLoading: Boolean = false,
     val isGenerating: Boolean = false,
+    val generationTarget: GenerationTarget? = null,
     val deck: Deck? = null,
     val source: StudySource? = null,
     val quizCount: Int = 0,
     val error: String? = null
 )
+
+enum class GenerationTarget {
+    Flashcards,
+    Quiz
+}
 
 sealed interface StudySetDetailEvent {
     data class OpenFlashcards(val deckId: String) : StudySetDetailEvent
@@ -76,20 +82,6 @@ class StudySetDetailViewModel(
         }
     }
 
-    fun openFlashcards() {
-        val deck = _state.value.deck ?: return
-        if (deck.totalCards > 0) {
-            _events.tryEmit(StudySetDetailEvent.OpenFlashcards(deck.id))
-        }
-    }
-
-    fun openQuiz() {
-        val deck = _state.value.deck ?: return
-        if (_state.value.quizCount > 0) {
-            _events.tryEmit(StudySetDetailEvent.OpenQuiz(deck.id))
-        }
-    }
-
     fun generateFlashcards(count: Int) {
         val deck = _state.value.deck ?: return
         val source = _state.value.source
@@ -103,22 +95,33 @@ class StudySetDetailViewModel(
             return
         }
 
-        _state.update { it.copy(isGenerating = true, error = null) }
+        _state.update {
+            it.copy(
+                isGenerating = true,
+                generationTarget = GenerationTarget.Flashcards,
+                error = null
+            )
+        }
 
         viewModelScope.launch {
             val generation = when (source.sourceType) {
                 StudySourceType.DOCUMENT -> {
-                    val fileId = source.sourceFileId
-                    if (fileId.isNullOrBlank()) {
-                        Result.Failure(
-                            FlashcardsGenerationError.Empty("Missing document reference.")
-                        )
+                    val text = source.sourceText.orEmpty().trim()
+                    if (text.isNotBlank()) {
+                        flashcardsGenerationService.generateFlashcards(text, count)
                     } else {
-                        flashcardsGenerationService.generateFlashcardsFromFile(fileId, count)
+                        val fileId = source.sourceFileId
+                        if (fileId.isNullOrBlank()) {
+                            Result.Failure(
+                                FlashcardsGenerationError.Empty("Missing document text.")
+                            )
+                        } else {
+                            flashcardsGenerationService.generateFlashcardsFromFile(fileId, count)
+                        }
                     }
                 }
                 StudySourceType.AUDIO -> {
-                    val text = source.sourceText.orEmpty()
+                    val text = source.sourceText.orEmpty().trim()
                     if (text.isBlank()) {
                         Result.Failure(
                             FlashcardsGenerationError.Empty("Missing audio transcript.")
@@ -133,13 +136,19 @@ class StudySetDetailViewModel(
                 is Result.Success -> {
                     val addResult = repository.addCards(deck.id, generation.data)
                     if (addResult is Result.Success) {
-                        _state.update { it.copy(isGenerating = false) }
+                        _state.update {
+                            it.copy(
+                                isGenerating = false,
+                                generationTarget = null
+                            )
+                        }
                         load(deck.id)
                         _events.tryEmit(StudySetDetailEvent.OpenFlashcards(deck.id))
                     } else {
                         _state.update {
                             it.copy(
                                 isGenerating = false,
+                                generationTarget = null,
                                 error = "Failed to save flashcards: ${(addResult as Result.Failure).error}"
                             )
                         }
@@ -149,6 +158,7 @@ class StudySetDetailViewModel(
                     _state.update {
                         it.copy(
                             isGenerating = false,
+                            generationTarget = null,
                             error = flashcardsErrorMessage(generation.error)
                         )
                     }
@@ -170,22 +180,33 @@ class StudySetDetailViewModel(
             return
         }
 
-        _state.update { it.copy(isGenerating = true, error = null) }
+        _state.update {
+            it.copy(
+                isGenerating = true,
+                generationTarget = GenerationTarget.Quiz,
+                error = null
+            )
+        }
 
         viewModelScope.launch {
             val generation = when (source.sourceType) {
                 StudySourceType.DOCUMENT -> {
-                    val fileId = source.sourceFileId
-                    if (fileId.isNullOrBlank()) {
-                        Result.Failure(
-                            QuizGenerationError.Empty("Missing document reference.")
-                        )
+                    val text = source.sourceText.orEmpty().trim()
+                    if (text.isNotBlank()) {
+                        quizGenerationService.generateQuizFromText(text, count, multipleChoice)
                     } else {
-                        quizGenerationService.generateQuizFromFile(fileId, count, multipleChoice)
+                        val fileId = source.sourceFileId
+                        if (fileId.isNullOrBlank()) {
+                            Result.Failure(
+                                QuizGenerationError.Empty("Missing document text.")
+                            )
+                        } else {
+                            quizGenerationService.generateQuizFromFile(fileId, count, multipleChoice)
+                        }
                     }
                 }
                 StudySourceType.AUDIO -> {
-                    val text = source.sourceText.orEmpty()
+                    val text = source.sourceText.orEmpty().trim()
                     if (text.isBlank()) {
                         Result.Failure(
                             QuizGenerationError.Empty("Missing audio transcript.")
@@ -200,13 +221,19 @@ class StudySetDetailViewModel(
                 is Result.Success -> {
                     val addResult = repository.addQuizQuestions(deck.id, generation.data)
                     if (addResult is Result.Success) {
-                        _state.update { it.copy(isGenerating = false) }
+                        _state.update {
+                            it.copy(
+                                isGenerating = false,
+                                generationTarget = null
+                            )
+                        }
                         load(deck.id)
                         _events.tryEmit(StudySetDetailEvent.OpenQuiz(deck.id))
                     } else {
                         _state.update {
                             it.copy(
                                 isGenerating = false,
+                                generationTarget = null,
                                 error = "Failed to save quiz: ${(addResult as Result.Failure).error}"
                             )
                         }
@@ -216,6 +243,7 @@ class StudySetDetailViewModel(
                     _state.update {
                         it.copy(
                             isGenerating = false,
+                            generationTarget = null,
                             error = quizErrorMessage(generation.error)
                         )
                     }

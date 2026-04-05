@@ -1,15 +1,23 @@
 package com.scelio.brainest.presentation.studysets
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,19 +26,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scelio.brainest.designsystem.BrainestTheme
-import com.scelio.brainest.presentation.components.GenerateContentBottomSheet
 import com.scelio.brainest.presentation.components.StudySetItem
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -38,11 +47,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.Instant as KxInstant
 
-private enum class GenerationSheetMode {
-    All,
-    FlashcardsOnly,
-    QuizOnly
-}
+private const val DefaultGenerationCount = 10
+private const val DefaultMultipleChoice = true
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,18 +61,9 @@ fun StudySetDetailScreen(
     viewModel: StudySetDetailViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var generationMode by remember { mutableStateOf<GenerationSheetMode?>(null) }
-    var countText by remember { mutableStateOf("10") }
-    var multipleChoice by remember { mutableStateOf(true) }
 
     LaunchedEffect(deckId) {
         viewModel.load(deckId)
-    }
-
-    LaunchedEffect(promptGeneration, state.deck) {
-        if (promptGeneration && state.deck != null) {
-            generationMode = GenerationSheetMode.All
-        }
     }
 
     LaunchedEffect(viewModel) {
@@ -89,7 +86,7 @@ fun StudySetDetailScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 20.dp),
+                        .padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TopAppBar(
@@ -101,13 +98,10 @@ fun StudySetDetailScreen(
                                     contentDescription = "Back"
                                 )
                             }
-                        }
+                        },
+                        windowInsets = WindowInsets(0, 0, 0, 0)
                     )
-                    Text(
-                        text = deck.title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+                    
 
                     StudySetItem(
                         title = deck.title,
@@ -119,65 +113,21 @@ fun StudySetDetailScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = "Flashcards",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    if (deck.totalCards > 0) {
-                        Text(
-                            text = "Open existing flashcards.",
-                            style = MaterialTheme.typography.bodyMedium
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        StudySetActionItem(
+                            title = "Flashcards",
+                            icon = Icons.Outlined.AutoStories,
+                            enabled = !state.isGenerating,
+                            onClick = { viewModel.generateFlashcards(DefaultGenerationCount) }
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        GenerateActionButton(
-                            text = "Open Flashcards",
-                            onClick = { viewModel.openFlashcards() }
-                        )
-                    } else {
-                        Text(
-                            text = "Generate flashcards from this study set.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        GenerateActionButton(
-                            text = "Generate Flashcards",
-                            onClick = {
-                                generationMode = GenerationSheetMode.FlashcardsOnly
-                            }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "Quiz",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    if (state.quizCount > 0) {
-                        Text(
-                            text = "Open existing quiz.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        GenerateActionButton(
-                            text = "Open Quiz",
-                            onClick = { viewModel.openQuiz() }
-                        )
-                    } else {
-                        Text(
-                            text = "Generate a quiz from this study set.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        GenerateActionButton(
-                            text = "Generate Quiz",
-                            onClick = {
-                                generationMode = GenerationSheetMode.QuizOnly
-                            }
+                        StudySetActionItem(
+                            title = "Quiz",
+                            icon = Icons.Outlined.Quiz,
+                            enabled = !state.isGenerating,
+                            onClick = { viewModel.generateQuiz(DefaultGenerationCount, DefaultMultipleChoice) }
                         )
                     }
                 }
@@ -196,45 +146,83 @@ fun StudySetDetailScreen(
         }
 
         if (state.isGenerating) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            val generationLabel = when (state.generationTarget) {
+                GenerationTarget.Flashcards -> "Generating flashcards"
+                GenerationTarget.Quiz -> "Generating quiz"
+                null -> "Generating"
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.7f))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = generationLabel,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+            }
         }
-    }
-
-    val mode = generationMode
-    if (mode != null) {
-        GenerateContentBottomSheet(
-            countText = countText,
-            onCountChange = { countText = it },
-            multipleChoice = multipleChoice,
-            onMultipleChoiceChange = { multipleChoice = it },
-            showQuizToggle = mode != GenerationSheetMode.FlashcardsOnly,
-            showFlashcards = mode != GenerationSheetMode.QuizOnly,
-            showQuiz = mode != GenerationSheetMode.FlashcardsOnly,
-            onGenerateFlashcards = {
-                val count = countText.toIntOrNull()?.coerceIn(3, 50) ?: 10
-                generationMode = null
-                viewModel.generateFlashcards(count)
-            },
-            onGenerateQuiz = {
-                val count = countText.toIntOrNull()?.coerceIn(3, 50) ?: 10
-                generationMode = null
-                viewModel.generateQuiz(count, multipleChoice)
-            },
-            onDismiss = { generationMode = null }
-        )
     }
 }
 
 @Composable
-private fun GenerateActionButton(
-    text: String,
-    onClick: () -> Unit
+private fun StudySetActionItem(
+    title: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(48.dp)
+    val colorScheme = MaterialTheme.colorScheme
+    Surface(
+        color = colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(enabled = enabled, onClick = onClick)
     ) {
-        Text(text)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = colorScheme.onPrimaryContainer
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 

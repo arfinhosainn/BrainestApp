@@ -70,7 +70,7 @@ private val AudioWaveTrack = Color(0xFFD7E3F8)
 @Composable
 fun AudioRecordingScreen(
     onBackClick: () -> Unit = {},
-    onGenerationComplete: (String) -> Unit = {},
+    onStudySetReady: (String) -> Unit = {},
     viewModel: AudioRecordingViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,7 +91,7 @@ fun AudioRecordingScreen(
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
-                is AudioRecordingEvent.GenerationComplete -> onGenerationComplete(event.deckId)
+                is AudioRecordingEvent.StudySetReady -> onStudySetReady(event.deckId)
             }
         }
     }
@@ -291,7 +291,7 @@ fun AudioRecordingScreen(
                     modifier = Modifier.padding(horizontal = 32.dp)
                 ) {
                     Text(
-                        text = "Generating flashcards...",
+                        text = "Preparing study set...",
                         style = MaterialTheme.typography.titleMedium,
                         color = AudioTextPrimary,
                         textAlign = TextAlign.Center
@@ -316,4 +316,3 @@ fun AudioRecordingScreen(
         }
     }
 }
-

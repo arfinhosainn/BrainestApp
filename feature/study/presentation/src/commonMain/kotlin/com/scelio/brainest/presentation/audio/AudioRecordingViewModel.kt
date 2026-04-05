@@ -5,25 +5,26 @@ import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
-import com.scelio.brainest.flashcards.domain.FlashcardsGenerationError
-import com.scelio.brainest.flashcards.domain.FlashcardsGenerationService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
+import com.scelio.brainest.flashcards.domain.StudySource
+import com.scelio.brainest.flashcards.domain.StudySourceType
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.time.Clock
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 private const val AmplitudeWindowSize = 50
 private const val AmplitudeNoiseFloor = 0.01f
 private const val AmplitudeLogCurve = 30f
 private const val MinVisualAmplitude = 0.04f
-private const val DefaultFlashcardCount = 10
-
 data class AudioRecordingUiState(
     val amplitudes: List<Float> = List(AmplitudeWindowSize) { 0f },
     val status: RecordingStatus = RecordingStatus.STOPPED,
@@ -33,13 +34,12 @@ data class AudioRecordingUiState(
 )
 
 sealed interface AudioRecordingEvent {
-    data class GenerationComplete(val deckId: String) : AudioRecordingEvent
+    data class StudySetReady(val deckId: String) : AudioRecordingEvent
 }
 
 class AudioRecordingViewModel(
     private val recorder: AudioRecorder,
     private val transcriptionService: AudioTranscriptionService,
-    private val generationService: FlashcardsGenerationService,
     private val repository: FlashcardsRepository,
     private val authService: AuthService
 ) : ViewModel() {
@@ -117,14 +117,14 @@ class AudioRecordingViewModel(
             val transcript = _state.value.transcript.trim()
             if (transcript.isBlank()) {
                 _state.update {
-                    it.copy(generationError = "Record some audio before generating flashcards.")
+                    it.copy(generationError = "Record some audio before generating.")
                 }
                 return@launch
             }
 
             _state.update { it.copy(isGenerating = true, generationError = null) }
 
-            val userId = authService.currentUserId()
+            val userId = awaitUserId()
             if (userId == null) {
                 _state.update {
                     it.copy(
@@ -135,53 +135,38 @@ class AudioRecordingViewModel(
                 return@launch
             }
 
-            when (val generation = generationService.generateFlashcards(
-                prompt = transcript,
-                count = DefaultFlashcardCount
+            val title = deriveTitleFromTranscript(transcript)
+            when (val deckResult = repository.createDeck(
+                userId = userId,
+                title = title,
+                sourceFilename = "audio-recording"
             )) {
                 is Result.Success -> {
-                    val cards = generation.data
-                    val title = "Audio Deck ${Clock.System.now().toEpochMilliseconds()}"
-                    when (val deckResult = repository.createDeck(
-                        userId = userId,
-                        title = title,
-                        sourceFilename = "audio-recording"
-                    )) {
-                        is Result.Success -> {
-                            val deck = deckResult.data
-                            when (val addResult = repository.addCards(deck.id, cards)) {
-                                is Result.Success -> {
-                                    _state.update { it.copy(isGenerating = false) }
-                                    _events.tryEmit(AudioRecordingEvent.GenerationComplete(deck.id))
-                                }
-
-                                is Result.Failure -> {
-                                    _state.update {
-                                        it.copy(
-                                            isGenerating = false,
-                                            generationError = "Failed to save cards: ${addResult.error}"
-                                        )
-                                    }
-                                }
-                            }
+                    val deck = deckResult.data
+                    val sourceResult = repository.saveStudySource(
+                        buildStudySource(
+                            deckId = deck.id,
+                            transcript = transcript
+                        )
+                    )
+                    if (sourceResult is Result.Failure) {
+                        _state.update {
+                            it.copy(
+                                isGenerating = false,
+                                generationError = "Failed to save study source: ${sourceResult.error}"
+                            )
                         }
-
-                        is Result.Failure -> {
-                            _state.update {
-                                it.copy(
-                                    isGenerating = false,
-                                    generationError = "Failed to create deck: ${deckResult.error}"
-                                )
-                            }
-                        }
+                        return@launch
                     }
+                    _state.update { it.copy(isGenerating = false) }
+                    _events.tryEmit(AudioRecordingEvent.StudySetReady(deck.id))
                 }
 
                 is Result.Failure -> {
                     _state.update {
                         it.copy(
                             isGenerating = false,
-                            generationError = generationErrorMessage(generation.error)
+                            generationError = "Failed to create study set: ${deckResult.error}"
                         )
                     }
                 }
@@ -209,11 +194,43 @@ class AudioRecordingViewModel(
         }
     }
 
-    private fun generationErrorMessage(error: FlashcardsGenerationError): String {
-        return when (error) {
-            is FlashcardsGenerationError.Parse -> error.message
-            is FlashcardsGenerationError.Empty -> error.message
-            is FlashcardsGenerationError.Remote -> "Generation failed: ${error.error}"
+    private fun deriveTitleFromTranscript(transcript: String): String {
+        val words = transcript.split(Regex("\\s+")).filter { it.isNotBlank() }
+        val candidate = words.take(6).joinToString(" ")
+        return if (candidate.isBlank()) {
+            "Audio Set ${Clock.System.now().toEpochMilliseconds()}"
+        } else {
+            candidate
         }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    private fun buildStudySource(
+        deckId: String,
+        transcript: String
+    ): StudySource {
+        return StudySource(
+            id = Uuid.random().toString(),
+            deckId = deckId,
+            sourceType = StudySourceType.AUDIO,
+            sourceText = transcript,
+            sourceFileId = null,
+            sourceFilename = "audio-recording",
+            createdAt = Clock.System.now()
+        )
+    }
+
+    private suspend fun awaitUserId(
+        maxAttempts: Int = 10,
+        delayMs: Long = 200
+    ): String? {
+        repeat(maxAttempts) {
+            val userId = authService.currentUserId()
+            if (!userId.isNullOrBlank()) {
+                return userId
+            }
+            delay(delayMs)
+        }
+        return null
     }
 }

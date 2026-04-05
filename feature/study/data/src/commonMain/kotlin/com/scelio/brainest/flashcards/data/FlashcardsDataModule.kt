@@ -6,6 +6,8 @@ import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
 import com.scelio.brainest.flashcards.domain.FlashcardsGenerationService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.OpenAiFileService
+import com.scelio.brainest.quiz.domain.QuizGenerationService
+import com.scelio.brainest.quiz.data.QuizGenerationServiceImpl
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -19,6 +21,12 @@ val flashcardsDataModule = module {
     }
     single<FlashcardsGenerationService> {
         FlashcardsGenerationServiceImpl(
+            httpClient = get(),
+            apiKey = get(named("openai_api_key"))
+        )
+    }
+    single<QuizGenerationService> {
+        QuizGenerationServiceImpl(
             httpClient = get(),
             apiKey = get(named("openai_api_key"))
         )

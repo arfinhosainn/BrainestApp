@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.flashcards.domain.DocumentTranscriptionError
+import com.scelio.brainest.flashcards.domain.DocumentTranscriptionService
 import com.scelio.brainest.flashcards.domain.Deck
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.OpenAiFileService
@@ -47,6 +49,7 @@ sealed interface StudySetsEvent {
 class StudySetsViewModel(
     private val repository: FlashcardsRepository,
     private val fileService: OpenAiFileService,
+    private val documentTranscriptionService: DocumentTranscriptionService,
     private val authService: AuthService
 ) : ViewModel() {
 
@@ -132,47 +135,75 @@ class StudySetsViewModel(
             }
 
             val fileId = (uploadResult as Result.Success).data
-            val title = document.fileName.substringBeforeLast('.').ifBlank {
-                "Study Set ${Clock.System.now().toEpochMilliseconds()}"
-            }
-
-            when (val deckResult = repository.createDeck(
-                userId = userId,
-                title = title,
-                sourceFilename = document.fileName
-            )) {
-                is Result.Success -> {
-                    val deck = deckResult.data
-                    val source = buildStudySource(
-                        deck = deck,
-                        type = StudySourceType.DOCUMENT,
-                        sourceText = null,
-                        sourceFileId = fileId,
-                        sourceFilename = document.fileName
-                    )
-                    val sourceResult = repository.saveStudySource(source)
-                    if (sourceResult is Result.Failure) {
-                        _state.update {
-                            it.copy(
-                                isCreating = false,
-                                creationError = "Failed to save study source: ${sourceResult.error}"
-                            )
-                        }
-                        return@launch
-                    }
-                    _state.update { it.copy(isCreating = false) }
-                    _events.tryEmit(StudySetsEvent.OpenSetDetail(deck.id, promptGeneration = true))
-                    loadSets()
-                }
-
-                is Result.Failure -> {
+            try {
+                val transcriptionResult = documentTranscriptionService.transcribeFile(fileId)
+                if (transcriptionResult is Result.Failure) {
                     _state.update {
                         it.copy(
                             isCreating = false,
-                            creationError = "Failed to create study set: ${deckResult.error}"
+                            creationError = "Document transcription failed: ${
+                                documentTranscriptionErrorMessage(transcriptionResult.error)
+                            }"
                         )
                     }
+                    return@launch
                 }
+
+                val transcript = (transcriptionResult as Result.Success).data.text.trim()
+                if (transcript.isBlank()) {
+                    _state.update {
+                        it.copy(
+                            isCreating = false,
+                            creationError = "Document transcription failed: empty text."
+                        )
+                    }
+                    return@launch
+                }
+
+                val title = document.fileName.substringBeforeLast('.').ifBlank {
+                    "Study Set ${Clock.System.now().toEpochMilliseconds()}"
+                }
+
+                when (val deckResult = repository.createDeck(
+                    userId = userId,
+                    title = title,
+                    sourceFilename = document.fileName
+                )) {
+                    is Result.Success -> {
+                        val deck = deckResult.data
+                        val source = buildStudySource(
+                            deck = deck,
+                            type = StudySourceType.DOCUMENT,
+                            sourceText = transcript,
+                            sourceFileId = null,
+                            sourceFilename = document.fileName
+                        )
+                        val sourceResult = repository.saveStudySource(source)
+                        if (sourceResult is Result.Failure) {
+                            _state.update {
+                                it.copy(
+                                    isCreating = false,
+                                    creationError = "Failed to save study source: ${sourceResult.error}"
+                                )
+                            }
+                            return@launch
+                        }
+                        _state.update { it.copy(isCreating = false) }
+                        _events.tryEmit(StudySetsEvent.OpenSetDetail(deck.id, promptGeneration = true))
+                        loadSets()
+                    }
+
+                    is Result.Failure -> {
+                        _state.update {
+                            it.copy(
+                                isCreating = false,
+                                creationError = "Failed to create study set: ${deckResult.error}"
+                            )
+                        }
+                    }
+                }
+            } finally {
+                fileService.deleteFile(fileId)
             }
         }
     }
@@ -200,6 +231,14 @@ class StudySetsViewModel(
         ) || fileName.endsWith(".pdf") || fileName.endsWith(".docx") || fileName.endsWith(".txt")
 
         return if (isSupported) null else "Unsupported file type. Use PDF, DOCX, or TXT."
+    }
+
+    private fun documentTranscriptionErrorMessage(error: DocumentTranscriptionError): String {
+        return when (error) {
+            is DocumentTranscriptionError.Empty -> error.message
+            is DocumentTranscriptionError.Invalid -> error.message
+            is DocumentTranscriptionError.Remote -> "Transcription failed: ${error.error}"
+        }
     }
 
     @OptIn(ExperimentalUuidApi::class)

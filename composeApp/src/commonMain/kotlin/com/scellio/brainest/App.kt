@@ -62,9 +62,18 @@ fun App(
             val chatDetailRoutePrefix = ChatGraphRoutes.ChatDetailRoute::class.qualifiedName
             val isChatDetailRoute = chatDetailRoutePrefix != null &&
                 currentRoute?.startsWith(chatDetailRoutePrefix) == true
+            val quizRoutePrefix = FlashcardsGraphRoutes.QuizSession::class.qualifiedName
+            val isQuizRoute = (quizRoutePrefix != null && currentRoute?.startsWith(quizRoutePrefix) == true) ||
+                currentRoute?.endsWith(".QuizSession") == true
+            val flashcardsSessionRoutePrefix = FlashcardsGraphRoutes.Session::class.qualifiedName
+            val isFlashcardsSessionRoute = (flashcardsSessionRoutePrefix != null &&
+                currentRoute?.startsWith(flashcardsSessionRoutePrefix) == true) ||
+                currentRoute?.endsWith(".Session") == true
             val hideBottomBar = currentRoute == FlashcardsGraphRoutes.AudioRecording::class.qualifiedName ||
                 currentRoute?.endsWith(".AudioRecording") == true ||
-                isChatDetailRoute
+                isChatDetailRoute ||
+                isQuizRoute ||
+                isFlashcardsSessionRoute
             val mainGraphPrefixes = listOfNotNull(
                 HomeGraphRoutes::class.qualifiedName,
                 ChatGraphRoutes::class.qualifiedName,

@@ -3,6 +3,7 @@ package com.scelio.brainest.flashcards.data
 import com.plcoding.feature.study.data.BuildKonfig
 import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
+import com.scelio.brainest.flashcards.domain.DocumentTranscriptionService
 import com.scelio.brainest.flashcards.domain.FlashcardsGenerationService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.OpenAiFileService
@@ -41,6 +42,12 @@ val flashcardsDataModule = module {
         AudioTranscriptionServiceImpl(
             httpClient = get(),
             apiKey = get(named("deepinfra_api_key"))
+        )
+    }
+    single<DocumentTranscriptionService> {
+        DocumentTranscriptionServiceImpl(
+            httpClient = get(),
+            apiKey = get(named("openai_api_key"))
         )
     }
     single<FlashcardsRepository> {

@@ -17,14 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.quiz.components.QuizBottomBar
 import com.scelio.brainest.presentation.quiz.components.QuizOptionItem
 import com.scelio.brainest.presentation.quiz.components.QuizOptionState
+import com.scelio.brainest.presentation.quiz.components.QuizQuestionCard
 import com.scelio.brainest.presentation.quiz.components.QuizTopAppBar
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -40,6 +39,7 @@ fun QuizScreen(
     questionIndex: Int,
     totalQuestions: Int,
     question: String,
+    questionSubtitle: String = "",
     options: List<QuizOptionUi>,
     timeLeftText: String,
     totalTimeText: String,
@@ -57,13 +57,13 @@ fun QuizScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Gray)
+            .background(colorScheme.surface)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp)
-                .background(colorScheme.primaryContainer.copy(alpha = 0.2f))
+                .height(240.dp)
+                .background(colorScheme.primaryContainer.copy(alpha = 0.12f))
         )
 
         Column(
@@ -81,26 +81,32 @@ fun QuizScreen(
                 onBackClick = onBackClick
             )
 
-            Spacer(modifier = Modifier.height(33.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "$questionIndex/$totalQuestions",
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.labelLarge,
                 color = colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = question,
-                fontSize = 23.sp,
-                color = colorScheme.onSurface,
-                lineHeight = 30.sp,
                 fontWeight = FontWeight.SemiBold
             )
 
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            QuizQuestionCard(
+                title = question,
+                subtitle = questionSubtitle
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Choose the correct answer:",
+                style = MaterialTheme.typography.titleSmall,
+                color = colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 options.forEach { option ->
@@ -138,6 +144,7 @@ private fun PreviewQuizScreen() {
                 questionIndex = 14,
                 totalQuestions = 20,
                 question = "With over 222 million units sold, what is Apple's highest-selling iPhone model?",
+                questionSubtitle = "Select the correct answer",
                 options = listOf(
                     QuizOptionUi(
                         id = "a",

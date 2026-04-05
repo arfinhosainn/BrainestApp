@@ -10,7 +10,10 @@ import com.scelio.brainest.flashcards.domain.FlashcardInput
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.SessionRecordInput
 import com.scelio.brainest.flashcards.domain.SessionSummary
+import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySession
+import com.scelio.brainest.quiz.domain.QuizQuestion
+import com.scelio.brainest.quiz.domain.QuizQuestionInput
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
@@ -100,6 +103,23 @@ class FlashcardsRepositoryImpl(
         }
     }
 
+    override suspend fun getDeck(
+        deckId: String
+    ): Result<Deck?, DataError.Remote> {
+        return try {
+            val decks = supabase.from("decks")
+                .select {
+                    filter { eq("id", deckId) }
+                }
+                .decodeList<SupabaseDeckDto>()
+                .map { it.toDomain() }
+            Result.Success(decks.firstOrNull())
+        } catch (e: Exception) {
+            logger.error("Failed to fetch deck", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
     override suspend fun listStudySessions(
         userId: String
     ): Result<List<StudySession>, DataError.Remote> {
@@ -118,6 +138,36 @@ class FlashcardsRepositoryImpl(
         }
     }
 
+    override suspend fun saveStudySource(
+        source: StudySource
+    ): EmptyResult<DataError.Remote> {
+        return try {
+            supabase.from("study_sources").upsert(source.toSupabaseDto())
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            logger.error("Failed to save study source", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    override suspend fun getStudySource(
+        deckId: String
+    ): Result<StudySource?, DataError.Remote> {
+        return try {
+            val sources = supabase.from("study_sources")
+                .select {
+                    filter { eq("deck_id", deckId) }
+                    order(column = "created_at", order = Order.DESCENDING)
+                }
+                .decodeList<SupabaseStudySourceDto>()
+                .map { it.toDomain() }
+            Result.Success(sources.firstOrNull())
+        } catch (e: Exception) {
+            logger.error("Failed to load study source", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
     override suspend fun getDeckCards(
         deckId: String
     ): Result<List<Flashcard>, DataError.Remote> {
@@ -132,6 +182,52 @@ class FlashcardsRepositoryImpl(
             Result.Success(cards)
         } catch (e: Exception) {
             logger.error("Failed to fetch deck cards", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    override suspend fun addQuizQuestions(
+        deckId: String,
+        questions: List<QuizQuestionInput>
+    ): EmptyResult<DataError.Remote> {
+        if (questions.isEmpty()) {
+            return Result.Success(Unit)
+        }
+
+        val dtoList = questions.map { question ->
+            SupabaseQuizQuestionDto(
+                id = Uuid.random().toString(),
+                deckId = deckId,
+                question = question.question,
+                options = question.options,
+                correctIndex = question.correctIndex,
+                orderIndex = question.orderIndex
+            )
+        }
+
+        return try {
+            supabase.from("quiz_questions").upsert(dtoList)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            logger.error("Failed to add quiz questions", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    override suspend fun getQuizQuestions(
+        deckId: String
+    ): Result<List<QuizQuestion>, DataError.Remote> {
+        return try {
+            val questions = supabase.from("quiz_questions")
+                .select {
+                    filter { eq("deck_id", deckId) }
+                    order(column = "order_index", order = Order.ASCENDING)
+                }
+                .decodeList<SupabaseQuizQuestionDto>()
+                .map { it.toDomain() }
+            Result.Success(questions)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch quiz questions", e)
             Result.Failure(e.toDataError())
         }
     }

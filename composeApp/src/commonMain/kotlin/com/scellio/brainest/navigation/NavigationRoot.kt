@@ -45,7 +45,7 @@ fun NavigationRoot(
         onboardingGraph(
             navController = navController,
             onFinishOnboarding = {
-                navController.navigate(HomeGraphRoutes.Graph) {
+                navController.navigate(AuthGraphRoutes.Login) {
                     popUpTo(OnboardingGraphRoutes.Graph) {
                         inclusive = true
                     }

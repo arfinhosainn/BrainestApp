@@ -1,10 +1,17 @@
 package com.scelio.brainest.flashcards.database.mappers
 
+import com.scelio.brainest.flashcards.database.DeckProgressSummaryRow
 import com.scelio.brainest.flashcards.database.StudySetSummaryRow
 import com.scelio.brainest.flashcards.database.entities.DeckEntity
+import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
+import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
+import com.scelio.brainest.flashcards.domain.DeckStudyProgressSummary
 import com.scelio.brainest.flashcards.domain.Deck
+import com.scelio.brainest.flashcards.domain.FlashcardProgress
+import com.scelio.brainest.flashcards.domain.FlashcardResult
+import com.scelio.brainest.flashcards.domain.QuizProgress
 import com.scelio.brainest.flashcards.domain.StudySetSummary
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
@@ -89,6 +96,50 @@ fun QuizQuestionEntity.toDomain(): QuizQuestion {
     )
 }
 
+fun FlashcardProgress.toEntity(): FlashcardProgressEntity {
+    return FlashcardProgressEntity(
+        id = id,
+        deckId = deckId,
+        cardId = cardId,
+        swipesCount = swipesCount,
+        lastResult = lastResult?.dbValue,
+        updatedAt = updatedAt.toEpochMilliseconds()
+    )
+}
+
+fun FlashcardProgressEntity.toDomain(): FlashcardProgress {
+    return FlashcardProgress(
+        id = id,
+        deckId = deckId,
+        cardId = cardId,
+        swipesCount = swipesCount,
+        lastResult = lastResult?.let(FlashcardResult::fromDbValue),
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+    )
+}
+
+fun QuizProgress.toEntity(): QuizProgressEntity {
+    return QuizProgressEntity(
+        id = id,
+        deckId = deckId,
+        totalQuestions = totalQuestions,
+        answeredQuestions = answeredQuestions,
+        correctAnswers = correctAnswers,
+        completedAt = completedAt.toEpochMilliseconds()
+    )
+}
+
+fun QuizProgressEntity.toDomain(): QuizProgress {
+    return QuizProgress(
+        id = id,
+        deckId = deckId,
+        totalQuestions = totalQuestions,
+        answeredQuestions = answeredQuestions,
+        correctAnswers = correctAnswers,
+        completedAt = Instant.fromEpochMilliseconds(completedAt)
+    )
+}
+
 fun StudySetSummaryRow.toDomain(): StudySetSummary {
     return StudySetSummary(
         id = deck.id,
@@ -96,5 +147,13 @@ fun StudySetSummaryRow.toDomain(): StudySetSummary {
         createdAt = Instant.fromEpochMilliseconds(deck.createdAt),
         flashcardsCount = deck.totalCards,
         quizCount = quizCount
+    )
+}
+
+fun DeckProgressSummaryRow.toDomain(): DeckStudyProgressSummary {
+    return DeckStudyProgressSummary(
+        deckId = deckId,
+        flashcardsSwiped = flashcardsSwiped,
+        quizzesCompleted = quizzesCompleted
     )
 }

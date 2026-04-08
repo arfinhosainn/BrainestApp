@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -31,7 +32,9 @@ data class StudySetItemUi(
     val title: String,
     val createdAt: kotlin.time.Instant,
     val flashcardsCount: Int,
-    val quizCount: Int
+    val quizCount: Int,
+    val flashcardsSwiped: Int,
+    val quizzesCompleted: Int
 )
 
 data class StudySetsState(
@@ -224,19 +227,26 @@ class StudySetsViewModel(
     private fun observeStudySets(userId: String) {
         observeSetsJob?.cancel()
         observeSetsJob = repository.observeStudySetSummaries(userId)
+            .combine(repository.observeDeckStudyProgressSummaries(userId)) { sets, progressSummaries ->
+                val progressByDeckId = progressSummaries.associateBy { it.deckId }
+                sets.map { set ->
+                    val progress = progressByDeckId[set.id]
+                    StudySetItemUi(
+                        id = set.id,
+                        title = set.title,
+                        createdAt = set.createdAt,
+                        flashcardsCount = set.flashcardsCount,
+                        quizCount = set.quizCount,
+                        flashcardsSwiped = progress?.flashcardsSwiped ?: 0,
+                        quizzesCompleted = progress?.quizzesCompleted ?: 0
+                    )
+                }
+            }
             .onEach { sets ->
                 _state.update { state ->
                     state.copy(
                         isLoading = false,
-                        sets = sets.map { set ->
-                            StudySetItemUi(
-                                id = set.id,
-                                title = set.title,
-                                createdAt = set.createdAt,
-                                flashcardsCount = set.flashcardsCount,
-                                quizCount = set.quizCount
-                            )
-                        },
+                        sets = sets,
                         error = if (sets.isNotEmpty()) null else state.error
                     )
                 }

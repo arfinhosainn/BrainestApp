@@ -30,6 +30,9 @@ fun FlashcardsSessionScreen(
 
     FlashCardScreen(
         cards = state.cards,
+        initialCurrentIndex = state.currentIndex,
+        initialKnowCount = state.knownCount,
+        initialDontKnowCount = state.unknownCount,
         error = state.error,
         onCardKnown = { viewModel.onCardKnown(it) },
         onCardUnknown = { viewModel.onCardUnknown(it) },

@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
+import com.scelio.brainest.presentation.quiz.QuizResultsScreen
 
 @Composable
 fun QuizSessionScreen(
@@ -43,6 +44,18 @@ fun QuizSessionScreen(
                 color = MaterialTheme.colorScheme.error
             )
         }
+        return
+    }
+
+    if (state.isCompleted) {
+        QuizResultsScreen(
+            totalQuestions = totalQuestions,
+            answeredQuestions = state.answeredQuestions,
+            correctAnswers = state.correctAnswers,
+            onBackClick = onBackClick,
+            onRetryClick = viewModel::restartQuiz,
+            modifier = Modifier
+        )
         return
     }
 

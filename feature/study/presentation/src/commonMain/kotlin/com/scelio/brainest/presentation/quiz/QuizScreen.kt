@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -130,6 +132,90 @@ fun QuizScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun QuizResultsScreen(
+    totalQuestions: Int,
+    answeredQuestions: Int,
+    correctAnswers: Int,
+    onBackClick: () -> Unit,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scorePercent = if (totalQuestions == 0) 0 else (correctAnswers * 100) / totalQuestions
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            QuizTopAppBar(
+                title = "Quiz results",
+                timeLeftText = "$answeredQuestions answered",
+                totalTimeText = "$totalQuestions total",
+                progress = 1f,
+                onBackClick = onBackClick
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                QuizQuestionCard(
+                    title = "$scorePercent%",
+                    subtitle = "You got $correctAnswers out of $totalQuestions correct"
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    StatSummary(label = "Answered", value = answeredQuestions.toString())
+                    StatSummary(label = "Correct", value = correctAnswers.toString())
+                    StatSummary(label = "Wrong", value = (answeredQuestions - correctAnswers).coerceAtLeast(0).toString())
+                }
+            }
+
+            Button(
+                onClick = onRetryClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) {
+                Text(text = "Retry quiz")
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatSummary(
+    label: String,
+    value: String
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

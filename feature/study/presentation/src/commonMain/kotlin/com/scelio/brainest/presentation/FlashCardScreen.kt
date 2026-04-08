@@ -54,16 +54,21 @@ private val ColorDontKnowButton = Color(0xFFE8E8E8)
 @Composable
 fun FlashCardScreen(
     cards: List<Flashcard>,
+    initialCurrentIndex: Int = 0,
+    initialKnowCount: Int = 0,
+    initialDontKnowCount: Int = 0,
     error: String?,
     onRetry: () -> Unit = {},
     onCardKnown: (Flashcard) -> Unit = {},
     onCardUnknown: (Flashcard) -> Unit = {},
     onSessionFinished: (knownCount: Int, unknownCount: Int, totalSwiped: Int) -> Unit = { _, _, _ -> }
 ) {
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var knowCount by remember { mutableIntStateOf(0) }
-    var dontKnowCount by remember { mutableIntStateOf(0) }
-    var hasReportedCompletion by remember { mutableStateOf(false) }
+    var currentIndex by remember(cards, initialCurrentIndex) {
+        mutableIntStateOf(initialCurrentIndex.coerceIn(0, cards.size))
+    }
+    var knowCount by remember(cards, initialKnowCount) { mutableIntStateOf(initialKnowCount) }
+    var dontKnowCount by remember(cards, initialDontKnowCount) { mutableIntStateOf(initialDontKnowCount) }
+    var hasReportedCompletion by remember(cards, initialCurrentIndex) { mutableStateOf(false) }
 
     val markDontKnow = {
         if (currentIndex < cards.size) {

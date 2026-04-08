@@ -113,6 +113,8 @@ fun StudySetDetailScreen(
                         createdAt = formatDate(deck.createdAt),
                         flashcardsCount = deck.totalCards,
                         quizCount = state.quizCount,
+                        flashcardsSwiped = state.flashcardsSwiped,
+                        quizzesCompleted = state.quizzesCompleted,
                         onClick = {}
                     )
 

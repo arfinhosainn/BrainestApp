@@ -13,7 +13,9 @@ import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.OpenAiFileService
 import com.scelio.brainest.flashcards.domain.SmartNotesGenerationService
 import com.scelio.brainest.quiz.domain.QuizGenerationService
+import com.scelio.brainest.quiz.domain.QuizRepository
 import com.scelio.brainest.quiz.data.QuizGenerationServiceImpl
+import com.scelio.brainest.quiz.data.QuizRepositoryImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -79,6 +81,15 @@ val flashcardsDataModule = module {
     }
     single<FlashcardsRepository> {
         FlashcardsRepositoryImpl(
+            supabase = get(),
+            logger = get<BrainestLogger>(),
+            studyDao = get(),
+            coroutineScope = get(),
+            quizRepository = get()
+        )
+    }
+    single<QuizRepository> {
+        QuizRepositoryImpl(
             supabase = get(),
             logger = get<BrainestLogger>(),
             studyDao = get(),

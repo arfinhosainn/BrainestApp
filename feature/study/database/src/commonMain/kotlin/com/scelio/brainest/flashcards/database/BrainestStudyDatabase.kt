@@ -4,16 +4,20 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.scelio.brainest.flashcards.database.entities.DeckEntity
+import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
+import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
 
 @Database(
     entities = [
         DeckEntity::class,
         StudySourceEntity::class,
-        QuizQuestionEntity::class
+        QuizQuestionEntity::class,
+        FlashcardProgressEntity::class,
+        QuizProgressEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @ConstructedBy(BrainestStudyDatabaseConstructor::class)

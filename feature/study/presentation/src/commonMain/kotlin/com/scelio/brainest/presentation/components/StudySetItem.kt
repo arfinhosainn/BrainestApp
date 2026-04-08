@@ -48,6 +48,8 @@ fun StudySetItem(
     createdAt: String,
     flashcardsCount: Int,
     quizCount: Int,
+    flashcardsSwiped: Int = 0,
+    quizzesCompleted: Int = 0,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -131,6 +133,8 @@ fun StudySetItem(
                 ) {
                     StatBlock(label = "Flashcards", value = flashcardsCount.toString())
                     StatBlock(label = "Quiz", value = quizCount.toString())
+                    StatBlock(label = "Swiped", value = flashcardsSwiped.toString())
+                    StatBlock(label = "Completed", value = quizzesCompleted.toString())
                 }
             }
         }
@@ -169,6 +173,8 @@ private fun PreviewStudySetItem() {
                     createdAt = "Apr 5, 2026",
                     flashcardsCount = 20,
                     quizCount = 10,
+                    flashcardsSwiped = 42,
+                    quizzesCompleted = 3,
                     onClick = {}
                 )
             }

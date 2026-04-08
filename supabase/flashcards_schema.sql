@@ -44,8 +44,12 @@ create table if not exists public.study_sources (
     source_text text,
     source_file_id text,
     source_filename text,
+    smart_notes text,
     created_at timestamptz not null default now()
 );
+
+alter table public.study_sources
+add column if not exists smart_notes text;
 
 create table if not exists public.quiz_questions (
     id uuid primary key default gen_random_uuid(),

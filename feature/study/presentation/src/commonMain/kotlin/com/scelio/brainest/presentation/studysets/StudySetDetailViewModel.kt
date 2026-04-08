@@ -7,6 +7,8 @@ import com.scelio.brainest.flashcards.domain.Deck
 import com.scelio.brainest.flashcards.domain.FlashcardsGenerationError
 import com.scelio.brainest.flashcards.domain.FlashcardsGenerationService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
+import com.scelio.brainest.flashcards.domain.SmartNotesGenerationError
+import com.scelio.brainest.flashcards.domain.SmartNotesGenerationService
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
 import com.scelio.brainest.quiz.domain.QuizGenerationError
@@ -22,9 +24,12 @@ data class StudySetDetailState(
     val isLoading: Boolean = false,
     val isGenerating: Boolean = false,
     val generationTarget: GenerationTarget? = null,
+    val isSmartNotesLoading: Boolean = false,
     val deck: Deck? = null,
     val source: StudySource? = null,
     val quizCount: Int = 0,
+    val smartNotes: String? = null,
+    val smartNotesError: String? = null,
     val error: String? = null
 )
 
@@ -41,7 +46,8 @@ sealed interface StudySetDetailEvent {
 class StudySetDetailViewModel(
     private val repository: FlashcardsRepository,
     private val flashcardsGenerationService: FlashcardsGenerationService,
-    private val quizGenerationService: QuizGenerationService
+    private val quizGenerationService: QuizGenerationService,
+    private val smartNotesGenerationService: SmartNotesGenerationService
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StudySetDetailState())
@@ -52,7 +58,16 @@ class StudySetDetailViewModel(
 
     fun load(deckId: String) {
         if (_state.value.isLoading) return
-        _state.update { it.copy(isLoading = true, error = null) }
+        val isNewDeck = _state.value.deck?.id != deckId
+        _state.update {
+            it.copy(
+                isLoading = true,
+                error = null,
+                smartNotes = if (isNewDeck) null else it.smartNotes,
+                smartNotesError = if (isNewDeck) null else it.smartNotesError,
+                isSmartNotesLoading = if (isNewDeck) false else it.isSmartNotesLoading
+            )
+        }
 
         viewModelScope.launch {
             val deckResult = repository.getDeck(deckId)
@@ -76,9 +91,13 @@ class StudySetDetailViewModel(
                     deck = deck,
                     source = source,
                     quizCount = quizCount,
+                    smartNotes = source?.smartNotes ?: it.smartNotes,
+                    smartNotesError = if (!source?.smartNotes.isNullOrBlank()) null else it.smartNotesError,
                     error = error
                 )
             }
+
+            maybeGenerateSmartNotes(source)
         }
     }
 
@@ -252,6 +271,10 @@ class StudySetDetailViewModel(
         }
     }
 
+    fun generateSmartNotes() {
+        generateSmartNotesForSource(_state.value.source, force = true)
+    }
+
     private fun flashcardsErrorMessage(error: FlashcardsGenerationError): String {
         return when (error) {
             is FlashcardsGenerationError.Parse -> error.message
@@ -265,6 +288,89 @@ class StudySetDetailViewModel(
             is QuizGenerationError.Parse -> error.message
             is QuizGenerationError.Empty -> error.message
             is QuizGenerationError.Remote -> "Generation failed: ${error.error}"
+        }
+    }
+
+    private fun maybeGenerateSmartNotes(source: StudySource?) {
+        generateSmartNotesForSource(source, force = false)
+    }
+
+    private fun generateSmartNotesForSource(source: StudySource?, force: Boolean) {
+        if (source == null) return
+        if (_state.value.isSmartNotesLoading) return
+        if (!force && !_state.value.smartNotes.isNullOrBlank()) return
+
+        _state.update {
+            it.copy(
+                isSmartNotesLoading = true,
+                smartNotesError = null
+            )
+        }
+
+        viewModelScope.launch {
+            val generation = when (source.sourceType) {
+                StudySourceType.DOCUMENT -> {
+                    val text = source.sourceText.orEmpty().trim()
+                    if (text.isNotBlank()) {
+                        smartNotesGenerationService.generateSmartNotes(text)
+                    } else {
+                        val fileId = source.sourceFileId
+                        if (fileId.isNullOrBlank()) {
+                            Result.Failure(
+                                SmartNotesGenerationError.Invalid("Missing document text.")
+                            )
+                        } else {
+                            smartNotesGenerationService.generateSmartNotesFromFile(fileId)
+                        }
+                    }
+                }
+                StudySourceType.AUDIO -> {
+                    val text = source.sourceText.orEmpty().trim()
+                    if (text.isBlank()) {
+                        Result.Failure(
+                            SmartNotesGenerationError.Invalid("Missing audio transcript.")
+                        )
+                    } else {
+                        smartNotesGenerationService.generateSmartNotes(text)
+                    }
+                }
+            }
+
+            when (generation) {
+                is Result.Success -> {
+                    val updatedSource = source.copy(smartNotes = generation.data)
+                    val saveResult = repository.saveStudySource(updatedSource)
+                    _state.update {
+                        it.copy(
+                            isSmartNotesLoading = false,
+                            source = updatedSource,
+                            smartNotes = generation.data,
+                            smartNotesError = null,
+                            error = if (saveResult is Result.Failure) {
+                                "Failed to save smart notes: ${saveResult.error}"
+                            } else {
+                                it.error
+                            }
+                        )
+                    }
+                }
+                is Result.Failure -> {
+                    _state.update {
+                        it.copy(
+                            isSmartNotesLoading = false,
+                            smartNotesError = smartNotesErrorMessage(generation.error)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun smartNotesErrorMessage(error: SmartNotesGenerationError): String {
+        return when (error) {
+            is SmartNotesGenerationError.Empty -> error.message
+            is SmartNotesGenerationError.Invalid -> error.message
+            is SmartNotesGenerationError.Remote -> "Smart notes failed: ${error.error}"
         }
     }
 }

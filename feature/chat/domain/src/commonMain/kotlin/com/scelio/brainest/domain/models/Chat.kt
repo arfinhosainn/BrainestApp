@@ -6,7 +6,7 @@ data class Chat(
     val id: String,
     val userId: String,
     val title: String,
-    val model: String = "gpt-4o-mini",
+    val model: String = "gpt-4.1-nano",
     val systemPrompt: String? = null,
     val createdAt: Instant,
     val lastActivityAt: Instant,

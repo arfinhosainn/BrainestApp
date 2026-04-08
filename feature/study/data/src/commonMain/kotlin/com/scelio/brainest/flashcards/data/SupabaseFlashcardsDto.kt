@@ -61,7 +61,8 @@ data class SupabaseStudySourceDto(
     @SerialName("source_text") val sourceText: String? = null,
     @SerialName("source_file_id") val sourceFileId: String? = null,
     @SerialName("source_filename") val sourceFilename: String? = null,
-    @SerialName("created_at") val createdAt: String
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("smart_notes") val smartNotes: String? = null
 )
 
 @Serializable
@@ -153,7 +154,8 @@ fun StudySource.toSupabaseDto() = SupabaseStudySourceDto(
     sourceText = sourceText,
     sourceFileId = sourceFileId,
     sourceFilename = sourceFilename,
-    createdAt = createdAt.toIsoTimestamp()
+    createdAt = createdAt.toIsoTimestamp(),
+    smartNotes = smartNotes
 )
 
 fun SupabaseStudySourceDto.toDomain() = StudySource(
@@ -163,7 +165,8 @@ fun SupabaseStudySourceDto.toDomain() = StudySource(
     sourceText = sourceText,
     sourceFileId = sourceFileId,
     sourceFilename = sourceFilename,
-    createdAt = createdAt.toKotlinInstant()
+    createdAt = createdAt.toKotlinInstant(),
+    smartNotes = smartNotes
 )
 
 fun QuizQuestion.toSupabaseDto() = SupabaseQuizQuestionDto(

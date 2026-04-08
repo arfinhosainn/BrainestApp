@@ -12,6 +12,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -20,6 +22,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -39,6 +42,10 @@ class AudioTranscriptionServiceImpl(
         return try {
             val response = httpClient.post("$baseUrl/audio/transcriptions") {
                 bearerAuth(apiKey)
+                timeout {
+                    requestTimeoutMillis = 120_000L
+                    socketTimeoutMillis = 120_000L
+                }
                 setBody(
                     MultiPartFormDataContent(
                         formData {
@@ -123,6 +130,8 @@ class AudioTranscriptionServiceImpl(
             is UnknownRestException -> DataError.Remote.UNKNOWN
             is ConnectTimeoutException -> DataError.Remote.SERVER_ERROR
             is SocketTimeoutException -> DataError.Remote.REQUEST_TIMEOUT
+            is HttpRequestTimeoutException -> DataError.Remote.REQUEST_TIMEOUT
+            is TimeoutCancellationException -> DataError.Remote.REQUEST_TIMEOUT
             else -> {
                 if (message?.contains("Unable to resolve host") == true ||
                     message?.contains("Network is unreachable") == true

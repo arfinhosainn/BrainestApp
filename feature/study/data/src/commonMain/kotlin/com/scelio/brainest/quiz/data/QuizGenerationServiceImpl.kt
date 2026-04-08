@@ -47,7 +47,7 @@ class QuizGenerationServiceImpl(
         val userPrompt = buildUserPrompt(prompt)
 
         val request = OpenAiResponseRequest(
-            model = "gpt-4o-mini",
+            model = "gpt-4.1-nano",
             input = listOf(
                 OpenAiMessage(
                     role = "system",
@@ -82,7 +82,7 @@ class QuizGenerationServiceImpl(
         """.trimIndent()
 
         val request = OpenAiResponseRequest(
-            model = "gpt-4o-mini",
+            model = "gpt-4.1-nano",
             input = listOf(
                 OpenAiMessage(
                     role = "system",

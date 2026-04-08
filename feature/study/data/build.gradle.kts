@@ -17,6 +17,7 @@ kotlin {
 
                 implementation(projects.core.domain)
                 implementation(projects.feature.study.domain)
+                implementation(projects.feature.study.database)
 
                 implementation(libs.koin.core)
                 implementation(libs.supabase.postgrest.kt)
@@ -28,9 +29,7 @@ kotlin {
 
         androidMain {
             dependencies {
-                // Add Android-specific dependencies here. Note that this source set depends on
-                // commonMain by default and will correctly pull the Android artifacts of any KMP
-                // dependencies declared in commonMain.
+                implementation(libs.koin.android)
             }
         }
 

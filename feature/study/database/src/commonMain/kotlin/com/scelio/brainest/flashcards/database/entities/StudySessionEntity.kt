@@ -1,13 +1,13 @@
 package com.scelio.brainest.flashcards.database.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import androidx.room.ColumnInfo
 
 @Entity(
-    tableName = "quiz_progress",
+    tableName = "study_sessions_local",
     foreignKeys = [
         ForeignKey(
             entity = DeckEntity::class,
@@ -17,18 +17,22 @@ import androidx.room.ColumnInfo
         )
     ],
     indices = [
+        Index(value = ["userId"]),
         Index(value = ["deckId"]),
-        Index(value = ["completedAt"])
+        Index(value = ["startedAt"]),
+        Index(value = ["endedAt"])
     ]
 )
-data class QuizProgressEntity(
+data class StudySessionEntity(
     @PrimaryKey
     val id: String,
+    val userId: String,
     val deckId: String,
-    val totalQuestions: Int,
-    val answeredQuestions: Int,
-    val correctAnswers: Int,
-    val completedAt: Long,
+    val cardsKnown: Int,
+    val cardsUnknown: Int,
+    val totalSwiped: Int,
+    val startedAt: Long,
+    val endedAt: Long?,
     @ColumnInfo(defaultValue = "0")
     val isPendingSync: Boolean
 )

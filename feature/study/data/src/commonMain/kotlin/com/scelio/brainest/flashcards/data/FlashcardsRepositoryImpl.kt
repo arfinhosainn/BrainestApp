@@ -181,18 +181,30 @@ class FlashcardsRepositoryImpl(
     override suspend fun listStudySessions(
         userId: String
     ): Result<List<StudySession>, DataError.Remote> {
+        val localSessions = studyDao.getStudySessionsByUserId(userId).map { it.toDomain() }
+
         return try {
-            val sessions = supabase.from("study_sessions")
-                .select {
-                    filter { eq("user_id", userId) }
-                    order(column = "started_at", order = Order.DESCENDING)
+            syncPendingStudySessions(userId)
+            when (val remoteSessions = fetchRemoteStudySessions(userId)) {
+                is Result.Success -> {
+                    studyDao.upsertStudySessions(
+                        remoteSessions.data.map { it.toEntity(isPendingSync = false) }
+                    )
                 }
-                .decodeList<SupabaseStudySessionDto>()
-                .map { it.toDomain() }
-            Result.Success(sessions)
+
+                is Result.Failure -> {
+                    logger.error("Failed to fetch remote study sessions for $userId: ${remoteSessions.error}")
+                }
+            }
+
+            Result.Success(studyDao.getStudySessionsByUserId(userId).map { it.toDomain() })
         } catch (e: Exception) {
             logger.error("Failed to list study sessions", e)
-            Result.Failure(e.toDataError())
+            if (localSessions.isNotEmpty()) {
+                Result.Success(localSessions)
+            } else {
+                Result.Failure(e.toDataError())
+            }
         }
     }
 
@@ -300,11 +312,11 @@ class FlashcardsRepositoryImpl(
         )
 
         return try {
-            supabase.from("study_sessions").upsert(session.toSupabaseDto())
+            studyDao.upsertStudySession(session.toEntity(isPendingSync = true))
             Result.Success(session)
         } catch (e: Exception) {
             logger.error("Failed to start study session", e)
-            Result.Failure(e.toDataError())
+            Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
 
@@ -314,32 +326,27 @@ class FlashcardsRepositoryImpl(
         records: List<SessionRecordInput>
     ): EmptyResult<DataError.Remote> {
         return try {
-            supabase.from("study_sessions").update({
-                set("cards_known", summary.cardsKnown)
-                set("cards_unknown", summary.cardsUnknown)
-                set("total_swiped", summary.totalSwiped)
-                set("ended_at", summary.endedAt.toIsoTimestamp())
-            }) {
-                filter { eq("id", sessionId) }
+            val existingSession = studyDao.getStudySession(sessionId)
+            if (existingSession == null) {
+                logger.error("Missing local study session $sessionId when finishing.")
+                return Result.Failure(DataError.Remote.UNKNOWN)
             }
 
-            if (records.isNotEmpty()) {
-                val recordDtos = records.map { record ->
-                    SupabaseSessionRecordDto(
-                        id = Uuid.random().toString(),
-                        sessionId = sessionId,
-                        flashcardId = record.flashcardId,
-                        result = record.result.dbValue,
-                        respondedAt = record.respondedAt.toIsoTimestamp()
-                    )
-                }
-                supabase.from("session_records").upsert(recordDtos)
+            val updatedSession = existingSession.copy(
+                cardsKnown = summary.cardsKnown,
+                cardsUnknown = summary.cardsUnknown,
+                totalSwiped = summary.totalSwiped,
+                endedAt = summary.endedAt.toEpochMilliseconds(),
+                isPendingSync = true
+            )
+            studyDao.upsertStudySession(updatedSession)
+            coroutineScope.launch(Dispatchers.IO) {
+                syncStudySessionToRemote(updatedSession.toDomain(), records)
             }
-
             Result.Success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to finish study session", e)
-            Result.Failure(e.toDataError())
+            Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
 
@@ -409,6 +416,57 @@ class FlashcardsRepositoryImpl(
         } catch (e: Exception) {
             logger.error("Failed to list decks", e)
             Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun fetchRemoteStudySessions(
+        userId: String
+    ): Result<List<StudySession>, DataError.Remote> {
+        return try {
+            val sessions = supabase.from("study_sessions")
+                .select {
+                    filter { eq("user_id", userId) }
+                    order(column = "started_at", order = Order.DESCENDING)
+                }
+                .decodeList<SupabaseStudySessionDto>()
+                .map { it.toDomain() }
+            Result.Success(sessions)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch study sessions", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun syncPendingStudySessions(userId: String) {
+        val pendingSessions = studyDao.getPendingStudySessionsByUserId(userId)
+        pendingSessions.forEach { sessionEntity ->
+            syncStudySessionToRemote(sessionEntity.toDomain(), emptyList())
+        }
+    }
+
+    private suspend fun syncStudySessionToRemote(
+        session: StudySession,
+        records: List<SessionRecordInput>
+    ) {
+        try {
+            supabase.from("study_sessions").upsert(session.toSupabaseDto())
+
+            if (records.isNotEmpty()) {
+                val recordDtos = records.map { record ->
+                    SupabaseSessionRecordDto(
+                        id = Uuid.random().toString(),
+                        sessionId = session.id,
+                        flashcardId = record.flashcardId,
+                        result = record.result.dbValue,
+                        respondedAt = record.respondedAt.toIsoTimestamp()
+                    )
+                }
+                supabase.from("session_records").upsert(recordDtos)
+            }
+
+            studyDao.upsertStudySession(session.toEntity(isPendingSync = false))
+        } catch (e: Exception) {
+            logger.error("Failed to sync study session ${session.id}", e)
         }
     }
 

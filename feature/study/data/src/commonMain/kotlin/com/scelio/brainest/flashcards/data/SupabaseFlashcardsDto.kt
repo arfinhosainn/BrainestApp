@@ -7,6 +7,7 @@ import com.scelio.brainest.flashcards.domain.SessionRecord
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
 import com.scelio.brainest.flashcards.domain.StudySession
+import com.scelio.brainest.flashcards.domain.QuizProgress
 import com.scelio.brainest.quiz.domain.QuizQuestion
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -73,6 +74,16 @@ data class SupabaseQuizQuestionDto(
     val options: List<String>,
     @SerialName("correct_index") val correctIndex: Int,
     @SerialName("order_index") val orderIndex: Int
+)
+
+@Serializable
+data class SupabaseQuizProgressDto(
+    val id: String,
+    @SerialName("deck_id") val deckId: String,
+    @SerialName("total_questions") val totalQuestions: Int,
+    @SerialName("answered_questions") val answeredQuestions: Int,
+    @SerialName("correct_answers") val correctAnswers: Int,
+    @SerialName("completed_at") val completedAt: String
 )
 
 fun Deck.toSupabaseDto() = SupabaseDeckDto(
@@ -185,6 +196,24 @@ fun SupabaseQuizQuestionDto.toDomain() = QuizQuestion(
     options = options,
     correctIndex = correctIndex,
     orderIndex = orderIndex
+)
+
+fun QuizProgress.toSupabaseDto() = SupabaseQuizProgressDto(
+    id = id,
+    deckId = deckId,
+    totalQuestions = totalQuestions,
+    answeredQuestions = answeredQuestions,
+    correctAnswers = correctAnswers,
+    completedAt = completedAt.toIsoTimestamp()
+)
+
+fun SupabaseQuizProgressDto.toDomain() = QuizProgress(
+    id = id,
+    deckId = deckId,
+    totalQuestions = totalQuestions,
+    answeredQuestions = answeredQuestions,
+    correctAnswers = correctAnswers,
+    completedAt = completedAt.toKotlinInstant()
 )
 
 private fun Instant.toIsoTimestamp(): String {

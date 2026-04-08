@@ -4,8 +4,10 @@ import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.flashcards.data.SupabaseQuizProgressDto
 import com.scelio.brainest.flashcards.data.SupabaseQuizQuestionDto
 import com.scelio.brainest.flashcards.data.toDomain
+import com.scelio.brainest.flashcards.data.toSupabaseDto
 import com.scelio.brainest.flashcards.database.StudyDao
 import com.scelio.brainest.flashcards.database.mappers.toDomain
 import com.scelio.brainest.flashcards.database.mappers.toEntity
@@ -104,7 +106,10 @@ class QuizRepositoryImpl(
                 correctAnswers = correctAnswers,
                 completedAt = completedAt
             )
-            studyDao.upsertQuizProgress(progress.toEntity())
+            studyDao.upsertQuizProgress(progress.toEntity(isPendingSync = true))
+            coroutineScope.launch(Dispatchers.IO) {
+                syncPendingQuizProgress(deckId)
+            }
             Result.Success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to save quiz progress", e)
@@ -116,9 +121,20 @@ class QuizRepositoryImpl(
         deckId: String
     ): Result<List<QuizProgress>, DataError.Remote> {
         return try {
-            Result.Success(
-                studyDao.getQuizProgressByDeckId(deckId).map { it.toDomain() }
-            )
+            syncPendingQuizProgress(deckId)
+            when (val remoteProgress = fetchRemoteQuizProgress(deckId)) {
+                is Result.Success -> {
+                    studyDao.upsertQuizProgressList(
+                        remoteProgress.data.map { it.toEntity(isPendingSync = false) }
+                    )
+                }
+
+                is Result.Failure -> {
+                    logger.error("Failed to fetch remote quiz progress for $deckId: ${remoteProgress.error}")
+                }
+            }
+
+            Result.Success(studyDao.getQuizProgressByDeckId(deckId).map { it.toDomain() })
         } catch (e: Exception) {
             logger.error("Failed to read quiz progress", e)
             Result.Failure(DataError.Remote.UNKNOWN)
@@ -166,6 +182,19 @@ class QuizRepositoryImpl(
         }
     }
 
+    private suspend fun syncPendingQuizProgress(deckId: String) {
+        val pendingProgress = studyDao.getPendingQuizProgressByDeckId(deckId)
+        pendingProgress.forEach { progressEntity ->
+            try {
+                val progress = progressEntity.toDomain()
+                supabase.from("quiz_progress").upsert(progress.toSupabaseDto())
+                studyDao.upsertQuizProgress(progress.toEntity(isPendingSync = false))
+            } catch (e: Exception) {
+                logger.error("Failed to sync quiz progress ${progressEntity.id}", e)
+            }
+        }
+    }
+
     private suspend fun fetchRemoteQuizQuestions(
         deckId: String
     ): Result<List<QuizQuestion>, DataError.Remote> {
@@ -180,6 +209,24 @@ class QuizRepositoryImpl(
             Result.Success(questions)
         } catch (e: Exception) {
             logger.error("Failed to fetch quiz questions", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun fetchRemoteQuizProgress(
+        deckId: String
+    ): Result<List<QuizProgress>, DataError.Remote> {
+        return try {
+            val progress = supabase.from("quiz_progress")
+                .select {
+                    filter { eq("deck_id", deckId) }
+                    order(column = "completed_at", order = Order.DESCENDING)
+                }
+                .decodeList<SupabaseQuizProgressDto>()
+                .map { it.toDomain() }
+            Result.Success(progress)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch quiz progress", e)
             Result.Failure(e.toDataError())
         }
     }

@@ -3,10 +3,12 @@ package com.scelio.brainest.flashcards.database
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.AutoMigration
 import com.scelio.brainest.flashcards.database.entities.DeckEntity
 import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
 import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
+import com.scelio.brainest.flashcards.database.entities.StudySessionEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
 
 @Database(
@@ -15,9 +17,13 @@ import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
         StudySourceEntity::class,
         QuizQuestionEntity::class,
         FlashcardProgressEntity::class,
-        QuizProgressEntity::class
+        QuizProgressEntity::class,
+        StudySessionEntity::class
     ],
-    version = 2,
+    version = 3,
+    autoMigrations = [
+        AutoMigration(from = 2, to = 3)
+    ],
     exportSchema = true
 )
 @ConstructedBy(BrainestStudyDatabaseConstructor::class)

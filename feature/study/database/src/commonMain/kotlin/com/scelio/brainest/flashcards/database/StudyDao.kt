@@ -11,6 +11,7 @@ import com.scelio.brainest.flashcards.database.entities.DeckEntity
 import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
 import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
+import com.scelio.brainest.flashcards.database.entities.StudySessionEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -99,6 +100,9 @@ interface StudyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertQuizProgress(progress: QuizProgressEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertQuizProgressList(progress: List<QuizProgressEntity>)
+
     @Query(
         """
         SELECT * FROM quiz_progress
@@ -107,6 +111,42 @@ interface StudyDao {
         """
     )
     suspend fun getQuizProgressByDeckId(deckId: String): List<QuizProgressEntity>
+
+    @Query(
+        """
+        SELECT * FROM quiz_progress
+        WHERE deckId = :deckId AND isPendingSync = 1
+        ORDER BY completedAt ASC
+        """
+    )
+    suspend fun getPendingQuizProgressByDeckId(deckId: String): List<QuizProgressEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertStudySession(session: StudySessionEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertStudySessions(sessions: List<StudySessionEntity>)
+
+    @Query("SELECT * FROM study_sessions_local WHERE id = :sessionId LIMIT 1")
+    suspend fun getStudySession(sessionId: String): StudySessionEntity?
+
+    @Query(
+        """
+        SELECT * FROM study_sessions_local
+        WHERE userId = :userId
+        ORDER BY startedAt DESC
+        """
+    )
+    suspend fun getStudySessionsByUserId(userId: String): List<StudySessionEntity>
+
+    @Query(
+        """
+        SELECT * FROM study_sessions_local
+        WHERE userId = :userId AND isPendingSync = 1
+        ORDER BY startedAt ASC
+        """
+    )
+    suspend fun getPendingStudySessionsByUserId(userId: String): List<StudySessionEntity>
 
     @Query(
         """

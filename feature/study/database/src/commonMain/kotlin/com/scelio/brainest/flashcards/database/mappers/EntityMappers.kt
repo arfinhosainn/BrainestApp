@@ -6,12 +6,14 @@ import com.scelio.brainest.flashcards.database.entities.DeckEntity
 import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
 import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
+import com.scelio.brainest.flashcards.database.entities.StudySessionEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
 import com.scelio.brainest.flashcards.domain.DeckStudyProgressSummary
 import com.scelio.brainest.flashcards.domain.Deck
 import com.scelio.brainest.flashcards.domain.FlashcardProgress
 import com.scelio.brainest.flashcards.domain.FlashcardResult
 import com.scelio.brainest.flashcards.domain.QuizProgress
+import com.scelio.brainest.flashcards.domain.StudySession
 import com.scelio.brainest.flashcards.domain.StudySetSummary
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
@@ -118,14 +120,15 @@ fun FlashcardProgressEntity.toDomain(): FlashcardProgress {
     )
 }
 
-fun QuizProgress.toEntity(): QuizProgressEntity {
+fun QuizProgress.toEntity(isPendingSync: Boolean = false): QuizProgressEntity {
     return QuizProgressEntity(
         id = id,
         deckId = deckId,
         totalQuestions = totalQuestions,
         answeredQuestions = answeredQuestions,
         correctAnswers = correctAnswers,
-        completedAt = completedAt.toEpochMilliseconds()
+        completedAt = completedAt.toEpochMilliseconds(),
+        isPendingSync = isPendingSync
     )
 }
 
@@ -137,6 +140,33 @@ fun QuizProgressEntity.toDomain(): QuizProgress {
         answeredQuestions = answeredQuestions,
         correctAnswers = correctAnswers,
         completedAt = Instant.fromEpochMilliseconds(completedAt)
+    )
+}
+
+fun StudySession.toEntity(isPendingSync: Boolean = false): StudySessionEntity {
+    return StudySessionEntity(
+        id = id,
+        userId = userId,
+        deckId = deckId,
+        cardsKnown = cardsKnown,
+        cardsUnknown = cardsUnknown,
+        totalSwiped = totalSwiped,
+        startedAt = startedAt.toEpochMilliseconds(),
+        endedAt = endedAt?.toEpochMilliseconds(),
+        isPendingSync = isPendingSync
+    )
+}
+
+fun StudySessionEntity.toDomain(): StudySession {
+    return StudySession(
+        id = id,
+        userId = userId,
+        deckId = deckId,
+        cardsKnown = cardsKnown,
+        cardsUnknown = cardsUnknown,
+        totalSwiped = totalSwiped,
+        startedAt = Instant.fromEpochMilliseconds(startedAt),
+        endedAt = endedAt?.let(Instant::fromEpochMilliseconds)
     )
 }
 

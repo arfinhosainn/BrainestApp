@@ -16,11 +16,14 @@ kotlin {
 
                 implementation(compose.components.resources)
 
+                implementation(projects.core.presentation)
 
 
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)
-                implementation(projects.feature.chat.domain)
+                implementation(projects.feature.study.domain)
+                implementation(libs.bundles.koin.common)
+                implementation(libs.kotlinx.datetime)
                 implementation(libs.jetbrains.compose.navigation)
                 implementation(compose.components.uiToolingPreview)
 

@@ -9,6 +9,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
 import io.ktor.client.request.post
@@ -20,6 +22,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Headers
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.Serializable
 
 class OpenAiFileServiceImpl(
@@ -40,6 +44,10 @@ class OpenAiFileServiceImpl(
         return try {
             val response = httpClient.post("$baseUrl/files") {
                 bearerAuth(apiKey)
+                timeout {
+                    requestTimeoutMillis = 120_000L
+                    socketTimeoutMillis = 120_000L
+                }
                 setBody(
                     MultiPartFormDataContent(
                         formData {
@@ -64,9 +72,15 @@ class OpenAiFileServiceImpl(
                         }
                     )
                 )
-            }.body<OpenAiFileUploadResponse>()
+            }
 
-            Result.Success(response.id)
+            if (!response.status.isSuccess()) {
+                return Result.Failure(response.status.toDataError())
+            }
+
+            val parsed = response.body<OpenAiFileUploadResponse>()
+
+            Result.Success(parsed.id)
         } catch (e: Exception) {
             Result.Failure(e.toDataError())
         }
@@ -78,8 +92,15 @@ class OpenAiFileServiceImpl(
         }
 
         return try {
-            httpClient.delete("$baseUrl/files/$fileId") {
+            val response = httpClient.delete("$baseUrl/files/$fileId") {
                 bearerAuth(apiKey)
+                timeout {
+                    requestTimeoutMillis = 120_000L
+                    socketTimeoutMillis = 120_000L
+                }
+            }
+            if (!response.status.isSuccess()) {
+                return Result.Failure(response.status.toDataError())
             }
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -108,6 +129,8 @@ class OpenAiFileServiceImpl(
             is UnknownRestException -> DataError.Remote.UNKNOWN
             is ConnectTimeoutException -> DataError.Remote.SERVER_ERROR
             is SocketTimeoutException -> DataError.Remote.REQUEST_TIMEOUT
+            is HttpRequestTimeoutException -> DataError.Remote.REQUEST_TIMEOUT
+            is TimeoutCancellationException -> DataError.Remote.REQUEST_TIMEOUT
             else -> {
                 if (message?.contains("Unable to resolve host") == true ||
                     message?.contains("Network is unreachable") == true
@@ -117,6 +140,22 @@ class OpenAiFileServiceImpl(
                     DataError.Remote.UNKNOWN
                 }
             }
+        }
+    }
+
+    private fun io.ktor.http.HttpStatusCode.toDataError(): DataError.Remote {
+        return when (value) {
+            400 -> DataError.Remote.BAD_REQUEST
+            401 -> DataError.Remote.UNAUTHORIZED
+            403 -> DataError.Remote.FORBIDDEN
+            404 -> DataError.Remote.NOT_FOUND
+            408 -> DataError.Remote.REQUEST_TIMEOUT
+            409 -> DataError.Remote.CONFLICT
+            413 -> DataError.Remote.PAYLOAD_TOO_LARGE
+            429 -> DataError.Remote.TOO_MANY_REQUESTS
+            in 500..502 -> DataError.Remote.SERVER_ERROR
+            503 -> DataError.Remote.SERVICE_UNAVAILABLE
+            else -> DataError.Remote.UNKNOWN
         }
     }
 }

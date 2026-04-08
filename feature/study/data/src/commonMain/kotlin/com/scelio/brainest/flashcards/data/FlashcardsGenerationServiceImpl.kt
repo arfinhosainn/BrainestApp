@@ -42,7 +42,7 @@ class FlashcardsGenerationServiceImpl(
         val userPrompt = buildUserPrompt(prompt)
 
         val request = OpenAiResponseRequest(
-            model = "gpt-4o-mini",
+            model = "gpt-4.1-nano",
             input = listOf(
                 OpenAiMessage(
                     role = "system",
@@ -76,7 +76,7 @@ class FlashcardsGenerationServiceImpl(
         """.trimIndent()
 
         val request = OpenAiResponseRequest(
-            model = "gpt-4o-mini",
+            model = "gpt-4.1-nano",
             input = listOf(
                 OpenAiMessage(
                     role = "system",

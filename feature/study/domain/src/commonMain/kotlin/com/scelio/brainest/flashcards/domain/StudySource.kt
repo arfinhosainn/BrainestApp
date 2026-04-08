@@ -20,5 +20,6 @@ data class StudySource(
     val sourceText: String?,
     val sourceFileId: String?,
     val sourceFilename: String?,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val smartNotes: String? = null
 )

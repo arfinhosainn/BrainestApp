@@ -19,7 +19,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
@@ -59,10 +62,10 @@ class StudySetsViewModel(
     private val _events = MutableSharedFlow<StudySetsEvent>(extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
 
-    fun loadSets() {
-        if (_state.value.isLoading) return
-        _state.update { it.copy(isLoading = true, error = null) }
+    private var observeSetsJob: Job? = null
+    private var observedUserId: String? = null
 
+    fun loadSets() {
         viewModelScope.launch {
             val userId = awaitUserId()
             if (userId == null) {
@@ -70,30 +73,33 @@ class StudySetsViewModel(
                 return@launch
             }
 
-            when (val decksResult = repository.listDecks(userId)) {
+            if (observedUserId != userId) {
+                observedUserId = userId
+                observeStudySets(userId)
+            }
+
+            val hasLocalSets = _state.value.sets.isNotEmpty()
+            _state.update { it.copy(isLoading = !hasLocalSets, error = null) }
+
+            when (val syncResult = repository.syncStudySetSummaries(userId)) {
                 is Result.Success -> {
-                    val decks = decksResult.data
-                    val quizCounts = decks.associate { deck ->
-                        val count = repository.getQuizQuestions(deck.id).let { result ->
-                            if (result is Result.Success) result.data.size else 0
+                    _state.update {
+                        if (it.isLoading && it.sets.isEmpty()) {
+                            it.copy(isLoading = false)
+                        } else {
+                            it
                         }
-                        deck.id to count
                     }
-                    val items = decks.map { deck ->
-                        StudySetItemUi(
-                            id = deck.id,
-                            title = deck.title,
-                            createdAt = deck.createdAt,
-                            flashcardsCount = deck.totalCards,
-                            quizCount = quizCounts[deck.id] ?: 0
-                        )
-                    }
-                    _state.update { it.copy(isLoading = false, sets = items) }
                 }
 
                 is Result.Failure -> {
-                    _state.update {
-                        it.copy(isLoading = false, error = "Failed to load study sets: ${decksResult.error}")
+                    if (_state.value.sets.isEmpty()) {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Failed to sync study sets: ${syncResult.error}"
+                            )
+                        }
                     }
                 }
             }
@@ -190,7 +196,6 @@ class StudySetsViewModel(
                         }
                         _state.update { it.copy(isCreating = false) }
                         _events.tryEmit(StudySetsEvent.OpenSetDetail(deck.id, promptGeneration = true))
-                        loadSets()
                     }
 
                     is Result.Failure -> {
@@ -214,6 +219,29 @@ class StudySetsViewModel(
 
     fun setCreationError(message: String) {
         _state.update { it.copy(creationError = message) }
+    }
+
+    private fun observeStudySets(userId: String) {
+        observeSetsJob?.cancel()
+        observeSetsJob = repository.observeStudySetSummaries(userId)
+            .onEach { sets ->
+                _state.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        sets = sets.map { set ->
+                            StudySetItemUi(
+                                id = set.id,
+                                title = set.title,
+                                createdAt = set.createdAt,
+                                flashcardsCount = set.flashcardsCount,
+                                quizCount = set.quizCount
+                            )
+                        },
+                        error = if (sets.isNotEmpty()) null else state.error
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun validateDocument(document: PickedDocument): String? {

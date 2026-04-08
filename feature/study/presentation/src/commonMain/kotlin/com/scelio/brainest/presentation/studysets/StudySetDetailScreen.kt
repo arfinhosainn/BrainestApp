@@ -15,12 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +34,7 @@ import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,6 +90,7 @@ fun StudySetDetailScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                         .padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -130,6 +135,13 @@ fun StudySetDetailScreen(
                             onClick = { viewModel.generateQuiz(DefaultGenerationCount, DefaultMultipleChoice) }
                         )
                     }
+
+                    SmartNotesSection(
+                        notes = state.smartNotes,
+                        isLoading = state.isSmartNotesLoading,
+                        error = state.smartNotesError,
+                        onRetry = viewModel::generateSmartNotes
+                    )
                 }
             }
         }
@@ -223,6 +235,141 @@ private fun StudySetActionItem(
                 color = colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Composable
+private fun SmartNotesSection(
+    notes: String?,
+    isLoading: Boolean,
+    error: String?,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "Smart notes",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        if (isLoading) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Generating smart notes...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            return
+        }
+
+        if (!notes.isNullOrBlank()) {
+            SmartNotesContent(notes = notes)
+            return
+        }
+
+        Text(
+            text = "Smart notes will appear here once generated.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        if (!error.isNullOrBlank()) {
+            Text(
+                text = error,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+
+        TextButton(onClick = onRetry) {
+            Text(text = "Generate smart notes")
+        }
+    }
+}
+
+@Composable
+private fun SmartNotesContent(
+    notes: String,
+    modifier: Modifier = Modifier
+) {
+    val sections = remember(notes) { parseSmartNotesSections(notes) }
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        sections.forEach { section ->
+            if (!section.heading.isNullOrBlank()) {
+                Text(
+                    text = section.heading,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            val bodyText = section.body
+                .map { line -> normalizeSmartNotesLine(line) }
+                .joinToString("\n")
+                .trim()
+            if (bodyText.isNotBlank()) {
+                Text(
+                    text = bodyText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+private data class SmartNotesSectionData(
+    val heading: String?,
+    val body: List<String>
+)
+
+private fun parseSmartNotesSections(raw: String): List<SmartNotesSectionData> {
+    val sections = mutableListOf<SmartNotesSectionData>()
+    var heading: String? = null
+    val body = mutableListOf<String>()
+
+    fun flush() {
+        if (heading != null || body.isNotEmpty()) {
+            sections.add(SmartNotesSectionData(heading = heading, body = body.toList()))
+        }
+        heading = null
+        body.clear()
+    }
+
+    raw.lineSequence().forEach { line ->
+        val trimmed = line.trim()
+        if (trimmed.startsWith("## ")) {
+            flush()
+            heading = trimmed.removePrefix("## ").trim()
+        } else if (trimmed.isNotEmpty()) {
+            body.add(trimmed)
+        } else if (body.isNotEmpty()) {
+            body.add("")
+        }
+    }
+    flush()
+
+    return if (sections.isNotEmpty()) sections else listOf(
+        SmartNotesSectionData(heading = null, body = raw.lines())
+    )
+}
+
+private fun normalizeSmartNotesLine(line: String): String {
+    val trimmed = line.trim()
+    return when {
+        trimmed.startsWith("- ") -> "• ${trimmed.removePrefix("- ").trim()}"
+        trimmed.startsWith("* ") -> "• ${trimmed.removePrefix("* ").trim()}"
+        else -> line
     }
 }
 

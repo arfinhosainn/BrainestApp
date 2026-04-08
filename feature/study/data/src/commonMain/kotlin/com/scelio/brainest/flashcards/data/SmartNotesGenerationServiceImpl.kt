@@ -2,9 +2,8 @@ package com.scelio.brainest.flashcards.data
 
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.Result
-import com.scelio.brainest.flashcards.domain.DocumentTranscriptionError
-import com.scelio.brainest.flashcards.domain.DocumentTranscriptionResult
-import com.scelio.brainest.flashcards.domain.DocumentTranscriptionService
+import com.scelio.brainest.flashcards.domain.SmartNotesGenerationError
+import com.scelio.brainest.flashcards.domain.SmartNotesGenerationService
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.ktor.client.HttpClient
@@ -18,30 +17,57 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.TimeoutCancellationException
 
-class DocumentTranscriptionServiceImpl(
+class SmartNotesGenerationServiceImpl(
     private val httpClient: HttpClient,
     private val apiKey: String,
     private val baseUrl: String = "https://api.openai.com/v1"
-) : DocumentTranscriptionService {
+) : SmartNotesGenerationService {
 
-    override suspend fun transcribeFile(
-        fileId: String
-    ): Result<DocumentTranscriptionResult, DocumentTranscriptionError> {
+    private val systemPrompt = """
+        You are a study assistant.
+        Create smart notes from the provided text.
+        Use markdown headings with "## " for each section.
+        Write short paragraphs and bullet points.
+        Do not add any preamble or code fences.
+    """.trimIndent()
+
+    override suspend fun generateSmartNotes(
+        text: String
+    ): Result<String, SmartNotesGenerationError> {
         if (apiKey.isBlank() || apiKey == "your-openai-api-key-here") {
             return Result.Failure(
-                DocumentTranscriptionError.Remote(DataError.Remote.UNAUTHORIZED)
+                SmartNotesGenerationError.Remote(DataError.Remote.UNAUTHORIZED)
             )
         }
 
-        val systemPrompt = """
-            You are a transcription engine.
-            Extract the document text verbatim.
-            Preserve paragraph breaks where possible.
-        """.trimIndent()
-        val userPrompt = "Return only the extracted text. Do not add commentary."
+        val request = OpenAiResponseRequest(
+            model = "gpt-4.1-nano",
+            input = listOf(
+                OpenAiMessage(
+                    role = "system",
+                    content = listOf(OpenAiContent(type = "input_text", text = systemPrompt))
+                ),
+                OpenAiMessage(
+                    role = "user",
+                    content = listOf(OpenAiContent(type = "input_text", text = text))
+                )
+            ),
+            temperature = 0.2
+        )
+
+        return requestSmartNotes(request)
+    }
+
+    override suspend fun generateSmartNotesFromFile(
+        fileId: String
+    ): Result<String, SmartNotesGenerationError> {
+        if (apiKey.isBlank() || apiKey == "your-openai-api-key-here") {
+            return Result.Failure(
+                SmartNotesGenerationError.Remote(DataError.Remote.UNAUTHORIZED)
+            )
+        }
 
         val request = OpenAiResponseRequest(
             model = "gpt-4.1-nano",
@@ -54,13 +80,22 @@ class DocumentTranscriptionServiceImpl(
                     role = "user",
                     content = listOf(
                         OpenAiContent(type = "input_file", fileId = fileId),
-                        OpenAiContent(type = "input_text", text = userPrompt)
+                        OpenAiContent(
+                            type = "input_text",
+                            text = "Use the attached document to create smart notes."
+                        )
                     )
                 )
             ),
-            temperature = 0.0
+            temperature = 0.2
         )
 
+        return requestSmartNotes(request)
+    }
+
+    private suspend fun requestSmartNotes(
+        request: OpenAiResponseRequest
+    ): Result<String, SmartNotesGenerationError> {
         return try {
             val response = httpClient.post("$baseUrl/responses") {
                 contentType(ContentType.Application.Json)
@@ -70,26 +105,18 @@ class DocumentTranscriptionServiceImpl(
                     socketTimeoutMillis = 120_000L
                 }
                 setBody(request)
-            }
+            }.body<OpenAiResponse>()
 
-            if (!response.status.isSuccess()) {
-                return Result.Failure(
-                    DocumentTranscriptionError.Remote(response.status.toDataError())
-                )
-            }
-
-            val parsed = response.body<OpenAiResponse>()
-
-            val text = parsed.extractedOutputText().trim()
-            if (text.isBlank()) {
+            val notes = response.extractedOutputText().trim()
+            if (notes.isBlank()) {
                 Result.Failure(
-                    DocumentTranscriptionError.Empty("Empty document transcription response.")
+                    SmartNotesGenerationError.Empty("Empty smart notes response.")
                 )
             } else {
-                Result.Success(DocumentTranscriptionResult(text = text))
+                Result.Success(notes)
             }
         } catch (e: Exception) {
-            Result.Failure(DocumentTranscriptionError.Remote(e.toDataError()))
+            Result.Failure(SmartNotesGenerationError.Remote(e.toDataError()))
         }
     }
 
@@ -125,22 +152,6 @@ class DocumentTranscriptionServiceImpl(
                     DataError.Remote.UNKNOWN
                 }
             }
-        }
-    }
-
-    private fun io.ktor.http.HttpStatusCode.toDataError(): DataError.Remote {
-        return when (value) {
-            400 -> DataError.Remote.BAD_REQUEST
-            401 -> DataError.Remote.UNAUTHORIZED
-            403 -> DataError.Remote.FORBIDDEN
-            404 -> DataError.Remote.NOT_FOUND
-            408 -> DataError.Remote.REQUEST_TIMEOUT
-            409 -> DataError.Remote.CONFLICT
-            413 -> DataError.Remote.PAYLOAD_TOO_LARGE
-            429 -> DataError.Remote.TOO_MANY_REQUESTS
-            in 500..502 -> DataError.Remote.SERVER_ERROR
-            503 -> DataError.Remote.SERVICE_UNAVAILABLE
-            else -> DataError.Remote.UNKNOWN
         }
     }
 }

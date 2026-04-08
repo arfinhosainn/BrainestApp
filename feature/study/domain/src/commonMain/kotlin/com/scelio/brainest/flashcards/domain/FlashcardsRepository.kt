@@ -6,8 +6,17 @@ import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.quiz.domain.QuizQuestion
 import com.scelio.brainest.quiz.domain.QuizQuestionInput
 import kotlin.time.Instant
+import kotlinx.coroutines.flow.Flow
 
 interface FlashcardsRepository {
+    fun observeStudySetSummaries(
+        userId: String
+    ): Flow<List<StudySetSummary>>
+
+    suspend fun syncStudySetSummaries(
+        userId: String
+    ): EmptyResult<DataError.Remote>
+
     suspend fun createDeck(
         userId: String,
         title: String,

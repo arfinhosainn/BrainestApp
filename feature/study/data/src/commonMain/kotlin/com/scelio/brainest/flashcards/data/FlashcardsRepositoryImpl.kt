@@ -4,12 +4,16 @@ import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.flashcards.database.StudyDao
+import com.scelio.brainest.flashcards.database.mappers.toDomain
+import com.scelio.brainest.flashcards.database.mappers.toEntity
 import com.scelio.brainest.flashcards.domain.Deck
 import com.scelio.brainest.flashcards.domain.Flashcard
 import com.scelio.brainest.flashcards.domain.FlashcardInput
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.SessionRecordInput
 import com.scelio.brainest.flashcards.domain.SessionSummary
+import com.scelio.brainest.flashcards.domain.StudySetSummary
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySession
 import com.scelio.brainest.quiz.domain.QuizQuestion
@@ -25,13 +29,44 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant as KxInstant
 
 @OptIn(ExperimentalUuidApi::class)
 class FlashcardsRepositoryImpl(
     private val supabase: SupabaseClient,
-    private val logger: BrainestLogger
+    private val logger: BrainestLogger,
+    private val studyDao: StudyDao,
+    private val coroutineScope: CoroutineScope
 ) : FlashcardsRepository {
+
+    override fun observeStudySetSummaries(
+        userId: String
+    ): Flow<List<StudySetSummary>> {
+        return studyDao.observeStudySetSummaries(userId)
+            .map { rows -> rows.map { it.toDomain() } }
+    }
+
+    override suspend fun syncStudySetSummaries(
+        userId: String
+    ): EmptyResult<DataError.Remote> {
+        return when (val remoteDecks = fetchRemoteDecks(userId)) {
+            is Result.Success -> {
+                cacheRemoteDecks(userId, remoteDecks.data)
+                remoteDecks.data.forEach { deck ->
+                    syncRemoteQuizQuestions(deck.id)
+                }
+                Result.Success(Unit)
+            }
+
+            is Result.Failure -> remoteDecks
+        }
+    }
 
     override suspend fun createDeck(
         userId: String,
@@ -49,11 +84,14 @@ class FlashcardsRepositoryImpl(
         )
 
         return try {
-            supabase.from("decks").upsert(deck.toSupabaseDto())
+            studyDao.upsertDeck(deck.toEntity(isPendingSync = true))
+            coroutineScope.launch(Dispatchers.IO) {
+                syncDeckToRemote(deck)
+            }
             Result.Success(deck)
         } catch (e: Exception) {
-            logger.error("Failed to create deck", e)
-            Result.Failure(e.toDataError())
+            logger.error("Failed to create local deck", e)
+            Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
 
@@ -77,7 +115,8 @@ class FlashcardsRepositoryImpl(
 
         return try {
             supabase.from("flashcards").upsert(dtoList)
-            updateDeckTotalCards(deckId, dtoList.size)
+            updateRemoteDeckTotalCards(deckId, dtoList.size)
+            updateLocalDeckTotalCards(deckId, dtoList.size)
             Result.Success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to add flashcards", e)
@@ -88,35 +127,44 @@ class FlashcardsRepositoryImpl(
     override suspend fun listDecks(
         userId: String
     ): Result<List<Deck>, DataError.Remote> {
-        return try {
-            val decks = supabase.from("decks")
-                .select {
-                    filter { eq("user_id", userId) }
-                    order(column = "created_at", order = Order.DESCENDING)
+        val localDecks = studyDao.getDecksByUserId(userId).map { it.toDomain() }
+        if (localDecks.isNotEmpty()) {
+            coroutineScope.launch(Dispatchers.IO) {
+                syncStudySetSummaries(userId)
+            }
+            return Result.Success(localDecks)
+        }
+
+        return when (val remoteDecks = fetchRemoteDecks(userId)) {
+            is Result.Success -> {
+                cacheRemoteDecks(userId, remoteDecks.data)
+                remoteDecks.data.forEach { deck ->
+                    coroutineScope.launch(Dispatchers.IO) {
+                        syncRemoteQuizQuestions(deck.id)
+                    }
                 }
-                .decodeList<SupabaseDeckDto>()
-                .map { it.toDomain() }
-            Result.Success(decks)
-        } catch (e: Exception) {
-            logger.error("Failed to list decks", e)
-            Result.Failure(e.toDataError())
+                Result.Success(remoteDecks.data)
+            }
+
+            is Result.Failure -> remoteDecks
         }
     }
 
     override suspend fun getDeck(
         deckId: String
     ): Result<Deck?, DataError.Remote> {
-        return try {
-            val decks = supabase.from("decks")
-                .select {
-                    filter { eq("id", deckId) }
-                }
-                .decodeList<SupabaseDeckDto>()
-                .map { it.toDomain() }
-            Result.Success(decks.firstOrNull())
-        } catch (e: Exception) {
-            logger.error("Failed to fetch deck", e)
-            Result.Failure(e.toDataError())
+        val localDeck = studyDao.getDeck(deckId)?.toDomain()
+        if (localDeck != null) {
+            return Result.Success(localDeck)
+        }
+
+        return when (val remoteDeck = fetchRemoteDeck(deckId)) {
+            is Result.Success -> {
+                remoteDeck.data?.let { studyDao.upsertDeck(it.toEntity()) }
+                remoteDeck
+            }
+
+            is Result.Failure -> remoteDeck
         }
     }
 
@@ -142,29 +190,32 @@ class FlashcardsRepositoryImpl(
         source: StudySource
     ): EmptyResult<DataError.Remote> {
         return try {
-            supabase.from("study_sources").upsert(source.toSupabaseDto())
+            studyDao.upsertStudySource(source.toEntity(isPendingSync = true))
+            coroutineScope.launch(Dispatchers.IO) {
+                syncStudySourceToRemote(source)
+            }
             Result.Success(Unit)
         } catch (e: Exception) {
-            logger.error("Failed to save study source", e)
-            Result.Failure(e.toDataError())
+            logger.error("Failed to save local study source", e)
+            Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
 
     override suspend fun getStudySource(
         deckId: String
     ): Result<StudySource?, DataError.Remote> {
-        return try {
-            val sources = supabase.from("study_sources")
-                .select {
-                    filter { eq("deck_id", deckId) }
-                    order(column = "created_at", order = Order.DESCENDING)
-                }
-                .decodeList<SupabaseStudySourceDto>()
-                .map { it.toDomain() }
-            Result.Success(sources.firstOrNull())
-        } catch (e: Exception) {
-            logger.error("Failed to load study source", e)
-            Result.Failure(e.toDataError())
+        val localSource = studyDao.getStudySource(deckId)?.toDomain()
+        if (localSource != null) {
+            return Result.Success(localSource)
+        }
+
+        return when (val remoteSource = fetchRemoteStudySource(deckId)) {
+            is Result.Success -> {
+                remoteSource.data?.let { studyDao.upsertStudySource(it.toEntity()) }
+                remoteSource
+            }
+
+            is Result.Failure -> remoteSource
         }
     }
 
@@ -194,8 +245,8 @@ class FlashcardsRepositoryImpl(
             return Result.Success(Unit)
         }
 
-        val dtoList = questions.map { question ->
-            SupabaseQuizQuestionDto(
+        val localQuestions = questions.map { question ->
+            QuizQuestion(
                 id = Uuid.random().toString(),
                 deckId = deckId,
                 question = question.question,
@@ -206,29 +257,35 @@ class FlashcardsRepositoryImpl(
         }
 
         return try {
-            supabase.from("quiz_questions").upsert(dtoList)
+            studyDao.upsertQuizQuestions(localQuestions.map { it.toEntity(isPendingSync = true) })
+            coroutineScope.launch(Dispatchers.IO) {
+                syncQuizQuestionsToRemote(deckId, localQuestions)
+            }
             Result.Success(Unit)
         } catch (e: Exception) {
-            logger.error("Failed to add quiz questions", e)
-            Result.Failure(e.toDataError())
+            logger.error("Failed to save local quiz questions", e)
+            Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
 
     override suspend fun getQuizQuestions(
         deckId: String
     ): Result<List<QuizQuestion>, DataError.Remote> {
-        return try {
-            val questions = supabase.from("quiz_questions")
-                .select {
-                    filter { eq("deck_id", deckId) }
-                    order(column = "order_index", order = Order.ASCENDING)
-                }
-                .decodeList<SupabaseQuizQuestionDto>()
-                .map { it.toDomain() }
-            Result.Success(questions)
-        } catch (e: Exception) {
-            logger.error("Failed to fetch quiz questions", e)
-            Result.Failure(e.toDataError())
+        val localQuestions = studyDao.getQuizQuestions(deckId).map { it.toDomain() }
+        if (localQuestions.isNotEmpty()) {
+            return Result.Success(localQuestions)
+        }
+
+        return when (val remoteQuestions = fetchRemoteQuizQuestions(deckId)) {
+            is Result.Success -> {
+                studyDao.replaceSyncedQuizQuestions(
+                    deckId = deckId,
+                    questions = remoteQuestions.data.map { it.toEntity() }
+                )
+                remoteQuestions
+            }
+
+            is Result.Failure -> remoteQuestions
         }
     }
 
@@ -292,8 +349,78 @@ class FlashcardsRepositoryImpl(
         }
     }
 
-    private suspend fun updateDeckTotalCards(deckId: String, addedCount: Int) {
-        val existingCount = fetchDeckTotalCards(deckId)
+    private suspend fun syncDeckToRemote(deck: Deck) {
+        try {
+            supabase.from("decks").upsert(deck.toSupabaseDto())
+            studyDao.upsertDeck(deck.toEntity(isPendingSync = false))
+        } catch (e: Exception) {
+            logger.error("Failed to sync deck", e)
+        }
+    }
+
+    private suspend fun syncStudySourceToRemote(source: StudySource) {
+        try {
+            supabase.from("study_sources").upsert(source.toSupabaseDto())
+            studyDao.upsertStudySource(source.toEntity(isPendingSync = false))
+        } catch (e: Exception) {
+            logger.error("Failed to sync study source", e)
+        }
+    }
+
+    private suspend fun syncQuizQuestionsToRemote(
+        deckId: String,
+        questions: List<QuizQuestion>
+    ) {
+        try {
+            val dtoList = questions.map { question ->
+                SupabaseQuizQuestionDto(
+                    id = question.id,
+                    deckId = deckId,
+                    question = question.question,
+                    options = question.options,
+                    correctIndex = question.correctIndex,
+                    orderIndex = question.orderIndex
+                )
+            }
+            supabase.from("quiz_questions").upsert(dtoList)
+            studyDao.upsertQuizQuestions(questions.map { it.toEntity(isPendingSync = false) })
+        } catch (e: Exception) {
+            logger.error("Failed to sync quiz questions", e)
+        }
+    }
+
+    private suspend fun cacheRemoteDecks(
+        userId: String,
+        remoteDecks: List<Deck>
+    ) {
+        studyDao.upsertDecks(remoteDecks.map { it.toEntity(isPendingSync = false) })
+        if (remoteDecks.isEmpty()) {
+            studyDao.deleteSyncedDecksByUserId(userId)
+        } else {
+            studyDao.deleteSyncedDecksByUserIdExcluding(
+                userId = userId,
+                deckIds = remoteDecks.map { it.id }
+            )
+        }
+    }
+
+    private suspend fun syncRemoteQuizQuestions(deckId: String) {
+        when (val result = fetchRemoteQuizQuestions(deckId)) {
+            is Result.Success -> {
+                studyDao.replaceSyncedQuizQuestions(
+                    deckId = deckId,
+                    questions = result.data.map { it.toEntity(isPendingSync = false) }
+                )
+            }
+
+            is Result.Failure -> {
+                logger.error("Failed to sync remote quiz questions for $deckId: ${result.error}")
+            }
+        }
+    }
+
+    private suspend fun updateRemoteDeckTotalCards(deckId: String, addedCount: Int) {
+        val existingCount = fetchRemoteDeckTotalCards(deckId)
         val updatedCount = (existingCount ?: 0) + addedCount
 
         supabase.from("decks").update({
@@ -303,7 +430,85 @@ class FlashcardsRepositoryImpl(
         }
     }
 
-    private suspend fun fetchDeckTotalCards(deckId: String): Int? {
+    private suspend fun updateLocalDeckTotalCards(deckId: String, addedCount: Int) {
+        val existingDeck = studyDao.getDeck(deckId) ?: return
+        studyDao.upsertDeck(
+            existingDeck.copy(totalCards = existingDeck.totalCards + addedCount)
+        )
+    }
+
+    private suspend fun fetchRemoteDecks(
+        userId: String
+    ): Result<List<Deck>, DataError.Remote> {
+        return try {
+            val decks = supabase.from("decks")
+                .select {
+                    filter { eq("user_id", userId) }
+                    order(column = "created_at", order = Order.DESCENDING)
+                }
+                .decodeList<SupabaseDeckDto>()
+                .map { it.toDomain() }
+            Result.Success(decks)
+        } catch (e: Exception) {
+            logger.error("Failed to list decks", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun fetchRemoteDeck(
+        deckId: String
+    ): Result<Deck?, DataError.Remote> {
+        return try {
+            val decks = supabase.from("decks")
+                .select {
+                    filter { eq("id", deckId) }
+                }
+                .decodeList<SupabaseDeckDto>()
+                .map { it.toDomain() }
+            Result.Success(decks.firstOrNull())
+        } catch (e: Exception) {
+            logger.error("Failed to fetch deck", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun fetchRemoteStudySource(
+        deckId: String
+    ): Result<StudySource?, DataError.Remote> {
+        return try {
+            val sources = supabase.from("study_sources")
+                .select {
+                    filter { eq("deck_id", deckId) }
+                    order(column = "created_at", order = Order.DESCENDING)
+                }
+                .decodeList<SupabaseStudySourceDto>()
+                .map { it.toDomain() }
+            Result.Success(sources.firstOrNull())
+        } catch (e: Exception) {
+            logger.error("Failed to load study source", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun fetchRemoteQuizQuestions(
+        deckId: String
+    ): Result<List<QuizQuestion>, DataError.Remote> {
+        return try {
+            val questions = supabase.from("quiz_questions")
+                .select {
+                    filter { eq("deck_id", deckId) }
+                    order(column = "order_index", order = Order.ASCENDING)
+                }
+                .decodeList<SupabaseQuizQuestionDto>()
+                .map { it.toDomain() }
+            Result.Success(questions)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch quiz questions", e)
+            Result.Failure(e.toDataError())
+        }
+    }
+
+    private suspend fun fetchRemoteDeckTotalCards(deckId: String): Int? {
         val decks = supabase.from("decks")
             .select {
                 filter { eq("id", deckId) }

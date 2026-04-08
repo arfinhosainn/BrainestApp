@@ -3,8 +3,6 @@ package com.scelio.brainest.flashcards.domain
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
-import com.scelio.brainest.quiz.domain.QuizQuestion
-import com.scelio.brainest.quiz.domain.QuizQuestionInput
 import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
 
@@ -12,6 +10,10 @@ interface FlashcardsRepository {
     fun observeStudySetSummaries(
         userId: String
     ): Flow<List<StudySetSummary>>
+
+    fun observeDeckStudyProgressSummaries(
+        userId: String
+    ): Flow<List<DeckStudyProgressSummary>>
 
     suspend fun syncStudySetSummaries(
         userId: String
@@ -52,14 +54,16 @@ interface FlashcardsRepository {
         deckId: String
     ): Result<List<Flashcard>, DataError.Remote>
 
-    suspend fun addQuizQuestions(
+    suspend fun recordFlashcardSwipe(
         deckId: String,
-        questions: List<QuizQuestionInput>
+        cardId: String,
+        result: FlashcardResult,
+        swipedAt: Instant = kotlin.time.Clock.System.now()
     ): EmptyResult<DataError.Remote>
 
-    suspend fun getQuizQuestions(
+    suspend fun getFlashcardProgress(
         deckId: String
-    ): Result<List<QuizQuestion>, DataError.Remote>
+    ): Result<List<FlashcardProgress>, DataError.Remote>
 
     suspend fun startSession(
         userId: String,

@@ -123,6 +123,8 @@ fun StudySetsScreen(
                             createdAt = formatDate(set.createdAt),
                             flashcardsCount = set.flashcardsCount,
                             quizCount = set.quizCount,
+                            flashcardsSwiped = set.flashcardsSwiped,
+                            quizzesCompleted = set.quizzesCompleted,
                             onClick = { onOpenSet(set.id) }
                         )
                     }

@@ -6,8 +6,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import com.scelio.brainest.flashcards.database.entities.DeckEntity
+import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
+import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -16,13 +19,19 @@ data class StudySetSummaryRow(
     val quizCount: Int
 )
 
+data class DeckProgressSummaryRow(
+    val deckId: String,
+    val flashcardsSwiped: Int,
+    val quizzesCompleted: Int
+)
+
 @Dao
 interface StudyDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertDeck(deck: DeckEntity)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertDecks(decks: List<DeckEntity>)
 
     @Query("SELECT * FROM study_decks WHERE id = :deckId")
@@ -74,4 +83,51 @@ interface StudyDao {
             upsertQuizQuestions(questions)
         }
     }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertFlashcardProgress(progress: FlashcardProgressEntity)
+
+    @Query(
+        """
+        SELECT * FROM flashcard_progress
+        WHERE deckId = :deckId
+        ORDER BY updatedAt DESC
+        """
+    )
+    suspend fun getFlashcardProgressByDeckId(deckId: String): List<FlashcardProgressEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertQuizProgress(progress: QuizProgressEntity)
+
+    @Query(
+        """
+        SELECT * FROM quiz_progress
+        WHERE deckId = :deckId
+        ORDER BY completedAt DESC
+        """
+    )
+    suspend fun getQuizProgressByDeckId(deckId: String): List<QuizProgressEntity>
+
+    @Query(
+        """
+        SELECT
+            d.id AS deckId,
+            COALESCE(fp.flashcardsSwiped, 0) AS flashcardsSwiped,
+            COALESCE(qp.quizzesCompleted, 0) AS quizzesCompleted
+        FROM study_decks d
+        LEFT JOIN (
+            SELECT deckId, SUM(swipesCount) AS flashcardsSwiped
+            FROM flashcard_progress
+            GROUP BY deckId
+        ) fp ON fp.deckId = d.id
+        LEFT JOIN (
+            SELECT deckId, COUNT(*) AS quizzesCompleted
+            FROM quiz_progress
+            GROUP BY deckId
+        ) qp ON qp.deckId = d.id
+        WHERE d.userId = :userId
+        ORDER BY d.createdAt DESC
+        """
+    )
+    fun observeDeckProgressSummaries(userId: String): Flow<List<DeckProgressSummaryRow>>
 }

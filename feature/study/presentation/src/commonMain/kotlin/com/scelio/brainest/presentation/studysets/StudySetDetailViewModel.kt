@@ -13,6 +13,7 @@ import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
 import com.scelio.brainest.quiz.domain.QuizGenerationError
 import com.scelio.brainest.quiz.domain.QuizGenerationService
+import com.scelio.brainest.quiz.domain.QuizRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +29,8 @@ data class StudySetDetailState(
     val deck: Deck? = null,
     val source: StudySource? = null,
     val quizCount: Int = 0,
+    val flashcardsSwiped: Int = 0,
+    val quizzesCompleted: Int = 0,
     val smartNotes: String? = null,
     val smartNotesError: String? = null,
     val error: String? = null
@@ -45,6 +48,7 @@ sealed interface StudySetDetailEvent {
 
 class StudySetDetailViewModel(
     private val repository: FlashcardsRepository,
+    private val quizRepository: QuizRepository,
     private val flashcardsGenerationService: FlashcardsGenerationService,
     private val quizGenerationService: QuizGenerationService,
     private val smartNotesGenerationService: SmartNotesGenerationService
@@ -72,16 +76,25 @@ class StudySetDetailViewModel(
         viewModelScope.launch {
             val deckResult = repository.getDeck(deckId)
             val sourceResult = repository.getStudySource(deckId)
-            val quizResult = repository.getQuizQuestions(deckId)
+            val quizResult = quizRepository.getQuizQuestions(deckId)
+            val flashcardProgressResult = repository.getFlashcardProgress(deckId)
+            val quizProgressResult = quizRepository.getQuizProgress(deckId)
 
             val deck = (deckResult as? Result.Success)?.data
             val source = (sourceResult as? Result.Success)?.data
             val quizCount = (quizResult as? Result.Success)?.data?.size ?: 0
+            val flashcardsSwiped = (flashcardProgressResult as? Result.Success)
+                ?.data
+                ?.sumOf { it.swipesCount }
+                ?: 0
+            val quizzesCompleted = (quizProgressResult as? Result.Success)?.data?.size ?: 0
 
             val error = when {
                 deckResult is Result.Failure -> "Failed to load study set: ${deckResult.error}"
                 sourceResult is Result.Failure -> "Failed to load study source: ${sourceResult.error}"
                 quizResult is Result.Failure -> "Failed to load quiz: ${quizResult.error}"
+                flashcardProgressResult is Result.Failure -> "Failed to load flashcard progress: ${flashcardProgressResult.error}"
+                quizProgressResult is Result.Failure -> "Failed to load quiz progress: ${quizProgressResult.error}"
                 else -> null
             }
 
@@ -91,6 +104,8 @@ class StudySetDetailViewModel(
                     deck = deck,
                     source = source,
                     quizCount = quizCount,
+                    flashcardsSwiped = flashcardsSwiped,
+                    quizzesCompleted = quizzesCompleted,
                     smartNotes = source?.smartNotes ?: it.smartNotes,
                     smartNotesError = if (!source?.smartNotes.isNullOrBlank()) null else it.smartNotesError,
                     error = error
@@ -238,7 +253,7 @@ class StudySetDetailViewModel(
 
             when (generation) {
                 is Result.Success -> {
-                    val addResult = repository.addQuizQuestions(deck.id, generation.data)
+                    val addResult = quizRepository.addQuizQuestions(deck.id, generation.data)
                     if (addResult is Result.Success) {
                         _state.update {
                             it.copy(

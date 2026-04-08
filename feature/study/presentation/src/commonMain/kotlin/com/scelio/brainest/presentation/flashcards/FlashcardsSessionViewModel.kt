@@ -5,16 +5,21 @@ import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.flashcards.domain.Flashcard
+import com.scelio.brainest.flashcards.domain.FlashcardResult
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 data class FlashcardsSessionState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val cards: List<Flashcard> = emptyList(),
+    val currentIndex: Int = 0,
+    val knownCount: Int = 0,
+    val unknownCount: Int = 0,
     val error: String? = null,
     val sessionId: String? = null
 )
@@ -39,7 +44,17 @@ class FlashcardsSessionViewModel(
         activeDeckId = deckId
         hasFinished = false
         tracker = FlashcardsSessionTracker()
-        _state.update { it.copy(isLoading = true, error = null, cards = emptyList(), sessionId = null) }
+        _state.update {
+            it.copy(
+                isLoading = true,
+                error = null,
+                cards = emptyList(),
+                currentIndex = 0,
+                knownCount = 0,
+                unknownCount = 0,
+                sessionId = null
+            )
+        }
 
         viewModelScope.launch {
             val userId = authService.currentUserId()
@@ -50,12 +65,26 @@ class FlashcardsSessionViewModel(
 
             when (val cardsResult = repository.getDeckCards(deckId)) {
                 is Result.Success -> {
+                    val progressResult = repository.getFlashcardProgress(deckId)
+                    val progress = (progressResult as? Result.Success)?.data.orEmpty()
+                    val knownCount = progress.count { it.lastResult == FlashcardResult.KNOWN }
+                    val unknownCount = progress.count { it.lastResult == FlashcardResult.UNKNOWN }
+                    val currentIndex = progress.size.coerceAtMost(cardsResult.data.size)
+
                     when (val sessionResult = repository.startSession(userId, deckId)) {
                         is Result.Success -> {
                             _state.update {
                                 it.copy(
                                     isLoading = false,
                                     cards = cardsResult.data,
+                                    currentIndex = currentIndex,
+                                    knownCount = knownCount,
+                                    unknownCount = unknownCount,
+                                    error = if (progressResult is Result.Failure) {
+                                        "Failed to load saved progress: ${progressResult.error}"
+                                    } else {
+                                        null
+                                    },
                                     sessionId = sessionResult.data.id
                                 )
                             }
@@ -85,11 +114,11 @@ class FlashcardsSessionViewModel(
     }
 
     fun onCardKnown(card: Flashcard) {
-        tracker.markKnown(card.id)
+        recordCardSwipe(card, FlashcardResult.KNOWN)
     }
 
     fun onCardUnknown(card: Flashcard) {
-        tracker.markUnknown(card.id)
+        recordCardSwipe(card, FlashcardResult.UNKNOWN)
     }
 
     fun finishSession() {
@@ -113,6 +142,38 @@ class FlashcardsSessionViewModel(
                             isSaving = false,
                             error = "Failed to save session: ${result.error}"
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun recordCardSwipe(card: Flashcard, result: FlashcardResult) {
+        val swipedAt = Clock.System.now()
+        when (result) {
+            FlashcardResult.KNOWN -> tracker.markKnown(card.id, swipedAt)
+            FlashcardResult.UNKNOWN -> tracker.markUnknown(card.id, swipedAt)
+        }
+
+        viewModelScope.launch {
+            when (val saveResult = repository.recordFlashcardSwipe(
+                deckId = card.deckId,
+                cardId = card.id,
+                result = result,
+                swipedAt = swipedAt
+            )) {
+                is Result.Success -> {
+                    _state.update { state ->
+                        state.copy(
+                            currentIndex = (state.currentIndex + 1).coerceAtMost(state.cards.size),
+                            knownCount = state.knownCount + if (result == FlashcardResult.KNOWN) 1 else 0,
+                            unknownCount = state.unknownCount + if (result == FlashcardResult.UNKNOWN) 1 else 0
+                        )
+                    }
+                }
+                is Result.Failure -> {
+                    _state.update {
+                        it.copy(error = "Failed to save progress: ${saveResult.error}")
                     }
                 }
             }

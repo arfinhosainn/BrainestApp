@@ -13,6 +13,7 @@ import com.scelio.brainest.domain.models.ChatWithLastMessage
 import com.scelio.brainest.domain.models.ConversationHistory
 import com.scelio.brainest.domain.models.CreateChatRequest
 import com.scelio.brainest.domain.models.MessageMetadata
+import com.scelio.brainest.domain.models.SendMessageStreamEvent
 import com.scelio.brainest.domain.models.SendMessageRequest
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
@@ -20,7 +21,8 @@ import com.scelio.brainest.domain.util.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -67,11 +69,22 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun sendMessage(request: SendMessageRequest): ChatMessage {
+        var assistantMessage: ChatMessage? = null
+        sendMessageStream(request).collect { event ->
+            if (event is SendMessageStreamEvent.Completed) {
+                assistantMessage = event.message
+            }
+        }
+        return assistantMessage ?: error("Assistant message was not produced")
+    }
+
+    override fun sendMessageStream(request: SendMessageRequest): Flow<SendMessageStreamEvent> = flow {
         val chatEntity = chatDao.getChat(request.chatId)
             ?: error("Chat not found: ${request.chatId}")
         val chat = chatEntity.toDomain()
 
         val userMessageTime = Clock.System.now()
+        val assistantMessageId = Uuid.random().toString()
 
         val userMessage = ChatMessage(
             id = Uuid.random().toString(),
@@ -84,23 +97,19 @@ class ChatRepositoryImpl(
             fileId = request.fileId
         )
         chatDao.insertMessage(userMessage.toEntity())
+        syncMessageInBackground(userMessage, "user")
 
-        coroutineScope.launch(Dispatchers.IO) {
-            when (val result = supabaseService.syncMessage(userMessage)) {
-                is Result.Success -> {
-                    // Successfully synced
-                }
-
-                is Result.Failure -> {
-                    println("Failed to sync user message: ${result.error}")
-                }
-            }
-        }
+        emit(
+            SendMessageStreamEvent.Started(
+                userMessage = userMessage,
+                assistantMessageId = assistantMessageId
+            )
+        )
 
         val allEntities = chatDao.getMessagesByChatId(request.chatId)
         val recentDomainMessages = allEntities
             .map { it.toDomain() }
-            .sortedBy { it.createdAt.toEpochMilliseconds() }  // Ensure chronological order
+            .sortedBy { it.createdAt.toEpochMilliseconds() }
             .takeLast(20)
 
         val history = ConversationHistory(
@@ -110,17 +119,40 @@ class ChatRepositoryImpl(
 
         val openAiRequest = history.toOpenAIRequest(
             model = chat.model,
-            systemPrompt = chat.systemPrompt
+            systemPrompt = chat.systemPrompt,
+            stream = true
         )
 
-        // Get AI response
-        val result = openAI.chat(openAiRequest)
-        val assistantText = result.extractedOutputText()
+        val assistantText = StringBuilder()
+        var completedResponseId: String? = null
+        var completedModel: String? = null
+        var totalTokens: Int? = null
 
+        openAI.streamChat(openAiRequest).collect { event ->
+            when (event) {
+                is OpenAiStreamEvent.OutputTextDelta -> {
+                    assistantText.append(event.delta)
+                    emit(
+                        SendMessageStreamEvent.AssistantPartial(
+                            messageId = assistantMessageId,
+                            content = assistantText.toString()
+                        )
+                    )
+                }
 
-        delay(10) // 10ms delay to ensure different timestamp
+                is OpenAiStreamEvent.Completed -> {
+                    completedResponseId = event.response?.id
+                    completedModel = event.response?.model
+                    totalTokens = event.response?.usage?.totalTokens
+
+                    if (assistantText.isEmpty()) {
+                        assistantText.append(event.response?.extractedOutputText().orEmpty())
+                    }
+                }
+            }
+        }
+
         val aiMessageTime = Clock.System.now()
-
         val finalAiTime = if (aiMessageTime <= userMessageTime) {
             Instant.fromEpochMilliseconds(userMessageTime.toEpochMilliseconds() + 1)
         } else {
@@ -128,22 +160,21 @@ class ChatRepositoryImpl(
         }
 
         val assistantMessage = ChatMessage(
-            id = Uuid.random().toString(),
+            id = assistantMessageId,
             chatId = request.chatId,
-            content = assistantText,
+            content = assistantText.toString().trim(),
             role = MessageRoles.ASSISTANT,
-            createdAt = finalAiTime,  // ✅ Use local timestamp, not OpenAI's
+            createdAt = finalAiTime,
             senderId = "assistant",
             metadata = MessageMetadata(
-                model = result.model,
-                tokensUsed = result.usage?.totalTokens,
-                openAIResponseId = result.id
+                model = completedModel ?: chat.model,
+                tokensUsed = totalTokens,
+                openAIResponseId = completedResponseId
             )
         )
 
         chatDao.insertMessage(assistantMessage.toEntity())
 
-        // Update chat stats
         val count = chatDao.getMessageCount(request.chatId)
         chatDao.updateChatStats(
             chatId = request.chatId,
@@ -151,31 +182,8 @@ class ChatRepositoryImpl(
             messageCount = count
         )
 
-        coroutineScope.launch(Dispatchers.IO) {
-            when (val syncResult = supabaseService.syncMessage(assistantMessage)) {
-                is Result.Success -> {
-                    // Successfully synced
-                }
-
-                is Result.Failure -> {
-                    println("Failed to sync assistant message: ${syncResult.error}")
-                }
-            }
-
-            chatDao.getChat(request.chatId)?.toDomain()?.let { updatedChat ->
-                when (val chatSyncResult = supabaseService.syncChat(updatedChat)) {
-                    is Result.Success -> {
-                        // Successfully synced
-                    }
-
-                    is Result.Failure -> {
-                        println("Failed to sync updated chat: ${chatSyncResult.error}")
-                    }
-                }
-            }
-        }
-
-        return assistantMessage
+        syncAssistantMessageAndChatInBackground(request.chatId, assistantMessage)
+        emit(SendMessageStreamEvent.Completed(assistantMessage))
     }
 
     override suspend fun getChatHistory(chatId: String): ConversationHistory {
@@ -321,6 +329,37 @@ class ChatRepositoryImpl(
             }
 
             is Result.Failure -> Result.Failure(chatsResult.error)
+        }
+    }
+
+    private fun syncMessageInBackground(
+        message: ChatMessage,
+        label: String
+    ) {
+        coroutineScope.launch(Dispatchers.IO) {
+            when (val result = supabaseService.syncMessage(message)) {
+                is Result.Success -> Unit
+                is Result.Failure -> println("Failed to sync $label message: ${result.error}")
+            }
+        }
+    }
+
+    private fun syncAssistantMessageAndChatInBackground(
+        chatId: String,
+        assistantMessage: ChatMessage
+    ) {
+        coroutineScope.launch(Dispatchers.IO) {
+            when (val syncResult = supabaseService.syncMessage(assistantMessage)) {
+                is Result.Success -> Unit
+                is Result.Failure -> println("Failed to sync assistant message: ${syncResult.error}")
+            }
+
+            chatDao.getChat(chatId)?.toDomain()?.let { updatedChat ->
+                when (val chatSyncResult = supabaseService.syncChat(updatedChat)) {
+                    is Result.Success -> Unit
+                    is Result.Failure -> println("Failed to sync updated chat: ${chatSyncResult.error}")
+                }
+            }
         }
     }
 }

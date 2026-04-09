@@ -6,7 +6,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.chat.ChatRepository
-import com.scelio.brainest.domain.models.ChatMessage
+import com.scelio.brainest.domain.models.SendMessageStreamEvent
 import com.scelio.brainest.domain.models.SendMessageRequest
 import com.scelio.brainest.presentation.mappers.toUi
 import com.scelio.brainest.presentation.model.ChatMessageUi
@@ -133,24 +133,34 @@ class ChatDetailViewModel(
         if (messageContent.isEmpty() || _state.value.isLoading) return
 
         viewModelScope.launch {
+            val tempUserMessageId = Uuid.random().toString()
+            val tempAssistantMessageId = Uuid.random().toString()
+
             val userMessageUi = ChatMessageUi(
-                id = Uuid.random().toString(), // Temp ID
+                id = tempUserMessageId,
                 content = messageContent,
                 isFromUser = true,
                 timestamp = UiText.DynamicString("Just now"),
                 isLoading = false
             )
+            val assistantMessageUi = ChatMessageUi(
+                id = tempAssistantMessageId,
+                content = "",
+                isFromUser = false,
+                timestamp = UiText.DynamicString("Just now"),
+                isLoading = true
+            )
 
             _state.update {
                 it.copy(
-                    // We add it to the start because index 0 = bottom of screen
-                    messages = listOf(userMessageUi) + it.messages,
+                    messages = listOf(assistantMessageUi, userMessageUi) + it.messages,
                     isLoading = true,
                     canSendMessage = false
                 )
             }
 
             messageTextFieldState.clearText()
+            var assistantPlaceholderIds = setOf(tempAssistantMessageId)
 
             try {
                 val request = SendMessageRequest(
@@ -159,32 +169,72 @@ class ChatDetailViewModel(
                     content = messageContent
                 )
 
-                // 4. API Call
-                val assistantMessage = chatRepository.sendMessage(request)
+                chatRepository.sendMessageStream(request).collect { event ->
+                    when (event) {
+                        is SendMessageStreamEvent.Started -> {
+                            assistantPlaceholderIds =
+                                assistantPlaceholderIds + event.assistantMessageId
+                            _state.update { state ->
+                                state.copy(
+                                    messages = state.messages.map { message ->
+                                        when (message.id) {
+                                            tempUserMessageId -> event.userMessage.toUi()
+                                            tempAssistantMessageId -> message.copy(id = event.assistantMessageId)
+                                            else -> message
+                                        }
+                                    }
+                                )
+                            }
+                        }
 
-                val history = chatRepository.getChatHistory(currentChatId)
-                val updatedMessages = history.messages
-                    .takeLast(pageSize * (currentPage + 1))
-                    .map { it.toUi() }
-                    .reversed() // Maintain newest-at-index-0 for reverseLayout
+                        is SendMessageStreamEvent.AssistantPartial -> {
+                            assistantPlaceholderIds =
+                                assistantPlaceholderIds + event.messageId
+                            _state.update { state ->
+                                state.copy(
+                                    messages = state.messages.map { message ->
+                                        if (message.id == event.messageId) {
+                                            message.copy(
+                                                content = event.content,
+                                                isLoading = false
+                                            )
+                                        } else {
+                                            message
+                                        }
+                                    }
+                                )
+                            }
+                        }
 
-                _state.update {
-                    it.copy(
-                        messages = updatedMessages,
-                        isLoading = false
-                    )
+                        is SendMessageStreamEvent.Completed -> {
+                            _state.update { state ->
+                                state.copy(
+                                    messages = state.messages.map { message ->
+                                        if (message.id == event.message.id) {
+                                            event.message.toUi()
+                                        } else {
+                                            message
+                                        }
+                                    },
+                                    isLoading = false,
+                                    canSendMessage = false
+                                )
+                            }
+                        }
+                    }
                 }
                 _events.send(ChatDetailEvent.OnNewMessage)
 
             } catch (e: Exception) {
                 _state.update {
                     it.copy(
-                        messages = it.messages.filter { msg -> msg.id != userMessageUi.id },
+                        messages = it.messages.filter { msg ->
+                            msg.id !in assistantPlaceholderIds
+                        },
                         canSendMessage = true,
                         isLoading = false
                     )
                 }
-                messageTextFieldState.edit { append(messageContent) }
                 _events.send(ChatDetailEvent.OnError(UiText.DynamicString(e.message ?: "Failed to send")))
             }
         }

@@ -24,13 +24,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.components.chat.BrainestChatBubble
+import com.scelio.brainest.presentation.chat_detail.components.ChatPaginationShimmer
 import com.scelio.brainest.presentation.chat_detail.components.ChatDetailHeader
 import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -43,6 +46,7 @@ fun ChatDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
+    val latestState by rememberUpdatedState(state)
     val listState = rememberLazyListState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -65,9 +69,17 @@ fun ChatDetailScreen(
         }
     }
 
-    LaunchedEffect(state.messages.size) {
-        if (state.messages.isNotEmpty()) {
-            listState.animateScrollToItem(0)
+    LaunchedEffect(chatId, state.messages.size) {
+        if (state.messages.isNotEmpty() && (latestState.isNearBottom || state.messages.size <= 1)) {
+            listState.scrollToItem(0)
+        }
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            listState.firstVisibleItemIndex <= 1 && listState.firstVisibleItemScrollOffset < 40
+        }.distinctUntilChanged().collectLatest { isNearBottom ->
+            viewModel.updateScrollPosition(isNearBottom)
         }
     }
 
@@ -76,8 +88,8 @@ fun ChatDetailScreen(
             val layoutInfo = listState.layoutInfo
             val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
             lastVisibleItem?.index == layoutInfo.totalItemsCount - 1
-        }.collectLatest { atBottom ->
-            if (atBottom && state.messages.isNotEmpty()) {
+        }.distinctUntilChanged().collectLatest { atTopOfHistory ->
+            if (atTopOfHistory && latestState.messages.isNotEmpty()) {
                 viewModel.onAction(ChatDetailAction.OnScrollToTop)
             }
         }
@@ -131,9 +143,11 @@ fun ChatDetailScreen(
 
                 if (state.isPaginationLoading) {
                     item {
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                        ChatPaginationShimmer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
+                        )
                     }
                 }
             }

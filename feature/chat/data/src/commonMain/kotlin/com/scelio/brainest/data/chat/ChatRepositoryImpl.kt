@@ -1,6 +1,9 @@
 package com.scelio.brainest.data.chat
 
+import com.scelio.brainest.data.dto.ChatRequest
+import com.scelio.brainest.data.dto.ContentDto
 import com.scelio.brainest.data.dto.MessageRoles
+import com.scelio.brainest.data.dto.MessageDto
 import com.scelio.brainest.data.mappers.toOpenAIRequest
 import com.scelio.brainest.database.ChatDao
 import com.scelio.brainest.database.mappers.toDomain
@@ -159,10 +162,15 @@ class ChatRepositoryImpl(
             aiMessageTime
         }
 
+        val finalizedAssistantContent = repairMathFormattingIfNeeded(
+            content = assistantText.toString(),
+            model = completedModel ?: chat.model
+        )
+
         val assistantMessage = ChatMessage(
             id = assistantMessageId,
             chatId = request.chatId,
-            content = assistantText.toString().trim(),
+            content = finalizedAssistantContent,
             role = MessageRoles.ASSISTANT,
             createdAt = finalAiTime,
             senderId = "assistant",
@@ -362,4 +370,48 @@ class ChatRepositoryImpl(
             }
         }
     }
+
+    private suspend fun repairMathFormattingIfNeeded(
+        content: String,
+        model: String
+    ): String {
+        val normalized = MathFormattingGuard.normalize(content)
+        if (!MathFormattingGuard.needsRepair(normalized)) {
+            return normalized
+        }
+
+        val repaired = runCatching {
+            openAI.chat(
+                ChatRequest(
+                    model = model,
+                    instructions = MATH_FORMAT_REPAIR_INSTRUCTIONS,
+                    input = listOf(
+                        MessageDto(
+                            role = MessageRoles.USER,
+                            content = listOf(ContentDto.Text(normalized))
+                        )
+                    )
+                )
+            ).extractedOutputText()
+        }.onFailure { error ->
+            println("Failed to repair math formatting: ${error.message}")
+        }.getOrNull()
+
+        val normalizedRepaired = MathFormattingGuard.normalize(repaired.orEmpty())
+        return normalizedRepaired.ifBlank {
+            normalized
+        }
+    }
 }
+
+private val MATH_FORMAT_REPAIR_INSTRUCTIONS = """
+Rewrite the user's answer without changing the meaning, ordering, or substantive wording more than necessary.
+
+Rules:
+- Convert every inline math expression to $...$
+- Convert every display equation to $$...$$
+- Never use \( \) or \[ \]
+- Do not add or remove steps
+- Do not add explanations
+- Return only the corrected answer text
+""".trimIndent()

@@ -8,23 +8,15 @@ import com.scelio.brainest.domain.models.ConversationHistory
 
 fun ConversationHistory.toOpenAIRequest(
     model: String,
-    systemPrompt: String? = null
+    systemPrompt: String? = null,
+    stream: Boolean = false
 ): ChatRequest {
-    val messages = mutableListOf<MessageDto>()
-
-    systemPrompt?.let {
-        messages.add(
-            MessageDto(
-                role = MessageRoles.SYSTEM,
-                content = listOf(ContentDto.Text(text = it))
-            )
-        )
-    }
-
-    messages.addAll(this.messages.toOpenAIMessages())
+    val messages = this.messages.toOpenAIMessages()
 
     return ChatRequest(
         model = model,
-        input = messages
+        input = messages,
+        instructions = systemPrompt,
+        stream = stream
     )
 }

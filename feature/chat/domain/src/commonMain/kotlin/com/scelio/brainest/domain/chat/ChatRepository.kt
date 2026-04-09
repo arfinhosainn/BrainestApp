@@ -5,11 +5,14 @@ import com.scelio.brainest.domain.models.ChatMessage
 import com.scelio.brainest.domain.models.ChatWithLastMessage
 import com.scelio.brainest.domain.models.ConversationHistory
 import com.scelio.brainest.domain.models.CreateChatRequest
+import com.scelio.brainest.domain.models.SendMessageStreamEvent
 import com.scelio.brainest.domain.models.SendMessageRequest
+import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     suspend fun createChat(request: CreateChatRequest): Chat
     suspend fun sendMessage(request: SendMessageRequest): ChatMessage
+    fun sendMessageStream(request: SendMessageRequest): Flow<SendMessageStreamEvent>
     suspend fun getChatHistory(chatId: String): ConversationHistory
     suspend fun getChat(chatId: String): Chat?
     suspend fun getUserChats(userId: String): List<ChatWithLastMessage>

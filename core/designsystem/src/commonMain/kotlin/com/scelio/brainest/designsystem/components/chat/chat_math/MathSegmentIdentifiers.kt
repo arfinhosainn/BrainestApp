@@ -100,7 +100,16 @@ fun intToRoman(num: Int): String {
 fun preprocessMathContent(content: String): String {
     var processed = content.replace("\r\n", "\n").replace("\r", "\n")
 
-    // 1) KATEX tokens -> $...$ / $$...$$
+    // 1) Normalize common LaTeX delimiters into $...$ / $$...$$
+    processed = processed.replace(
+        Regex("""\\\(\s*([\s\S]+?)\s*\\\)""")
+    ) { m -> "${'$'}${sanitizeLatexInsideDelimiters(m.groupValues[1])}${'$'}" }
+
+    processed = processed.replace(
+        Regex("""\\\[\s*([\s\S]+?)\s*\\\]""")
+    ) { m -> "${'$'}${'$'}${sanitizeLatexInsideDelimiters(m.groupValues[1])}${'$'}${'$'}" }
+
+    // 2) KATEX tokens -> $...$ / $$...$$
     processed = processed.replace(
         Regex("""KATEX_INLINE_OPEN\s*([\s\S]+?)\s*KATEX_INLINE_CLOSE""")
     ) { m -> "${'$'}${sanitizeLatexInsideDelimiters(m.groupValues[1])}${'$'}" }
@@ -109,12 +118,12 @@ fun preprocessMathContent(content: String): String {
         Regex("""KATEX_DISPLAY_OPEN\s*([\s\S]+?)\s*KATEX_DISPLAY_CLOSE""")
     ) { m -> "${'$'}${'$'}${sanitizeLatexInsideDelimiters(m.groupValues[1])}${'$'}${'$'}" }
 
-    // 2) Fenced math blocks ```math / ```latex
+    // 3) Fenced math blocks ```math / ```latex
     processed = processed.replace(
         Regex("""```(?:math|latex)\s+([\s\S]+?)```""", RegexOption.IGNORE_CASE)
     ) { m -> "${'$'}${'$'}${sanitizeLatexInsideDelimiters(m.groupValues[1])}${'$'}${'$'}" }
 
-    // 3) Escaped variants
+    // 4) Escaped variants
     processed = processed.replace(
         Regex("""\\KATEX_INLINE_OPEN([\s\S]+?)\\KATEX_INLINE_CLOSE""")
     ) { m -> "${'$'}${sanitizeLatexInsideDelimiters(m.groupValues[1])}${'$'}" }
@@ -185,6 +194,19 @@ fun parseContentSegments(content: String): List<ContentSegment> {
         if (inCodeBlock) {
             codeBuffer.appendLine(line) // keep indentation
             i++
+            continue
+        }
+
+        // Multiline display math blocks:
+        // $$
+        // ...
+        // $$
+        extractStandaloneDisplayMathBlock(lines, i)?.let { (latex, endIndex) ->
+            segments.add(ContentSegment.DisplayMathSegment(latex))
+            i = endIndex + 1
+            previousLineWasEmpty = false
+            isInNumberedList = false
+            currentListNumber = 1
             continue
         }
 
@@ -285,6 +307,31 @@ fun parseContentSegments(content: String): List<ContentSegment> {
             else -> true
         }
     }
+}
+
+private fun extractStandaloneDisplayMathBlock(
+    lines: List<String>,
+    startIndex: Int
+): Pair<String, Int>? {
+    if (startIndex >= lines.size) return null
+    if (lines[startIndex].trim() != "${'$'}${'$'}") return null
+
+    val content = mutableListOf<String>()
+    var i = startIndex + 1
+
+    while (i < lines.size) {
+        val current = lines[i]
+        if (current.trim() == "${'$'}${'$'}") {
+            val latex = sanitizeLatexInsideDelimiters(
+                content.joinToString("\n").trim()
+            )
+            return if (latex.isNotBlank()) latex to i else null
+        }
+        content += current
+        i++
+    }
+
+    return null
 }
 
 // Pieces used for splitting $$...$$ blocks before inline parsing

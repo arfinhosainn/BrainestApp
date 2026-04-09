@@ -195,30 +195,67 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun getChatHistory(chatId: String): ConversationHistory {
-        // Read from local DB (offline-first)
-        val messages = chatDao.getMessagesByChatId(chatId)
+        val localMessages = chatDao.getMessagesByChatId(chatId)
             .map { it.toDomain() }
-            .sortedBy { it.createdAt.toEpochMilliseconds() }  // Ensure chronological order
+            .sortedBy { it.createdAt.toEpochMilliseconds() }
 
-        coroutineScope.launch(Dispatchers.IO) {
-            when (val result = supabaseService.fetchChatMessages(chatId)) {
-                is Result.Success -> {
-                    // Sync any messages that don't exist locally
-                    result.data.forEach { remoteMessage ->
-                        val exists = messages.any { it.id == remoteMessage.id }
-                        if (!exists) {
-                            chatDao.insertMessage(remoteMessage.toEntity())
-                        }
-                    }
+        val mergedMessages = when (val remoteResult = fetchAllRemoteMessages(chatId)) {
+            is Result.Success -> {
+                val remoteMessages = remoteResult.data
+                    .sortedBy { it.createdAt.toEpochMilliseconds() }
+
+                remoteMessages.forEach { remoteMessage ->
+                    chatDao.insertMessage(remoteMessage.toEntity())
                 }
 
-                is Result.Failure -> {
-                    println("Failed to fetch messages from Supabase: ${result.error}")
-                }
+                (localMessages + remoteMessages)
+                    .associateBy { it.id }
+                    .values
+                    .sortedBy { it.createdAt.toEpochMilliseconds() }
+            }
+
+            is Result.Failure -> {
+                println("Failed to fetch messages from Supabase: ${remoteResult.error}")
+                localMessages
             }
         }
 
-        return ConversationHistory(chatId = chatId, messages = messages)
+        return ConversationHistory(chatId = chatId, messages = mergedMessages)
+    }
+
+    private suspend fun fetchAllRemoteMessages(
+        chatId: String,
+        pageSize: Int = 100
+    ): Result<List<ChatMessage>, DataError.Remote> {
+        val allMessages = mutableListOf<ChatMessage>()
+        var offset = 0
+
+        while (true) {
+            when (
+                val result = supabaseService.fetchChatMessages(
+                    chatId = chatId,
+                    limit = pageSize,
+                    offset = offset
+                )
+            ) {
+                is Result.Success -> {
+                    if (result.data.isEmpty()) {
+                        break
+                    }
+
+                    allMessages += result.data
+                    if (result.data.size < pageSize) {
+                        break
+                    }
+
+                    offset += pageSize
+                }
+
+                is Result.Failure -> return Result.Failure(result.error)
+            }
+        }
+
+        return Result.Success(allMessages)
     }
 
     override suspend fun getChat(chatId: String): Chat? {

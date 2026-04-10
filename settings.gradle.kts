@@ -68,3 +68,11 @@ include(":feature:home:data")
 include(":feature:home:database")
 include(":feature:home:domain")
 include(":feature:home:presentation")
+
+
+
+include(":feature:settings")
+include(":feature:settings:data")
+include(":feature:settings:database")
+include(":feature:settings:domain")
+include(":feature:settings:presentation")

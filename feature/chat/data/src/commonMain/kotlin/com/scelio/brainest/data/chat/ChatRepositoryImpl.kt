@@ -81,6 +81,35 @@ class ChatRepositoryImpl(
         return assistantMessage ?: error("Assistant message was not produced")
     }
 
+    override suspend fun suggestChatTitle(messageContent: String): String? {
+        val sanitizedMessage = messageContent.trim()
+        if (sanitizedMessage.isBlank()) return null
+
+        val suggestedTitle = runCatching {
+            openAI.chat(
+                ChatRequest(
+                    model = TITLE_GENERATION_MODEL,
+                    instructions = CHAT_TITLE_INSTRUCTIONS,
+                    input = listOf(
+                        MessageDto(
+                            role = MessageRoles.USER,
+                            content = listOf(ContentDto.Text(sanitizedMessage))
+                        )
+                    )
+                )
+            ).extractedOutputText()
+        }.onFailure { error ->
+            println("Failed to suggest chat title: ${error.message}")
+        }.getOrNull()
+
+        return suggestedTitle
+            ?.lineSequence()
+            ?.firstOrNull { it.isNotBlank() }
+            ?.trim()
+            ?.trim('"', '\'', '`')
+            ?.takeIf { it.isNotBlank() }
+    }
+
     override fun sendMessageStream(request: SendMessageRequest): Flow<SendMessageStreamEvent> = flow {
         val chatEntity = chatDao.getChat(request.chatId)
             ?: error("Chat not found: ${request.chatId}")
@@ -276,7 +305,16 @@ class ChatRepositoryImpl(
             when (val result = supabaseService.fetchUserChats(userId)) {
                 is Result.Success -> {
                     result.data.forEach { remoteChat ->
-                        chatDao.insertChat(remoteChat.toEntity())
+                        val localChat = chatDao.getChat(remoteChat.id)?.toDomain()
+                        val mergedChat = if (
+                            localChat != null &&
+                            hasMeaningfulLocalTitle(localChat.title, remoteChat.title)
+                        ) {
+                            remoteChat.copy(title = localChat.title)
+                        } else {
+                            remoteChat
+                        }
+                        chatDao.insertChat(mergedChat.toEntity())
                     }
                 }
 
@@ -355,10 +393,19 @@ class ChatRepositoryImpl(
         return when (val chatsResult = supabaseService.fetchUserChats(userId)) {
             is Result.Success -> {
                 chatsResult.data.forEach { chat ->
-                    chatDao.insertChat(chat.toEntity())
+                    val localChat = chatDao.getChat(chat.id)?.toDomain()
+                    val mergedChat = if (
+                        localChat != null &&
+                        hasMeaningfulLocalTitle(localChat.title, chat.title)
+                    ) {
+                        chat.copy(title = localChat.title)
+                    } else {
+                        chat
+                    }
+                    chatDao.insertChat(mergedChat.toEntity())
 
                     // Fetch messages for each chat
-                    when (val messagesResult = supabaseService.fetchChatMessages(chat.id)) {
+                    when (val messagesResult = supabaseService.fetchChatMessages(mergedChat.id)) {
                         is Result.Success -> {
                             messagesResult.data.forEach { message ->
                                 chatDao.insertMessage(message.toEntity())
@@ -375,6 +422,14 @@ class ChatRepositoryImpl(
 
             is Result.Failure -> Result.Failure(chatsResult.error)
         }
+    }
+
+    private fun hasMeaningfulLocalTitle(localTitle: String, remoteTitle: String): Boolean {
+        val normalizedLocal = localTitle.trim()
+        val normalizedRemote = remoteTitle.trim()
+        return normalizedLocal.isNotBlank() &&
+            !normalizedLocal.equals("New chat", ignoreCase = true) &&
+            normalizedRemote.equals("New chat", ignoreCase = true)
     }
 
     private fun syncMessageInBackground(
@@ -451,4 +506,19 @@ Rules:
 - Do not add or remove steps
 - Do not add explanations
 - Return only the corrected answer text
+""".trimIndent()
+
+private const val TITLE_GENERATION_MODEL = "gpt-4.1-mini"
+
+private val CHAT_TITLE_INSTRUCTIONS = """
+Generate a concise title for a chat based on the user's first message.
+
+Rules:
+- Capture the user's intent, not their exact wording
+- Use 3 to 7 words
+- Do not quote the message
+- Do not start with verbs like "Help", "Explain", "Tell", or "How to" unless essential
+- Use title case
+- No punctuation except apostrophes when needed
+- Return only the title
 """.trimIndent()

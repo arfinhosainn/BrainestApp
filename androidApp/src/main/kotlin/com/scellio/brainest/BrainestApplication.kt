@@ -5,7 +5,7 @@ import com.scellio.brainest.di.initKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 
-class BrainestApplication: Application() {
+class BrainestApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

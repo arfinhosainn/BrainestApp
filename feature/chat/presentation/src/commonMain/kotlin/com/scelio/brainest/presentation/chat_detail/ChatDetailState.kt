@@ -7,6 +7,7 @@ import com.scelio.brainest.presentation.util.UiText
 
 data class ChatDetailState(
     val chatUi: ChatItemUi? = null,
+    val recentChats: List<ChatItemUi> = emptyList(),
     val isLoading: Boolean = false,
     val messages: List<ChatMessageUi> = emptyList(),
     val error: UiText? = null,

@@ -6,8 +6,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.chat.ChatRepository
+import com.scelio.brainest.domain.models.CreateChatRequest
 import com.scelio.brainest.domain.models.SendMessageStreamEvent
 import com.scelio.brainest.domain.models.SendMessageRequest
+import com.scelio.brainest.presentation.chat_list.components.ChatSystemPrompt
 import com.scelio.brainest.presentation.mappers.toUi
 import com.scelio.brainest.presentation.model.ChatMessageUi
 import com.scelio.brainest.presentation.util.UiText
@@ -57,6 +59,7 @@ class ChatDetailViewModel(
 
     fun setUserId(userId: String) {
         currentUserId = userId
+        loadRecentChats()
     }
 
     private fun selectChat(chatId: String?) {
@@ -127,12 +130,13 @@ class ChatDetailViewModel(
 
     @OptIn(ExperimentalUuidApi::class)
     private fun sendMessage() {
-        val currentChatId = _state.value.chatUi?.id ?: return
         val messageContent = messageTextFieldState.text.toString().trim()
 
         if (messageContent.isEmpty() || _state.value.isLoading) return
 
         viewModelScope.launch {
+            val currentChatId = ensureChatExists() ?: return@launch
+            updateChatTitleIfNeeded(currentChatId, messageContent)
             val tempUserMessageId = Uuid.random().toString()
             val tempAssistantMessageId = Uuid.random().toString()
 
@@ -224,6 +228,7 @@ class ChatDetailViewModel(
                     }
                 }
                 _events.send(ChatDetailEvent.OnNewMessage)
+                loadRecentChats()
 
             } catch (e: Exception) {
                 _state.update {
@@ -237,6 +242,35 @@ class ChatDetailViewModel(
                 }
                 _events.send(ChatDetailEvent.OnError(UiText.DynamicString(e.message ?: "Failed to send")))
             }
+        }
+    }
+
+    private suspend fun ensureChatExists(): String? {
+        _state.value.chatUi?.id?.let { return it }
+
+        if (currentUserId.isBlank()) {
+            _events.send(ChatDetailEvent.OnError(UiText.DynamicString("Not logged in")))
+            return null
+        }
+
+        return try {
+            val chat = chatRepository.createChat(
+                CreateChatRequest(
+                    userId = currentUserId,
+                    title = "New chat",
+                    systemPrompt = ChatSystemPrompt
+                )
+            )
+            _state.update { it.copy(chatUi = chat.toUi()) }
+            loadRecentChats()
+            chat.id
+        } catch (e: Exception) {
+            _events.send(
+                ChatDetailEvent.OnError(
+                    UiText.DynamicString(e.message ?: "Failed to create chat")
+                )
+            )
+            null
         }
     }
     private fun loadMoreMessages() {
@@ -308,7 +342,17 @@ class ChatDetailViewModel(
 
     private fun clearSelectedChat() {
         _state.update {
-            ChatDetailState()
+            it.copy(
+                chatUi = null,
+                isLoading = false,
+                messages = emptyList(),
+                error = null,
+                canSendMessage = false,
+                isPaginationLoading = false,
+                paginationError = null,
+                endReached = false,
+                isNearBottom = false
+            )
         }
         messageTextFieldState.clearText()
         currentPage = 0
@@ -321,5 +365,111 @@ class ChatDetailViewModel(
 
     fun updateScrollPosition(isNearBottom: Boolean) {
         _state.update { it.copy(isNearBottom = isNearBottom) }
+    }
+
+    private fun loadRecentChats() {
+        if (currentUserId.isBlank()) return
+
+        viewModelScope.launch {
+            runCatching {
+                chatRepository.getUserChats(currentUserId).map { it.toUi() }
+            }.onSuccess { chats ->
+                _state.update { it.copy(recentChats = chats) }
+            }.onFailure { error ->
+                _events.send(
+                    ChatDetailEvent.OnError(
+                        UiText.DynamicString(error.message ?: "Failed to load recent chats")
+                    )
+                )
+            }
+        }
+    }
+
+    private suspend fun updateChatTitleIfNeeded(chatId: String, messageContent: String) {
+        val currentTitle = _state.value.chatUi?.title?.trim().orEmpty()
+        if (currentTitle.isNotBlank() && !currentTitle.equals("New chat", ignoreCase = true)) {
+            return
+        }
+
+        val generatedTitle = chatRepository.suggestChatTitle(messageContent)
+            ?.let(::normalizeGeneratedTitle)
+            ?: generateFallbackChatTitle(messageContent)
+        if (generatedTitle.isBlank()) return
+
+        runCatching {
+            chatRepository.updateChatTitle(chatId, generatedTitle)
+        }.onSuccess {
+            _state.update { state ->
+                state.copy(chatUi = state.chatUi?.copy(title = generatedTitle))
+            }
+            loadRecentChats()
+        }
+    }
+
+    private fun generateFallbackChatTitle(messageContent: String): String {
+        val firstLine = messageContent
+            .lineSequence()
+            .firstOrNull { it.isNotBlank() }
+            .orEmpty()
+            .replace(Regex("""[`*_#>\[\]\(\)]"""), " ")
+            .replace(Regex("""\s+"""), " ")
+            .trim()
+
+        if (firstLine.isBlank()) return "Untitled chat"
+
+        val withoutLeadIn = firstLine
+            .replace(
+                Regex(
+                    pattern = """^(can you|could you|would you|please|help me|i need help with|explain|solve|show me|tell me about|what is|how do i|how to)\s+""",
+                    option = RegexOption.IGNORE_CASE
+                ),
+                ""
+            )
+            .trim()
+            .ifBlank { firstLine }
+
+        val topicWords = withoutLeadIn
+            .split(Regex("""\s+"""))
+            .filter { it.isNotBlank() }
+            .take(7)
+            .mapIndexed { index, word ->
+                val normalized = word.trim { it.isWhitespace() || it == ',' || it == '.' || it == '?' || it == '!' || it == ':' || it == ';' }
+                if (normalized.isEmpty()) {
+                    ""
+                } else if (index == 0) {
+                    normalized.replaceFirstChar { char -> char.titlecase() }
+                } else {
+                    normalized.lowercase()
+                }
+            }
+            .filter { it.isNotBlank() }
+
+        val title = topicWords.joinToString(" ").trim()
+        if (title.isBlank()) return "Untitled chat"
+
+        return if (title.length > 48) {
+            title.take(45).trimEnd() + "..."
+        } else {
+            title
+        }
+    }
+
+    private fun normalizeGeneratedTitle(title: String): String {
+        val normalized = title
+            .lineSequence()
+            .firstOrNull { it.isNotBlank() }
+            .orEmpty()
+            .replace(Regex("""["'`]+"""), "")
+            .replace(Regex("""[.!?,:;]+$"""), "")
+            .replace(Regex("""\s+"""), " ")
+            .trim()
+
+        if (normalized.isBlank()) return ""
+
+        return if (normalized.length > 48) {
+            normalized.take(45).trimEnd() + "..."
+        } else {
+            normalized
+        }
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -134,11 +136,34 @@ fun BrainestChatBubble(
                             }
 
                             is ContentSegment.TextWithInlineMathSegment -> {
+                                val normalizedText = segment.originalText.trim()
+                                val isSectionLabel = !isFromUser &&
+                                    (normalizedText == "Answer" || normalizedText == "Explanation")
+                                val isAnswerLine = !isFromUser &&
+                                    normalizedText.startsWith("The answer is")
+
                                 InlineMath(
                                     text = segment.originalText,
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = when {
+                                        isSectionLabel -> MaterialTheme.typography.titleLarge.copy(
+                                            fontSize = if (normalizedText == "Answer") 24.sp else 21.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+
+                                        isAnswerLine -> MaterialTheme.typography.titleMedium.copy(
+                                            fontSize = 22.sp,
+                                            lineHeight = 30.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+
+                                        else -> MaterialTheme.typography.bodyLarge
+                                    },
                                     color = textColor,
-                                    mathFontSize = 16.sp
+                                    mathFontSize = when {
+                                        isSectionLabel -> 22.sp
+                                        isAnswerLine -> 22.sp
+                                        else -> if (!isFromUser) 20.sp else 16.sp
+                                    }
                                 )
                             }
 
@@ -156,7 +181,7 @@ fun BrainestChatBubble(
                                 ) {
                                     MTMathView(
                                         latex = segment.latex,
-                                        fontSize = 18.sp,
+                                        fontSize = if (isFromUser) 18.sp else 22.sp,
                                         textColor = textColor,
                                         mode = MTMathViewMode.KMTMathViewModeDisplay,
                                         textAlignment = MTTextAlignment.KMTTextAlignmentCenter,
@@ -167,25 +192,62 @@ fun BrainestChatBubble(
 
                             is ContentSegment.ListItemSegment -> {
                                 Row(
-                                    modifier = Modifier.padding(start = 8.dp),
+                                    modifier = Modifier.padding(start = 4.dp),
                                     verticalAlignment = Alignment.Top
                                 ) {
                                     val marker = when (segment.type) {
                                         ListType.BULLET -> "•"
-                                        ListType.NUMBERED -> "${segment.number}."
+                                        ListType.NUMBERED -> null
                                         ListType.ROMAN -> "${intToRoman(segment.number ?: 1)}."
                                     }
-                                    Text(
-                                        text = marker,
-                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                                        color = textColor,
-                                        modifier = Modifier.padding(end = 8.dp)
-                                    )
+
+                                    if (segment.type == ListType.NUMBERED && !isFromUser) {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(top = 2.dp, end = 10.dp)
+                                                .size(30.dp)
+                                                .clip(CircleShape)
+                                                .background(
+                                                    MaterialTheme.colorScheme.surfaceVariant
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = (segment.number ?: 1).toString(),
+                                                style = MaterialTheme.typography.labelMedium.copy(
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                ),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    } else if (marker != null) {
+                                        Text(
+                                            text = marker,
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            color = textColor,
+                                            modifier = Modifier.padding(end = 8.dp)
+                                        )
+                                    }
+
                                     InlineMath(
                                         text = segment.text,
-                                        style = MaterialTheme.typography.bodyLarge,
+                                        style = if (segment.type == ListType.NUMBERED && !isFromUser) {
+                                            MaterialTheme.typography.titleSmall.copy(
+                                                fontSize = 19.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        } else {
+                                            MaterialTheme.typography.bodyLarge
+                                        },
                                         color = textColor,
-                                        mathFontSize = 16.sp
+                                        mathFontSize = if (segment.type == ListType.NUMBERED && !isFromUser) {
+                                            22.sp
+                                        } else {
+                                            if (!isFromUser) 20.sp else 16.sp
+                                        }
                                     )
                                 }
                             }

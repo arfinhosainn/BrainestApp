@@ -92,7 +92,7 @@ fun App(
                                     0 -> navController.navigate(HomeGraphRoutes.Graph) {
                                         launchSingleTop = true
                                     }
-                                    1 -> navController.navigate(ChatGraphRoutes.Graph) {
+                                    2 -> navController.navigate(ChatGraphRoutes.ChatDetailRoute()) {
                                         launchSingleTop = true
                                     }
                                     3 -> navController.navigate(FlashcardsGraphRoutes.Graph) {

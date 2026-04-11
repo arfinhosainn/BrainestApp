@@ -4,15 +4,16 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,15 +29,35 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ChatDetailHeader(
     scrollState: LazyListState,
+    onMenuClick: () -> Unit,
     onCloseClick: () -> Unit,
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = "Ask Anything",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = onMenuClick,
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .size(32.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Open recent chats",
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.extended.textSecondary
+                )
+            }
         },
         actions = {
             IconButton(
@@ -51,7 +72,7 @@ fun ChatDetailHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = null,
+                    contentDescription = "Close chat",
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.extended.textSecondary
                 )
@@ -70,7 +91,11 @@ fun ChatDetailHeader(
 @Composable
 fun PreviewChatListHeader() {
     BrainestTheme(darkTheme = true) {
-        ChatDetailHeader(scrollState = remember { LazyListState() }, onCloseClick = {})
+        ChatDetailHeader(
+            scrollState = remember { LazyListState() },
+            onMenuClick = {},
+            onCloseClick = {}
+        )
     }
 
 }

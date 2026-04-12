@@ -16,6 +16,7 @@ import com.scelio.brainest.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -34,6 +35,7 @@ class ChatDetailViewModel(
     private var currentUserId: String = ""
     private val pageSize = 20
     private var currentPage = 0
+    private val sendMessageMutex = Mutex()
 
     init {
         viewModelScope.launch {
@@ -132,115 +134,138 @@ class ChatDetailViewModel(
     private fun sendMessage() {
         val messageContent = messageTextFieldState.text.toString().trim()
 
-        if (messageContent.isEmpty() || _state.value.isLoading) return
+        if (messageContent.isEmpty()) return
 
         viewModelScope.launch {
-            val currentChatId = ensureChatExists() ?: return@launch
-            updateChatTitleIfNeeded(currentChatId, messageContent)
-            val tempUserMessageId = Uuid.random().toString()
-            val tempAssistantMessageId = Uuid.random().toString()
-
-            val userMessageUi = ChatMessageUi(
-                id = tempUserMessageId,
-                content = messageContent,
-                isFromUser = true,
-                timestamp = UiText.DynamicString("Just now"),
-                isLoading = false
-            )
-            val assistantMessageUi = ChatMessageUi(
-                id = tempAssistantMessageId,
-                content = "",
-                isFromUser = false,
-                timestamp = UiText.DynamicString("Just now"),
-                isLoading = true
-            )
-
-            _state.update {
-                it.copy(
-                    messages = listOf(assistantMessageUi, userMessageUi) + it.messages,
-                    isLoading = true,
-                    canSendMessage = false
-                )
-            }
-
-            messageTextFieldState.clearText()
-            var assistantPlaceholderIds = setOf(tempAssistantMessageId)
+            if (!sendMessageMutex.tryLock()) return@launch
 
             try {
-                val request = SendMessageRequest(
-                    chatId = currentChatId,
-                    userId = currentUserId,
-                    content = messageContent
+                _state.update {
+                    it.copy(
+                        isLoading = true,
+                        canSendMessage = false,
+                        error = null
+                    )
+                }
+
+                val currentChatId = ensureChatExists() ?: run {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            canSendMessage = messageTextFieldState.text.toString().trim().isNotEmpty()
+                        )
+                    }
+                    return@launch
+                }
+
+                updateChatTitleIfNeeded(currentChatId, messageContent)
+                val tempUserMessageId = Uuid.random().toString()
+                val tempAssistantMessageId = Uuid.random().toString()
+
+                val userMessageUi = ChatMessageUi(
+                    id = tempUserMessageId,
+                    content = messageContent,
+                    isFromUser = true,
+                    timestamp = UiText.DynamicString("Just now"),
+                    isLoading = false
+                )
+                val assistantMessageUi = ChatMessageUi(
+                    id = tempAssistantMessageId,
+                    content = "",
+                    isFromUser = false,
+                    timestamp = UiText.DynamicString("Just now"),
+                    isLoading = true
                 )
 
-                chatRepository.sendMessageStream(request).collect { event ->
-                    when (event) {
-                        is SendMessageStreamEvent.Started -> {
-                            assistantPlaceholderIds =
-                                assistantPlaceholderIds + event.assistantMessageId
-                            _state.update { state ->
-                                state.copy(
-                                    messages = state.messages.map { message ->
-                                        when (message.id) {
-                                            tempUserMessageId -> event.userMessage.toUi()
-                                            tempAssistantMessageId -> message.copy(id = event.assistantMessageId)
-                                            else -> message
-                                        }
-                                    }
-                                )
-                            }
-                        }
+                _state.update {
+                    it.copy(
+                        messages = listOf(assistantMessageUi, userMessageUi) + it.messages,
+                        isLoading = true,
+                        canSendMessage = false
+                    )
+                }
 
-                        is SendMessageStreamEvent.AssistantPartial -> {
-                            assistantPlaceholderIds =
-                                assistantPlaceholderIds + event.messageId
-                            _state.update { state ->
-                                state.copy(
-                                    messages = state.messages.map { message ->
-                                        if (message.id == event.messageId) {
-                                            message.copy(
-                                                content = event.content,
-                                                isLoading = false
-                                            )
-                                        } else {
-                                            message
-                                        }
-                                    }
-                                )
-                            }
-                        }
+                messageTextFieldState.clearText()
+                var assistantPlaceholderIds = setOf(tempAssistantMessageId)
 
-                        is SendMessageStreamEvent.Completed -> {
-                            _state.update { state ->
-                                state.copy(
-                                    messages = state.messages.map { message ->
-                                        if (message.id == event.message.id) {
-                                            event.message.toUi()
-                                        } else {
-                                            message
+                try {
+                    val request = SendMessageRequest(
+                        chatId = currentChatId,
+                        userId = currentUserId,
+                        content = messageContent
+                    )
+
+                    chatRepository.sendMessageStream(request).collect { event ->
+                        when (event) {
+                            is SendMessageStreamEvent.Started -> {
+                                assistantPlaceholderIds =
+                                    assistantPlaceholderIds + event.assistantMessageId
+                                _state.update { state ->
+                                    state.copy(
+                                        messages = state.messages.map { message ->
+                                            when (message.id) {
+                                                tempUserMessageId -> event.userMessage.toUi()
+                                                tempAssistantMessageId -> message.copy(id = event.assistantMessageId)
+                                                else -> message
+                                            }
                                         }
-                                    },
-                                    isLoading = false,
-                                    canSendMessage = false
-                                )
+                                    )
+                                }
+                            }
+
+                            is SendMessageStreamEvent.AssistantPartial -> {
+                                assistantPlaceholderIds =
+                                    assistantPlaceholderIds + event.messageId
+                                _state.update { state ->
+                                    state.copy(
+                                        messages = state.messages.map { message ->
+                                            if (message.id == event.messageId) {
+                                                message.copy(
+                                                    content = event.content,
+                                                    isLoading = false
+                                                )
+                                            } else {
+                                                message
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+
+                            is SendMessageStreamEvent.Completed -> {
+                                _state.update { state ->
+                                    state.copy(
+                                        messages = state.messages.map { message ->
+                                            if (message.id == event.message.id) {
+                                                event.message.toUi()
+                                            } else {
+                                                message
+                                            }
+                                        },
+                                        isLoading = false,
+                                        canSendMessage = false
+                                    )
+                                }
                             }
                         }
                     }
-                }
-                _events.send(ChatDetailEvent.OnNewMessage)
-                loadRecentChats()
+                    _events.send(ChatDetailEvent.OnNewMessage)
+                    loadRecentChats()
 
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        messages = it.messages.filter { msg ->
-                            msg.id !in assistantPlaceholderIds
-                        },
-                        canSendMessage = true,
-                        isLoading = false
-                    )
+                } catch (e: Exception) {
+                    _state.update {
+                        it.copy(
+                            messages = it.messages.filter { msg ->
+                                msg.id !in assistantPlaceholderIds
+                            },
+                            canSendMessage = true,
+                            isLoading = false
+                        )
+                    }
+                    _events.send(ChatDetailEvent.OnError(UiText.DynamicString(e.message ?: "Failed to send")))
                 }
-                _events.send(ChatDetailEvent.OnError(UiText.DynamicString(e.message ?: "Failed to send")))
+            } finally {
+                sendMessageMutex.unlock()
             }
         }
     }

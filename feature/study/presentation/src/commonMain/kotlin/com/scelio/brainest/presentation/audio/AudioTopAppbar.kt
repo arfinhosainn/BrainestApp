@@ -73,25 +73,7 @@ private fun AudioTopIconButton(
     val interactionSource = remember { MutableInteractionSource() }
     val layoutDirection = LocalLayoutDirection.current
     val iconOffset = if (layoutDirection == LayoutDirection.Ltr) 1.dp else (-1).dp
-    Box(
-        modifier = Modifier
-            .size(36.dp)
-            .clip(CircleShape)
-            .background(Color.White)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true, radius = 20.dp),
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(18.dp).offset(x = iconOffset),
-            tint = Color(0xFF1E2633)
-        )
-    }
+
 }
 
 

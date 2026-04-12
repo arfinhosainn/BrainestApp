@@ -259,6 +259,7 @@ fun AudioRecordingScreen(
                     RecordingStatus.PAUSED,
                     RecordingStatus.STOPPED -> PlaybackState.PAUSED
                 },
+                elapsedMillis = state.elapsedMillis,
                 onTogglePlayback = {
                     if (permissionState == PermissionState.GRANTED && !state.isGenerating) {
                         viewModel.togglePauseResume()

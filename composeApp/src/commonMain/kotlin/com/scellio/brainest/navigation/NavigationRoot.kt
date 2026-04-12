@@ -35,7 +35,9 @@ fun NavigationRoot(
                 }
             }
         )
-        homeGraph()
+        homeGraph(
+            navController = navController
+        )
         chatGraph(
             navController = navController
         )

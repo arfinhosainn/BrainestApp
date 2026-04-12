@@ -42,14 +42,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.components.StudySetItem
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.Instant as KxInstant
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 private const val DefaultGenerationCount = 10
 private const val DefaultMultipleChoice = true
@@ -65,9 +68,16 @@ fun StudySetDetailScreen(
     viewModel: StudySetDetailViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(deckId) {
         viewModel.load(deckId)
+    }
+
+    LaunchedEffect(lifecycleOwner, deckId) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.load(deckId)
+        }
     }
 
     LaunchedEffect(viewModel) {

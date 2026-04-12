@@ -13,11 +13,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.time.Clock
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -28,6 +32,7 @@ private const val MinVisualAmplitude = 0.04f
 data class AudioRecordingUiState(
     val amplitudes: List<Float> = List(AmplitudeWindowSize) { 0f },
     val status: RecordingStatus = RecordingStatus.STOPPED,
+    val elapsedMillis: Long = 0L,
     val transcript: String = "",
     val isGenerating: Boolean = false,
     val generationError: String? = null
@@ -53,10 +58,14 @@ class AudioRecordingViewModel(
     private val _events = MutableSharedFlow<AudioRecordingEvent>(extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
 
+    private var elapsedTickerJob: Job? = null
+    private var activeRecordingStartedAt: TimeMark? = null
+    private var accumulatedElapsedMillis = 0L
+
     init {
         viewModelScope.launch {
             recorder.status.collect { status ->
-                _state.update { it.copy(status = status) }
+                onRecordingStatusChanged(status)
             }
         }
 
@@ -91,6 +100,7 @@ class AudioRecordingViewModel(
     }
 
     fun startRecording() {
+        resetElapsedTime()
         viewModelScope.launch { recorder.start() }
     }
 
@@ -175,7 +185,65 @@ class AudioRecordingViewModel(
     }
 
     override fun onCleared() {
+        elapsedTickerJob?.cancel()
         recorder.release()
+    }
+
+    private fun onRecordingStatusChanged(status: RecordingStatus) {
+        _state.update { it.copy(status = status) }
+
+        when (status) {
+            RecordingStatus.RECORDING -> startElapsedTicker()
+            RecordingStatus.PAUSED,
+            RecordingStatus.STOPPED -> stopElapsedTicker()
+        }
+    }
+
+    private fun startElapsedTicker() {
+        if (activeRecordingStartedAt == null) {
+            activeRecordingStartedAt = TimeSource.Monotonic.markNow()
+        }
+        publishElapsedTime()
+
+        if (elapsedTickerJob?.isActive == true) return
+
+        elapsedTickerJob = viewModelScope.launch {
+            while (isActive) {
+                delay(250L)
+                publishElapsedTime()
+            }
+        }
+    }
+
+    private fun stopElapsedTicker() {
+        val currentSegment = activeRecordingStartedAt
+        if (currentSegment != null) {
+            accumulatedElapsedMillis += currentSegment.elapsedNow().inWholeMilliseconds
+            activeRecordingStartedAt = null
+        }
+
+        elapsedTickerJob?.cancel()
+        elapsedTickerJob = null
+        publishElapsedTime()
+    }
+
+    private fun publishElapsedTime() {
+        val activeElapsedMillis = activeRecordingStartedAt
+            ?.elapsedNow()
+            ?.inWholeMilliseconds
+            ?: 0L
+
+        _state.update {
+            it.copy(elapsedMillis = accumulatedElapsedMillis + activeElapsedMillis)
+        }
+    }
+
+    private fun resetElapsedTime() {
+        elapsedTickerJob?.cancel()
+        elapsedTickerJob = null
+        activeRecordingStartedAt = null
+        accumulatedElapsedMillis = 0L
+        _state.update { it.copy(elapsedMillis = 0L) }
     }
 
     private fun pushAmplitude(rawAmplitude: Float) {

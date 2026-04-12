@@ -36,6 +36,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ArcPlayback(
     playbackState: PlaybackState,
+    elapsedMillis: Long,
     onTogglePlayback: () -> Unit,
     onConfirm: () -> Unit = {},
     onCancel: () -> Unit = {},
@@ -43,6 +44,7 @@ fun ArcPlayback(
 ) {
     DividedCircleCanvas(
         playbackState = playbackState,
+        elapsedMillis = elapsedMillis,
         onTogglePlayback = onTogglePlayback,
         onConfirm = onConfirm,
         onCancel = onCancel,
@@ -53,6 +55,7 @@ fun ArcPlayback(
 @Composable
 fun DividedCircleCanvas(
     playbackState: PlaybackState,
+    elapsedMillis: Long,
     onTogglePlayback: () -> Unit,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
@@ -109,7 +112,7 @@ fun DividedCircleCanvas(
                     .width(130.dp),
                 contentAlignment = Alignment.Center
             ) {
-                StopwatchTimer()
+                StopwatchTimer(elapsedMillis = elapsedMillis)
             }
 
             FilledIconButton(
@@ -191,6 +194,7 @@ fun PreviewSheet() {
         Box(modifier = Modifier.fillMaxSize()) {
             ArcPlayback(
                 playbackState = PlaybackState.PAUSED,
+                elapsedMillis = 0L,
                 onTogglePlayback = {},
                 onConfirm = {},
                 onCancel = {},

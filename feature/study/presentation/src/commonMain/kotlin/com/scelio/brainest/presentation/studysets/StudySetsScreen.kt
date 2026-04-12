@@ -28,7 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.scelio.brainest.presentation.components.StudySetItem
 import com.scelio.brainest.presentation.components.UploadDocsBottomSheet
 import com.scelio.brainest.presentation.flashcards.rememberDocumentPicker
@@ -46,6 +49,7 @@ fun StudySetsScreen(
     viewModel: StudySetsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
     var isUploadSheetVisible by remember { mutableStateOf(false) }
 
     val documentPicker = rememberDocumentPicker(
@@ -60,6 +64,12 @@ fun StudySetsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadSets()
+    }
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.loadSets()
+        }
     }
 
     LaunchedEffect(viewModel) {

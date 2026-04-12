@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import brainest.feature.home.presentation.generated.resources.Res
-import brainest.feature.home.presentation.generated.resources.ic_2point
-import brainest.feature.home.presentation.generated.resources.ic_8point
+import brainest.feature.home.presentation.generated.resources.ic_cancel
 import brainest.feature.home.presentation.generated.resources.ic_check
 import org.jetbrains.compose.resources.vectorResource
 
@@ -32,16 +32,19 @@ internal fun StudyDayItem(
     val shape = RoundedCornerShape(16.dp)
     val backgroundColor = when (day.status) {
         StudyDayStatus.Completed -> Color(0xFFFEF5EA)
+        StudyDayStatus.Missed -> Color.White
         StudyDayStatus.Current -> Color.White
         StudyDayStatus.Upcoming -> Color.White
     }
     val borderColor = when (day.status) {
         StudyDayStatus.Completed -> null
+        StudyDayStatus.Missed -> Color(0xFFF1EFEA)
         StudyDayStatus.Current -> Color(0xFFFFA225)
         StudyDayStatus.Upcoming -> Color(0xFFF1EFEA)
     }
     val labelColor = when (day.status) {
         StudyDayStatus.Completed -> Color(0xFF6B6B6B)
+        StudyDayStatus.Missed -> Color(0xFF6B6B6B)
         StudyDayStatus.Current -> Color(0xFFFF8C1A)
         StudyDayStatus.Upcoming -> Color(0xFF6B6B6B)
     }
@@ -65,17 +68,23 @@ internal fun StudyDayItem(
     ) {
         when (day.status) {
             StudyDayStatus.Completed -> {
-                androidx.compose.material3.Icon(
+                Icon(
                     imageVector = vectorResource(Res.drawable.ic_check),
                     contentDescription = "Completed",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(35.dp),
                 )
             }
-            StudyDayStatus.Current,
-            StudyDayStatus.Upcoming -> {
-                PointsBadge(points = day.points)
+            StudyDayStatus.Missed -> {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.ic_cancel),
+                    contentDescription = "Missed",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(35.dp),
+                )
             }
+            StudyDayStatus.Current,
+            StudyDayStatus.Upcoming -> StatusBadge(day.status)
         }
 
         Text(
@@ -87,25 +96,14 @@ internal fun StudyDayItem(
 }
 
 @Composable
-private fun PointsBadge(
-    points: StudyDayPoints?,
+private fun StatusBadge(
+    status: StudyDayStatus,
     modifier: Modifier = Modifier,
 ) {
-    val icon = when (points) {
-        StudyDayPoints.Two -> vectorResource(Res.drawable.ic_2point)
-        StudyDayPoints.Eight -> vectorResource(Res.drawable.ic_8point)
-        null -> null
-    }
-
-    if (icon == null) {
+    if (status == StudyDayStatus.Upcoming) {
         Spacer(modifier = Modifier.size(32.dp))
         return
     }
 
-    androidx.compose.material3.Icon(
-        imageVector = icon,
-        contentDescription = "Points",
-        tint = Color.Unspecified,
-        modifier = modifier.size(35.dp),
-    )
+    Spacer(modifier = modifier.size(32.dp))
 }

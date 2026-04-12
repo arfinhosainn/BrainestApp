@@ -19,7 +19,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,6 +41,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChatListRoot(
     onNavigateToChat: (String) -> Unit,
+    onCloseClick: () -> Unit,
     viewModel: ChatListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -70,7 +70,8 @@ fun ChatListRoot(
     ChatListScreen(
         state = state,
         onAction = viewModel::onAction,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onCloseClick = onCloseClick
     )
 }
 
@@ -79,7 +80,8 @@ fun ChatListRoot(
 fun ChatListScreen(
     state: ChatListState,
     onAction: (ChatListAction) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    onCloseClick: () -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -91,7 +93,7 @@ fun ChatListScreen(
         topBar = {
             ChatListHeader(
                 scrollState = listState,
-                onSettingsClicked = { /* handle */ },
+                onCloseClicked = onCloseClick,
             )
         },
         floatingActionButton = {
@@ -152,7 +154,6 @@ fun ChatListScreen(
         }
     }
 }
-
 
 
 

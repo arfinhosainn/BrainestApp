@@ -2,7 +2,9 @@ package com.scelio.brainest.presentation.navigation
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
@@ -30,14 +32,40 @@ sealed interface ChatGraphRoutes {
     @Serializable data class ChatDetailRoute(val chatId: String? = null) : ChatGraphRoutes
 }
 
+private const val chatDrawerAnimationDurationMs = 1200
+private const val chatDetailEnterAnimationDurationMs = 1500
+private const val chatDetailExitAnimationDurationMs = 950
+
 fun NavGraphBuilder.chatGraph(navController: NavController) {
     navigation<ChatGraphRoutes.Graph>(
         startDestination = ChatGraphRoutes.ChatDetailRoute()
     ) {
-        composable<ChatGraphRoutes.ChatListRoute> {
+        composable<ChatGraphRoutes.ChatListRoute>(
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(
+                        durationMillis = chatDrawerAnimationDurationMs,
+                        easing = FastOutSlowInEasing
+                    )
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(
+                        durationMillis = chatDrawerAnimationDurationMs,
+                        easing = FastOutSlowInEasing
+                    )
+                )
+            }
+        ) {
             ChatListRoot(
                 onNavigateToChat = { chatId ->
                     navController.navigate(ChatGraphRoutes.ChatDetailRoute(chatId))
+                },
+                onCloseClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -47,7 +75,7 @@ fun NavGraphBuilder.chatGraph(navController: NavController) {
                 slideInVertically(
                     initialOffsetY = { fullHeight -> fullHeight },
                     animationSpec = tween(
-                        durationMillis = 950,
+                        durationMillis = chatDetailEnterAnimationDurationMs,
                         easing = FastOutSlowInEasing
                     )
                 )
@@ -56,7 +84,7 @@ fun NavGraphBuilder.chatGraph(navController: NavController) {
                 slideOutVertically(
                     targetOffsetY = { fullHeight -> fullHeight },
                     animationSpec = tween(
-                        durationMillis = 540,
+                        durationMillis = chatDetailExitAnimationDurationMs,
                         easing = FastOutSlowInEasing
                     )
                 )
@@ -65,7 +93,7 @@ fun NavGraphBuilder.chatGraph(navController: NavController) {
                 slideOutVertically(
                     targetOffsetY = { fullHeight -> fullHeight },
                     animationSpec = tween(
-                        durationMillis = 540,
+                        durationMillis = chatDetailExitAnimationDurationMs,
                         easing = FastOutSlowInEasing
                     )
                 )
@@ -94,9 +122,6 @@ fun NavGraphBuilder.chatGraph(navController: NavController) {
                     onOpenChatsClick = {
                         navController.navigate(ChatGraphRoutes.ChatListRoute) {
                             launchSingleTop = true
-                            popUpTo(ChatGraphRoutes.Graph) {
-                                inclusive = false
-                            }
                         }
                     },
                     onNavigateToChat = { selectedChatId ->

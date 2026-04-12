@@ -17,7 +17,8 @@
         <activity
             android:name="com.scellio.brainest.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Brainest">
+            android:theme="@style/Theme.Brainest"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

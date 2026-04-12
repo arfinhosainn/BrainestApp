@@ -3,10 +3,8 @@ package com.scelio.brainest.presentation.chat_detail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -116,7 +114,6 @@ fun ChatDetailScreen(
                         onNewChatClick()
                     },
                     onChatsClick = {
-                        coroutineScope.launch { drawerState.close() }
                         onOpenChatsClick()
                     },
                     onChatSelected = { selectedChatId ->
@@ -139,14 +136,35 @@ fun ChatDetailScreen(
                     onCloseClick = onCloseClick,
                 )
             },
+            bottomBar = {
+                MessageInputBox(
+                    modifier = Modifier.imePadding(),
+                    textFieldState = viewModel.messageTextFieldState,
+                    selectedImages = emptyList(),
+                    selectedDocument = null,
+                    enabled = !state.isLoading,
+                    onSendMessage = {
+                        if (state.canSendMessage) {
+                            viewModel.onAction(ChatDetailAction.OnSendMessageClick)
+                        }
+                    },
+                    onImageSelected = { /* TODO: Handle image selection */ },
+                    onImageRemoved = { /* TODO: Handle image removal */ },
+                    onDocumentSelected = { /* TODO: Handle document selection */ },
+                    onDocumentCleared = { /* TODO: Handle document clear */ },
+                    onGalleryClick = { /* TODO: Handle gallery click */ },
+                    onCameraClick = { /* TODO: Handle camera click */ },
+                    onDocumentClick = { /* TODO: Handle document click */ },
+                    onMicClick = { /* TODO: Handle mic click */ }
+                )
+            },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
             Column(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp)
-                    .imePadding()
+                    .padding(horizontal = 16.dp)
             ) {
                 if (state.isLoading && state.messages.isEmpty()) {
                     ChatConversationShimmer(
@@ -185,28 +203,6 @@ fun ChatDetailScreen(
                         }
                     }
                 }
-
-                Spacer(Modifier.height(12.dp))
-
-                MessageInputBox(
-                    textFieldState = viewModel.messageTextFieldState,
-                    selectedImages = emptyList(),
-                    selectedDocument = null,
-                    enabled = !state.isLoading,
-                    onSendMessage = {
-                        if (state.canSendMessage) {
-                            viewModel.onAction(ChatDetailAction.OnSendMessageClick)
-                        }
-                    },
-                    onImageSelected = { /* TODO: Handle image selection */ },
-                    onImageRemoved = { /* TODO: Handle image removal */ },
-                    onDocumentSelected = { /* TODO: Handle document selection */ },
-                    onDocumentCleared = { /* TODO: Handle document clear */ },
-                    onGalleryClick = { /* TODO: Handle gallery click */ },
-                    onCameraClick = { /* TODO: Handle camera click */ },
-                    onDocumentClick = { /* TODO: Handle document click */ },
-                    onMicClick = { /* TODO: Handle mic click */ }
-                )
             }
         }
     }

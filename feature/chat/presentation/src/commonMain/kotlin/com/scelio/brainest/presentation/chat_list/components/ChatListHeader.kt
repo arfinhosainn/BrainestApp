@@ -6,6 +6,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,18 +23,15 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import brainest.feature.chat.presentation.generated.resources.Res
-import brainest.feature.chat.presentation.generated.resources.ic_settings
 import com.scelio.brainest.designsystem.BrainestTheme
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListHeader(
-    scrollState: LazyListState, // Pass scroll state
-    onSettingsClicked: () -> Unit,
+    scrollState: LazyListState,
+    onCloseClicked: () -> Unit,
 ) {
     val scrollProgress = remember(scrollState.firstVisibleItemScrollOffset) {
         min(1f, scrollState.firstVisibleItemScrollOffset / 300f)
@@ -62,10 +61,10 @@ fun ChatListHeader(
             )
         },
         actions = {
-            IconButton(onClick = onSettingsClicked) {
+            IconButton(onClick = onCloseClicked) {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_settings),
-                    contentDescription = "Settings",
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close history",
                 )
             }
         },
@@ -82,7 +81,7 @@ fun ChatListHeader(
 @Composable
 fun PreviewChatListHeader() {
     BrainestTheme(darkTheme = true) {
-        ChatListHeader(scrollState = remember { LazyListState() }, onSettingsClicked = {})
+        ChatListHeader(scrollState = remember { LazyListState() }, onCloseClicked = {})
     }
 
 }

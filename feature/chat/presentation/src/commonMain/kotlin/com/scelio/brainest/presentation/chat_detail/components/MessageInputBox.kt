@@ -8,11 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -75,7 +76,9 @@ fun MessageInputBox(
     }
 
 
-    Column(modifier = Modifier.padding(horizontal = 12.022.dp, vertical = 10.dp)) {
+    Column(
+        modifier = modifier.padding(horizontal = 12.022.dp, vertical = 10.dp)
+    ) {
         if (selectedDocument != null) {
             DocumentPreview(
                 document = selectedDocument,
@@ -112,14 +115,16 @@ fun MessageInputBox(
                 state = textFieldState,
                 modifier = Modifier
                     .weight(1f)
-                    .heightIn(min = 44.dp)
+                    .height(48.dp)
                     .clip(CircleShape)
                     .background(inputFieldBackground)
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 enabled = enabled,
+                lineLimits = TextFieldLineLimits.SingleLine,
                 textStyle = TextStyle(
                     fontFamily = FontFamily.SansSerif,
                     fontSize = 16.sp,
+                    lineHeight = 20.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -145,6 +150,7 @@ fun MessageInputBox(
                                     ),
                                     style = TextStyle(
                                         fontSize = 16.sp,
+                                        lineHeight = 20.sp,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                 )

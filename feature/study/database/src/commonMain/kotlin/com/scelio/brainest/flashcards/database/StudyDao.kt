@@ -87,6 +87,37 @@ interface StudyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertFlashcardProgress(progress: FlashcardProgressEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertFlashcardProgressList(progress: List<FlashcardProgressEntity>)
+
+    @Query("DELETE FROM flashcard_progress WHERE deckId = :deckId")
+    suspend fun deleteFlashcardProgressByDeckId(deckId: String)
+
+    @Query("DELETE FROM flashcard_progress WHERE deckId = :deckId")
+    suspend fun deleteSyncedFlashcardProgressByDeckId(deckId: String)
+
+    @Transaction
+    suspend fun replaceSyncedFlashcardProgress(deckId: String, progress: List<FlashcardProgressEntity>) {
+        deleteSyncedFlashcardProgressByDeckId(deckId)
+        if (progress.isNotEmpty()) {
+            upsertFlashcardProgressList(progress)
+        }
+    }
+
+    @Query("DELETE FROM quiz_progress WHERE deckId = :deckId")
+    suspend fun deleteQuizProgressByDeckId(deckId: String)
+
+    @Query("DELETE FROM quiz_progress WHERE deckId = :deckId")
+    suspend fun deleteSyncedQuizProgressByDeckId(deckId: String)
+
+    @Transaction
+    suspend fun replaceSyncedQuizProgress(deckId: String, progress: List<QuizProgressEntity>) {
+        deleteSyncedQuizProgressByDeckId(deckId)
+        if (progress.isNotEmpty()) {
+            upsertQuizProgressList(progress)
+        }
+    }
+
     @Query(
         """
         SELECT * FROM flashcard_progress
@@ -98,6 +129,9 @@ interface StudyDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertQuizProgress(progress: QuizProgressEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertQuizProgressList(progress: List<QuizProgressEntity>)
 
     @Query(
         """

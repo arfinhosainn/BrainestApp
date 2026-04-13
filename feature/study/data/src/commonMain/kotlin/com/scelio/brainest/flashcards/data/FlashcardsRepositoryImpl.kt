@@ -261,6 +261,9 @@ class FlashcardsRepositoryImpl(
                 updatedAt = swipedAt
             )
             studyDao.upsertFlashcardProgress(progress.toEntity())
+            coroutineScope.launch(Dispatchers.IO) {
+                syncFlashcardProgressToRemote(progress)
+            }
             Result.Success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to save flashcard progress", e)
@@ -271,13 +274,26 @@ class FlashcardsRepositoryImpl(
     override suspend fun getFlashcardProgress(
         deckId: String
     ): Result<List<FlashcardProgress>, DataError.Remote> {
-        return try {
-            Result.Success(
-                studyDao.getFlashcardProgressByDeckId(deckId).map { it.toDomain() }
-            )
-        } catch (e: Exception) {
-            logger.error("Failed to read flashcard progress", e)
-            Result.Failure(DataError.Remote.UNKNOWN)
+        val localProgress = studyDao.getFlashcardProgressByDeckId(deckId).map { it.toDomain() }
+        if (localProgress.isNotEmpty()) {
+            return Result.Success(localProgress)
+        }
+
+        return when (val remoteProgress = fetchRemoteFlashcardProgress(deckId)) {
+            is Result.Success -> {
+                if (remoteProgress.data.isNotEmpty()) {
+                    studyDao.replaceSyncedFlashcardProgress(
+                        deckId = deckId,
+                        progress = remoteProgress.data.map { it.toEntity() }
+                    )
+                }
+                remoteProgress
+            }
+            is Result.Failure -> {
+                // If remote fetch fails, return empty success instead of error
+                // since no progress data is not a critical failure
+                Result.Success(emptyList())
+            }
         }
     }
 
@@ -452,6 +468,32 @@ class FlashcardsRepositoryImpl(
             }
             .decodeList<SupabaseDeckDto>()
         return decks.firstOrNull()?.totalCards
+    }
+
+    private suspend fun syncFlashcardProgressToRemote(progress: FlashcardProgress) {
+        try {
+            supabase.from("flashcard_progress").upsert(progress.toSupabaseDto())
+        } catch (e: Exception) {
+            logger.error("Failed to sync flashcard progress", e)
+        }
+    }
+
+    private suspend fun fetchRemoteFlashcardProgress(
+        deckId: String
+    ): Result<List<FlashcardProgress>, DataError.Remote> {
+        return try {
+            val progress = supabase.from("flashcard_progress")
+                .select {
+                    filter { eq("deck_id", deckId) }
+                    order(column = "updated_at", order = Order.DESCENDING)
+                }
+                .decodeList<SupabaseFlashcardProgressDto>()
+                .map { it.toDomain() }
+            Result.Success(progress)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch flashcard progress", e)
+            Result.Failure(e.toDataError())
+        }
     }
 
 }

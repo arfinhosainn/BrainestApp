@@ -2,7 +2,9 @@ package com.scelio.brainest.flashcards.data
 
 import com.scelio.brainest.flashcards.domain.Deck
 import com.scelio.brainest.flashcards.domain.Flashcard
+import com.scelio.brainest.flashcards.domain.FlashcardProgress
 import com.scelio.brainest.flashcards.domain.FlashcardResult
+import com.scelio.brainest.flashcards.domain.QuizProgress
 import com.scelio.brainest.flashcards.domain.SessionRecord
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
@@ -73,6 +75,26 @@ data class SupabaseQuizQuestionDto(
     val options: List<String>,
     @SerialName("correct_index") val correctIndex: Int,
     @SerialName("order_index") val orderIndex: Int
+)
+
+@Serializable
+data class SupabaseFlashcardProgressDto(
+    val id: String,
+    @SerialName("deck_id") val deckId: String,
+    @SerialName("card_id") val cardId: String,
+    @SerialName("swipes_count") val swipesCount: Int,
+    @SerialName("last_result") val lastResult: String? = null,
+    @SerialName("updated_at") val updatedAt: String
+)
+
+@Serializable
+data class SupabaseQuizProgressDto(
+    val id: String,
+    @SerialName("deck_id") val deckId: String,
+    @SerialName("total_questions") val totalQuestions: Int,
+    @SerialName("answered_questions") val answeredQuestions: Int,
+    @SerialName("correct_answers") val correctAnswers: Int,
+    @SerialName("completed_at") val completedAt: String
 )
 
 fun Deck.toSupabaseDto() = SupabaseDeckDto(
@@ -185,6 +207,42 @@ fun SupabaseQuizQuestionDto.toDomain() = QuizQuestion(
     options = options,
     correctIndex = correctIndex,
     orderIndex = orderIndex
+)
+
+fun FlashcardProgress.toSupabaseDto() = SupabaseFlashcardProgressDto(
+    id = id,
+    deckId = deckId,
+    cardId = cardId,
+    swipesCount = swipesCount,
+    lastResult = lastResult?.dbValue,
+    updatedAt = updatedAt.toIsoTimestamp()
+)
+
+fun SupabaseFlashcardProgressDto.toDomain() = FlashcardProgress(
+    id = id,
+    deckId = deckId,
+    cardId = cardId,
+    swipesCount = swipesCount,
+    lastResult = lastResult?.let { FlashcardResult.fromDbValue(it) },
+    updatedAt = updatedAt.toKotlinInstant()
+)
+
+fun QuizProgress.toSupabaseDto() = SupabaseQuizProgressDto(
+    id = id,
+    deckId = deckId,
+    totalQuestions = totalQuestions,
+    answeredQuestions = answeredQuestions,
+    correctAnswers = correctAnswers,
+    completedAt = completedAt.toIsoTimestamp()
+)
+
+fun SupabaseQuizProgressDto.toDomain() = QuizProgress(
+    id = id,
+    deckId = deckId,
+    totalQuestions = totalQuestions,
+    answeredQuestions = answeredQuestions,
+    correctAnswers = correctAnswers,
+    completedAt = completedAt.toKotlinInstant()
 )
 
 private fun Instant.toIsoTimestamp(): String {

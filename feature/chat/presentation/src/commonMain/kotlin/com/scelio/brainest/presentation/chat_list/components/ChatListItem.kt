@@ -66,8 +66,8 @@ import kotlin.math.roundToInt
 @Composable
 fun ChatListItem(
     chat: ChatItemUi,
-    onClick: () -> Unit,
-    onDelete: () -> Unit,
+    onChatClick: (String) -> Unit,
+    onDeleteChat: (String) -> Unit,
     leadingIcon: Painter? = null,
     iconSize: Dp = 24.dp,
     iconTint: Color = Color.Unspecified,
@@ -84,8 +84,9 @@ fun ChatListItem(
     val coroutineScope = rememberCoroutineScope()
 
     var offsetX by remember { mutableFloatStateOf(0f) }
-    val deleteButtonWidth = with(LocalDensity.current) { 80.dp.toPx() }
-    val swipeThreshold = -deleteButtonWidth * 0.2f
+    val density = LocalDensity.current
+    val deleteButtonWidth = remember(density) { with(density) { 80.dp.toPx() } }
+    val swipeThreshold = remember(deleteButtonWidth) { -deleteButtonWidth * 0.2f }
 
     val draggableState = rememberDraggableState { delta ->
         val newOffset = offsetX + delta
@@ -118,7 +119,7 @@ fun ChatListItem(
                         isRemoved = true
                         coroutineScope.launch {
                             delay(300)
-                            onDelete()
+                            onDeleteChat(chat.id)
                         }
                     }
                 ) {
@@ -159,7 +160,7 @@ fun ChatListItem(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = ripple(bounded = true)
-                        ) { onClick() }
+                        ) { onChatClick(chat.id) }
                         .padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -222,8 +223,8 @@ private fun ChatListItemUiPreview() {
                     isSelected = false
                 ),
                 leadingIcon = painterResource(Res.drawable.improve_style),
-                onClick = { /* Handle click */ },
-                onDelete = { /* Handle delete */ }
+                onChatClick = { /* Handle click */ },
+                onDeleteChat = { /* Handle delete */ }
             )
         }
     }
@@ -250,8 +251,8 @@ private fun ChatListItemDarkUiPreview() {
                     isSelected = false
                 ),
                 leadingIcon = painterResource(Res.drawable.improve_style),
-                onClick = { /* Handle click */ },
-                onDelete = { /* Handle delete */ }
+                onChatClick = { /* Handle click */ },
+                onDeleteChat = { /* Handle delete */ }
             )
         }
     }

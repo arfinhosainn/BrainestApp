@@ -36,6 +36,9 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+private val FabMenuContainerColor = Color(0xFF787880).copy(alpha = 0.30f)
+private val IconButtonDisabledContainer = Color(0xFFEAE6E2)
+
 @Composable
 fun AttachmentFabMenu(
     onGalleryClick: () -> Unit,
@@ -51,7 +54,7 @@ fun AttachmentFabMenu(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape),
-            containerColor = Color(0xFF787880).copy(alpha = 0.30f),
+            containerColor = FabMenuContainerColor,
             contentColor = MaterialTheme.colorScheme.onBackground,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
             shape = CircleShape,
@@ -81,9 +84,9 @@ fun AttachmentFabMenu(
                     IconButton(
                         onClick = {},
                         colors = IconButtonColors(
-                            containerColor = Color(0xFF787880).copy(alpha = 0.30f),
+                            containerColor = FabMenuContainerColor,
                             contentColor = Color.Black,
-                            disabledContainerColor = Color(0xFFEAE6E2),
+                            disabledContainerColor = IconButtonDisabledContainer,
                             disabledContentColor = Color.Black
                         )
                     ) {
@@ -109,9 +112,9 @@ fun AttachmentFabMenu(
                     IconButton(
                         onClick = {},
                         colors = IconButtonColors(
-                            containerColor = Color(0xFF787880).copy(alpha = 0.30f),
+                            containerColor = FabMenuContainerColor,
                             contentColor = Color.Black,
-                            disabledContainerColor = Color(0xFFEAE6E2),
+                            disabledContainerColor = IconButtonDisabledContainer,
                             disabledContentColor = Color.Black
                         )
                     ) {
@@ -136,9 +139,9 @@ fun AttachmentFabMenu(
                     IconButton(
                         onClick = {},
                         colors = IconButtonColors(
-                            containerColor = Color(0xFF787880).copy(alpha = 0.30f),
+                            containerColor = FabMenuContainerColor,
                             contentColor = Color.Black,
-                            disabledContainerColor = Color(0xFFEAE6E2),
+                            disabledContainerColor = IconButtonDisabledContainer,
                             disabledContentColor = Color.Black
                         )
                     ) {

@@ -4,9 +4,10 @@ import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.flashcards.domain.QuizProgress
+import com.scelio.brainest.flashcards.domain.QuizSyncProvider
 import kotlin.time.Instant
 
-interface QuizRepository {
+interface QuizRepository : QuizSyncProvider {
     suspend fun addQuizQuestions(
         deckId: String,
         questions: List<QuizQuestionInput>
@@ -28,7 +29,7 @@ interface QuizRepository {
         deckId: String
     ): Result<List<QuizProgress>, DataError.Remote>
 
-    suspend fun syncDeckQuizQuestions(
+    override suspend fun syncDeckQuizQuestions(
         deckId: String
     ): EmptyResult<DataError.Remote>
 }

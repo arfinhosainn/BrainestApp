@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.domain.util.awaitValue
 import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.StudySource
@@ -288,17 +289,7 @@ class AudioRecordingViewModel(
         )
     }
 
-    private suspend fun awaitUserId(
-        maxAttempts: Int = 10,
-        delayMs: Long = 200
-    ): String? {
-        repeat(maxAttempts) {
-            val userId = authService.currentUserId()
-            if (!userId.isNullOrBlank()) {
-                return userId
-            }
-            delay(delayMs)
-        }
-        return null
+    private suspend fun awaitUserId(): String? {
+        return awaitValue({ authService.currentUserId() })
     }
 }

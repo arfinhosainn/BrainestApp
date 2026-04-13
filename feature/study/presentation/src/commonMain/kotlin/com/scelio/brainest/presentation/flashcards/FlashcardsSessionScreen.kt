@@ -3,7 +3,7 @@ package com.scelio.brainest.presentation.flashcards
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import com.scelio.brainest.presentation.FlashCardScreen
@@ -15,7 +15,7 @@ fun FlashcardsSessionScreen(
     deckId: String,
     viewModel: FlashcardsSessionViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(deckId) {

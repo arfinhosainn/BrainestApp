@@ -129,13 +129,14 @@ fun StudySetsScreen(
                 ) {
                     items(state.sets, key = { it.id }) { set ->
                         StudySetItem(
+                            id = set.id,
                             title = set.title,
                             createdAt = formatDate(set.createdAt),
                             flashcardsCount = set.flashcardsCount,
                             quizCount = set.quizCount,
                             flashcardsSwiped = set.flashcardsSwiped,
                             quizzesCompleted = set.quizzesCompleted,
-                            onClick = { onOpenSet(set.id) }
+                            onSetClick = { id -> onOpenSet(id) }
                         )
                     }
                 }

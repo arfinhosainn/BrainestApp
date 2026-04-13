@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -89,7 +89,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Name> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             NameInputScreen(
                 title = "What's your name?",
@@ -106,7 +106,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Grade> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             GradeScreen(
                 title = "What's your grade level?",
@@ -123,7 +123,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Subjects> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             SelectSubjectScreen(
                 title = "What subjects are you studying?",
@@ -144,7 +144,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Goal> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             GoalScreen(
                 title = "What's your main goal?",
@@ -161,7 +161,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Challenges> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             SelectSubjectScreen(
                 title = "What challenges are you facing?",
@@ -182,7 +182,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Survey> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             StudyHoursScreen(
                 title = "How many hours do you study daily?",
@@ -198,7 +198,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.LearningMethod> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             LearningMethodScreen(
                 title = "How do you learn best?",
@@ -215,7 +215,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.StudyTime> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             StudyTimeScreen(
                 title = "When do you usually study?",
@@ -232,7 +232,7 @@ fun NavGraphBuilder.onboardingGraph(
 
         composable<OnboardingGraphRoutes.Language> {
             val viewModel = rememberOnboardingViewModel(navController)
-            val state by viewModel.state.collectAsState()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             LanguageSelectionScreen(
                 title = "Select your language",

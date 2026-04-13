@@ -1,6 +1,8 @@
 package com.scelio.brainest.presentation.login
 
 sealed interface LoginAction {
+    data class OnEmailChanged(val email: String) : LoginAction
+    data class OnPasswordChanged(val password: String) : LoginAction
     data object OnTogglePasswordVisibility: LoginAction
     data object OnForgotPasswordClick: LoginAction
     data object OnLoginClick: LoginAction

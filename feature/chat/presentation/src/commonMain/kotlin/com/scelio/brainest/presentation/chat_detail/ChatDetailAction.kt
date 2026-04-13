@@ -7,4 +7,5 @@ sealed interface ChatDetailAction {
     data object OnDismissMessageMenu: ChatDetailAction
     data object OnBackClick: ChatDetailAction
     data object OnRetryPaginationClick: ChatDetailAction
+    data class OnMessageTextChanged(val text: String): ChatDetailAction
 }

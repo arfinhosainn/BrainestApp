@@ -1,7 +1,7 @@
 package com.scelio.brainest.flashcards.data
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.plcoding.feature.study.data.BuildKonfig
+import com.scelio.brainest.feature.study.data.BuildKonfig
 import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.flashcards.database.BrainestStudyDatabase
 import com.scelio.brainest.flashcards.database.DatabaseFactory
@@ -11,6 +11,7 @@ import com.scelio.brainest.flashcards.domain.DocumentTranscriptionService
 import com.scelio.brainest.flashcards.domain.FlashcardsGenerationService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.OpenAiFileService
+import com.scelio.brainest.flashcards.domain.QuizSyncProvider
 import com.scelio.brainest.flashcards.domain.SmartNotesGenerationService
 import com.scelio.brainest.quiz.domain.QuizGenerationService
 import com.scelio.brainest.quiz.domain.QuizRepository
@@ -79,13 +80,16 @@ val flashcardsDataModule = module {
     single<StudyDao> {
         get<BrainestStudyDatabase>().studyDao()
     }
+    single<QuizSyncProvider> {
+        get<QuizRepository>() // QuizRepository implements QuizSyncProvider
+    }
     single<FlashcardsRepository> {
         FlashcardsRepositoryImpl(
             supabase = get(),
             logger = get<BrainestLogger>(),
             studyDao = get(),
             coroutineScope = get(),
-            quizRepository = get()
+            quizSyncProvider = get()
         )
     }
     single<QuizRepository> {

@@ -3,11 +3,14 @@ package com.scelio.brainest.presentation.reset_password
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +43,12 @@ fun ResetPasswordRoot(
     onLoginClick: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val passwordFieldState = rememberTextFieldState()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { passwordFieldState.text.toString() }
+            .collect { viewModel.onAction(ResetPasswordAction.OnPasswordChanged(it)) }
+    }
 
     LaunchedEffect(state.isResetSuccessful) {
         if (state.isResetSuccessful) {
@@ -50,14 +59,15 @@ fun ResetPasswordRoot(
 
     ResetPasswordScreen(
         state = state,
+        passwordFieldState = passwordFieldState,
         onAction = viewModel::onAction
-
     )
 }
 
 @Composable
 fun ResetPasswordScreen(
     state: ResetPasswordState,
+    passwordFieldState: TextFieldState,
     onAction: (ResetPasswordAction) -> Unit,
 ) {
     BrainestSnackbarScaffold {
@@ -69,7 +79,7 @@ fun ResetPasswordScreen(
             }
         ) {
             BrainestPasswordTextField(
-                state = state.passwordTextState,
+                state = passwordFieldState,
                 modifier = Modifier
                     .fillMaxWidth(),
                 placeholder = stringResource(Res.string.password),
@@ -110,8 +120,10 @@ fun ResetPasswordScreen(
 @Composable
 private fun Preview() {
     BrainestTheme {
+        val passwordFieldState = rememberTextFieldState()
         ResetPasswordScreen(
             state = ResetPasswordState(),
+            passwordFieldState = passwordFieldState,
             onAction = {}
         )
     }

@@ -44,19 +44,20 @@ private val ColorIconBg = Color(0xFFD8F5E2)
 
 @Composable
 fun StudySetItem(
+    id: String,
     title: String,
     createdAt: String,
     flashcardsCount: Int,
     quizCount: Int,
     flashcardsSwiped: Int = 0,
     quizzesCompleted: Int = 0,
-    onClick: () -> Unit,
+    onSetClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = { onSetClick(id) }),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = ColorCardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -169,13 +170,14 @@ private fun PreviewStudySetItem() {
         Surface(color = MaterialTheme.colorScheme.surface) {
             Column(modifier = Modifier.padding(16.dp)) {
                 StudySetItem(
+                    id = "preview-id",
                     title = "Mitochondria",
                     createdAt = "Apr 5, 2026",
                     flashcardsCount = 20,
                     quizCount = 10,
                     flashcardsSwiped = 42,
                     quizzesCompleted = 3,
-                    onClick = {}
+                    onSetClick = {}
                 )
             }
         }

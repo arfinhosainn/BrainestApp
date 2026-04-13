@@ -119,13 +119,14 @@ fun StudySetDetailScreen(
                     
 
                     StudySetItem(
+                        id = deck.id,
                         title = deck.title,
                         createdAt = formatDate(deck.createdAt),
                         flashcardsCount = deck.totalCards,
                         quizCount = state.quizCount,
                         flashcardsSwiped = state.flashcardsSwiped,
                         quizzesCompleted = state.quizzesCompleted,
-                        onClick = {}
+                        onSetClick = {}
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))

@@ -5,7 +5,7 @@ import com.scelio.brainest.data.chat.ChatRepositoryImpl
 import com.scelio.brainest.data.chat.OpenAIApiService
 import com.scelio.brainest.data.chat.OpenAIApiServiceImpl
 import com.scelio.brainest.data.chat.SupabaseChatServiceImpl
-import com.plcoding.feature.chat.data.BuildKonfig
+import com.scelio.brainest.feature.chat.data.BuildKonfig
 import com.scelio.brainest.database.BrainestChatDatabase
 import com.scelio.brainest.database.ChatDao
 import com.scelio.brainest.database.DatabaseFactory
@@ -65,13 +65,14 @@ val chatDataModule = module {
         get<BrainestChatDatabase>().chatDao()
     }
 
-    // Repository - all 4 dependencies satisfied ✅
+    // Repository - all 5 dependencies satisfied ✅
     single<ChatRepository> {
         ChatRepositoryImpl(
             chatDao = get(),              // ✅
             openAI = get(),               // ✅
             supabaseService = get(),      // ✅
-            coroutineScope = get()        // ✅
+            coroutineScope = get(),       // ✅
+            logger = get()                // ✅
         )
     }
 }

@@ -33,14 +33,16 @@ fun BrainestTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     onFocusChanged: (Boolean) -> Unit = {},
 ) {
-    BrainestTextFieldLayout(
+    val interaction = rememberTextFieldInteraction(onFocusChanged)
+    val styleModifier = getTextFieldModifier(interaction.isFocused, isError, enabled)
+    
+    TextFieldLayoutContainer(
         title = title,
         isError = isError,
         supportingText = supportingText,
-        enabled = enabled,
-        onFocusChanged = onFocusChanged,
+        textFieldInteraction = interaction,
         modifier = modifier
-    ) { styleModifier, interactionSource ->
+    ) {
         BasicTextField(
             state = state,
             enabled = enabled,
@@ -58,25 +60,37 @@ fun BrainestTextField(
                 keyboardType = keyboardType
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-            interactionSource = interactionSource,
+            interactionSource = interaction.interactionSource,
             modifier = styleModifier,
             decorator = { innerBox ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if(state.text.isEmpty() && placeholder != null) {
-                        Text(
-                            text = placeholder,
-                            color = MaterialTheme.colorScheme.extended.textPlaceholder,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    innerBox()
-                }
+                BrainestTextFieldDecoratorBox(
+                    state = state,
+                    placeholder = placeholder,
+                    innerBox = innerBox
+                )
             }
         )
+    }
+}
+
+@Composable
+private fun BrainestTextFieldDecoratorBox(
+    state: TextFieldState,
+    placeholder: String?,
+    innerBox: @Composable () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        if(state.text.isEmpty() && placeholder != null) {
+            Text(
+                text = placeholder,
+                color = MaterialTheme.colorScheme.extended.textPlaceholder,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+        innerBox()
     }
 }
 

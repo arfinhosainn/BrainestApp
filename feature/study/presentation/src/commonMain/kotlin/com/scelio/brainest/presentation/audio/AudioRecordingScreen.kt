@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -79,6 +80,7 @@ fun AudioRecordingScreen(
 
     var showPlayback by remember { mutableStateOf(false) }
     val transcriptScrollState = rememberScrollState()
+    val showTopGradient by remember { derivedStateOf { transcriptScrollState.value > 0 } }
 
     LaunchedEffect(Unit) {
         showPlayback = true
@@ -206,7 +208,7 @@ fun AudioRecordingScreen(
                                 .fillMaxWidth()
                                 .height(52.dp)
                                 .align(Alignment.TopCenter)
-                                .alpha(if (transcriptScrollState.value > 0) 1f else 0f)
+                                .alpha(if (showTopGradient) 1f else 0f)
                                 .background(
                                     brush = Brush.verticalGradient(
                                         colors = listOf(

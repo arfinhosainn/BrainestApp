@@ -51,7 +51,6 @@ fun ChatListRoot(
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            println("🔄 ChatListRoot: Screen resumed, refreshing chats")
             viewModel.onAction(ChatListAction.OnRefresh)
         }
     }
@@ -145,8 +144,8 @@ fun ChatListScreen(
                         ChatListItem(
                             chat = chat,
                             leadingIcon = painterResource(Res.drawable.improve_style),
-                            onClick = { onAction(ChatListAction.OnChatClick(chat.id)) },
-                            onDelete = { onAction(ChatListAction.OnDeleteChat(chat.id)) }
+                            onChatClick = { id -> onAction(ChatListAction.OnChatClick(id)) },
+                            onDeleteChat = { id -> onAction(ChatListAction.OnDeleteChat(id)) }
                         )
                     }
                 }

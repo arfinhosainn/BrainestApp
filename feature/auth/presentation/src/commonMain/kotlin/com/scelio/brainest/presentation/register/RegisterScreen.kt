@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,8 +52,24 @@ fun RegisterRoot(
     onLoginClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val emailFieldState = rememberTextFieldState()
+    val passwordFieldState = rememberTextFieldState()
+    val usernameFieldState = rememberTextFieldState()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { emailFieldState.text.toString() }
+            .collect { viewModel.onAction(RegisterAction.OnEmailChanged(it)) }
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { passwordFieldState.text.toString() }
+            .collect { viewModel.onAction(RegisterAction.OnPasswordChanged(it)) }
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { usernameFieldState.text.toString() }
+            .collect { viewModel.onAction(RegisterAction.OnUsernameChanged(it)) }
+    }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -62,6 +82,9 @@ fun RegisterRoot(
 
     RegisterScreen(
         state = state,
+        emailFieldState = emailFieldState,
+        passwordFieldState = passwordFieldState,
+        usernameFieldState = usernameFieldState,
         onAction = { action ->
             when (action) {
                 is RegisterAction.OnLoginClick -> onLoginClick()
@@ -76,6 +99,9 @@ fun RegisterRoot(
 @Composable
 fun RegisterScreen(
     state: RegisterState,
+    emailFieldState: TextFieldState,
+    passwordFieldState: TextFieldState,
+    usernameFieldState: TextFieldState,
     onAction: (RegisterAction) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
@@ -89,7 +115,7 @@ fun RegisterScreen(
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 BrainestTextField(
-                    state = state.usernameTextState,
+                    state = usernameFieldState,
                     placeholder = stringResource(Res.string.username_placeholder),
                     title = stringResource(Res.string.username),
                     supportingText = state.usernameError?.asString()
@@ -101,7 +127,7 @@ fun RegisterScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BrainestTextField(
-                    state = state.emailTextState,
+                    state = emailFieldState,
                     placeholder = stringResource(Res.string.email_placeholder),
                     title = stringResource(Res.string.email),
                     supportingText = state.emailError?.asString(),
@@ -113,7 +139,7 @@ fun RegisterScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BrainestPasswordTextField(
-                    state = state.passwordTextState,
+                    state = passwordFieldState,
                     placeholder = stringResource(Res.string.password),
                     title = stringResource(Res.string.password),
                     supportingText = state.passwordError?.asString()
@@ -160,8 +186,14 @@ fun RegisterScreen(
 @Composable
 private fun Preview() {
     BrainestTheme {
+        val emailFieldState = rememberTextFieldState()
+        val passwordFieldState = rememberTextFieldState()
+        val usernameFieldState = rememberTextFieldState()
         RegisterScreen(
             state = RegisterState(),
+            emailFieldState = emailFieldState,
+            passwordFieldState = passwordFieldState,
+            usernameFieldState = usernameFieldState,
             onAction = {},
             snackbarHostState = remember { SnackbarHostState() }
         )

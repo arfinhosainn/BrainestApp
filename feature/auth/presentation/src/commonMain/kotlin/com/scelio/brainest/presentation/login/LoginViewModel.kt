@@ -1,6 +1,5 @@
 package com.scelio.brainest.presentation.login
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import brainest.feature.auth.presentation.generated.resources.Res
@@ -38,16 +37,17 @@ class LoginViewModel(
     private val eventChannel = Channel<LoginEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val isEmailValidFlow = snapshotFlow { state.value.emailTextFieldState.text.toString() }
-        .map { email -> EmailValidator.validate(email) }
+    private val _state = MutableStateFlow(LoginState())
+    
+    private val isEmailValidFlow = _state
+        .map { EmailValidator.validate(it.email) }
         .distinctUntilChanged()
 
     private val isPasswordNotBlankFlow =
-        snapshotFlow { state.value.passwordTextFieldState.text.toString() }
-            .map { it.isNotBlank() }
+        _state
+            .map { it.password.isNotBlank() }
             .distinctUntilChanged()
 
-    private val _state = MutableStateFlow(LoginState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -69,6 +69,12 @@ class LoginViewModel(
 
     fun onAction(action: LoginAction) {
         when (action) {
+            is LoginAction.OnEmailChanged -> {
+                _state.update { it.copy(email = action.email) }
+            }
+            is LoginAction.OnPasswordChanged -> {
+                _state.update { it.copy(password = action.password) }
+            }
             LoginAction.OnLoginClick -> login()
             LoginAction.OnTogglePasswordVisibility -> {
                 _state.update {
@@ -110,8 +116,8 @@ class LoginViewModel(
                 )
             }
 
-            val email = state.value.emailTextFieldState.text.toString()
-            val password = state.value.passwordTextFieldState.text.toString()
+            val email = state.value.email
+            val password = state.value.password
 
             authService
                 .login(

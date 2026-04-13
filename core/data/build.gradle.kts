@@ -19,6 +19,7 @@ kotlin {
                 implementation(projects.core.domain)
 
                 implementation(libs.bundles.ktor.common)
+                implementation(libs.ktor.client.core)
                 implementation(libs.touchlab.kermit)
 
                 implementation(libs.supabase.postgrest.kt)
@@ -30,9 +31,6 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
 
                 implementation(libs.supabase.auth.kt) // Add this line
-
-
-
             }
         }
 

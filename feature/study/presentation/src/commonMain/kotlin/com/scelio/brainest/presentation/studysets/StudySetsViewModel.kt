@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.domain.util.awaitValue
+import com.scelio.brainest.domain.util.validateDocumentForUpload
 import com.scelio.brainest.flashcards.domain.DocumentTranscriptionError
 import com.scelio.brainest.flashcards.domain.DocumentTranscriptionService
 import com.scelio.brainest.flashcards.domain.Deck
@@ -255,20 +257,11 @@ class StudySetsViewModel(
     }
 
     private fun validateDocument(document: PickedDocument): String? {
-        val maxBytes = 20 * 1024 * 1024
-        if (document.bytes.size > maxBytes) {
-            return "Document is too large. Max size is 20MB."
-        }
-
-        val fileName = document.fileName.lowercase()
-        val mimeType = document.mimeType.lowercase()
-        val isSupported = mimeType in setOf(
-            "application/pdf",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "text/plain"
-        ) || fileName.endsWith(".pdf") || fileName.endsWith(".docx") || fileName.endsWith(".txt")
-
-        return if (isSupported) null else "Unsupported file type. Use PDF, DOCX, or TXT."
+        return validateDocumentForUpload(
+            fileName = document.fileName,
+            mimeType = document.mimeType,
+            sizeBytes = document.bytes.size
+        )
     }
 
     private fun documentTranscriptionErrorMessage(error: DocumentTranscriptionError): String {
@@ -298,17 +291,7 @@ class StudySetsViewModel(
         )
     }
 
-    private suspend fun awaitUserId(
-        maxAttempts: Int = 10,
-        delayMs: Long = 200
-    ): String? {
-        repeat(maxAttempts) {
-            val userId = authService.currentUserId()
-            if (!userId.isNullOrBlank()) {
-                return userId
-            }
-            delay(delayMs)
-        }
-        return null
+    private suspend fun awaitUserId(): String? {
+        return awaitValue({ authService.currentUserId() })
     }
 }

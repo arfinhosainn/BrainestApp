@@ -1,9 +1,12 @@
 package com.scelio.brainest.data.di
 
+import com.scelio.brainest.core.data.BuildKonfig
 import com.scelio.brainest.data.auth.SupabaseAuthService
+import com.scelio.brainest.data.auth.SupabaseSessionManager
 import com.scelio.brainest.data.logging.KermitLogger
 import com.scelio.brainest.data.networking.HttpClientFactory
 import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.auth.SessionManager
 import com.scelio.brainest.domain.logging.BrainestLogger
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.FlowType
@@ -27,11 +30,12 @@ val coreDataModule = module {
         HttpClientFactory(get()).create(get())
     }
     singleOf(::SupabaseAuthService) bind AuthService::class
+    singleOf(::SupabaseSessionManager) bind SessionManager::class
 
     single {
         createSupabaseClient (
-            supabaseUrl = "https://ezhmtxiqaalkhngvshda.supabase.co",
-            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6aG10eGlxYWFsa2huZ3ZzaGRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4OTg2MjEsImV4cCI6MjA3OTQ3NDYyMX0.IoUrlWhuiVwALa-SmsOid-I7VZx9h0DZSq-azcyu-2s"
+            supabaseUrl = BuildKonfig.SUPABASE_URL,
+            supabaseKey = BuildKonfig.SUPABASE_KEY
         ) {
             defaultLogLevel = LogLevel.DEBUG
             requestTimeout = 60.seconds // 60 seconds

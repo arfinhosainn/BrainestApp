@@ -1,6 +1,7 @@
 package com.scelio.brainest.data.file_upload
 
 import com.scelio.brainest.domain.file_upload.FileUploadService
+import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.Result
 import io.github.jan.supabase.storage.Storage
@@ -10,7 +11,8 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 class FileUploadServiceImpl(
     private val storage: Storage,
-    private val userId: String
+    private val userId: String,
+    private val logger: BrainestLogger
 ) : FileUploadService {
 
     companion object {
@@ -36,8 +38,7 @@ class FileUploadServiceImpl(
 
             Result.Success(publicUrl)
         } catch (e: Exception) {
-            println("Image upload error: ${e.message}")
-            e.printStackTrace()
+            logger.error("Image upload error", e)
             Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
@@ -63,8 +64,7 @@ class FileUploadServiceImpl(
 
             Result.Success(urls)
         } catch (e: Exception) {
-            println("Images upload error: ${e.message}")
-            e.printStackTrace()
+            logger.error("Images upload error", e)
             Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
@@ -88,8 +88,7 @@ class FileUploadServiceImpl(
 
             Result.Success(publicUrl)
         } catch (e: Exception) {
-            println("File upload error: ${e.message}")
-            e.printStackTrace()
+            logger.error("File upload error", e)
             Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
@@ -103,7 +102,7 @@ class FileUploadServiceImpl(
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            println("Image delete error: ${e.message}")
+            logger.error("Image delete error", e)
             Result.Failure(DataError.Remote.UNKNOWN)
         }
     }
@@ -118,7 +117,7 @@ class FileUploadServiceImpl(
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            println("File delete error: ${e.message}")
+            logger.error("File delete error", e)
             Result.Failure(DataError.Remote.UNKNOWN)
         }
     }

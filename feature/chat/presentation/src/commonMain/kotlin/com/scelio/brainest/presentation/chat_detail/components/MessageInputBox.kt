@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
@@ -132,40 +133,43 @@ fun MessageInputBox(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Send
                 ),
-                decorator = { innerTextField ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.weight(1f),
-                            contentAlignment = Alignment.CenterStart
+                decorator = object : TextFieldDecorator {
+                    @Composable
+                    override fun Decoration(innerTextField: @Composable () -> Unit) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            if (textFieldState.text.isEmpty()) {
-                                Text(
-                                    text = getPlaceholderText(
-                                        selectedImages.size,
-                                        selectedDocument
-                                    ),
-                                    style = TextStyle(
-                                        fontSize = 16.sp,
-                                        lineHeight = 20.sp,
-                                        color = MaterialTheme.colorScheme.onSurface
+                            Box(
+                                modifier = Modifier.weight(1f),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                if (textFieldState.text.isEmpty()) {
+                                    Text(
+                                        text = getPlaceholderText(
+                                            selectedImages.size,
+                                            selectedDocument
+                                        ),
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            lineHeight = 20.sp,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
                                     )
-                                )
+                                }
+                                innerTextField()
                             }
-                            innerTextField()
-                        }
 
-                        TrailingButton(
-                            hasContent = textFieldState.text.isNotEmpty() ||
-                                    selectedImages.isNotEmpty() ||
-                                    selectedDocument != null,
-                            enabled = enabled,
-                            onSendClick = onSendMessage,
-                            onMicClick = onMicClick
-                        )
+                            TrailingButton(
+                                hasContent = textFieldState.text.isNotEmpty() ||
+                                        selectedImages.isNotEmpty() ||
+                                        selectedDocument != null,
+                                enabled = enabled,
+                                onSendClick = onSendMessage,
+                                onMicClick = onMicClick
+                            )
+                        }
                     }
                 }
             )

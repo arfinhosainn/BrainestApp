@@ -61,14 +61,7 @@ fun BrainestTextField(
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             interactionSource = interaction.interactionSource,
-            modifier = styleModifier,
-            decorator = { innerBox ->
-                BrainestTextFieldDecoratorBox(
-                    state = state,
-                    placeholder = placeholder,
-                    innerBox = innerBox
-                )
-            }
+            modifier = styleModifier
         )
     }
 }

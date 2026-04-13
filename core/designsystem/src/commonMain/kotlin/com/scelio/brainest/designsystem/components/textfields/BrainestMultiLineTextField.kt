@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
@@ -68,15 +69,18 @@ fun BrainestMultiLineTextField(
                 onKeyboardAction()
             },
             cursorBrush = SolidColor(MaterialTheme.colorScheme.extended.textPrimary),
-            decorator = { innerBox ->
-                if (placeholder != null && state.text.isNotEmpty()) {
-                    Text(
-                        text = placeholder,
-                        color = MaterialTheme.colorScheme.extended.textPlaceholder,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+            decorator = object : TextFieldDecorator {
+                @Composable
+                override fun Decoration(innerTextField: @Composable () -> Unit) {
+                    if (placeholder != null && state.text.isNotEmpty()) {
+                        Text(
+                            text = placeholder,
+                            color = MaterialTheme.colorScheme.extended.textPlaceholder,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    innerTextField()
                 }
-                innerBox()
             }
         )
         if (bottomContent != null) {

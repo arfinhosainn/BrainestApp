@@ -1,5 +1,6 @@
 package com.scelio.brainest.presentation.home
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
@@ -11,6 +12,8 @@ import com.scelio.brainest.presentation.home.components.StudyDayStatus
 import com.scelio.brainest.quiz.domain.QuizRepository
 import kotlin.time.Clock
 import kotlin.time.Instant
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -23,6 +26,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
+@Stable
 data class HomeState(
     val isLoading: Boolean = false,
     val userName: String = "Student",
@@ -91,53 +95,43 @@ class HomeViewModel(
 
             val decks = (decksResult as Result.Success).data
 
-            val deckSnapshots = mutableListOf<DeckStudySnapshot>()
-            for (deck in decks) {
-                when (val flashcardProgressResult = flashcardsRepository.getFlashcardProgress(deck.id)) {
-                    is Result.Success -> {
-                        when (val quizProgressResult = quizRepository.getQuizProgress(deck.id)) {
-                            is Result.Success -> {
-                                val flashcardsSwiped = flashcardProgressResult.data.sumOf { it.swipesCount }
-                                deckSnapshots += DeckStudySnapshot(
-                                    deckId = deck.id,
-                                    totalCards = deck.totalCards,
-                                    flashcardsSwiped = flashcardsSwiped,
-                                    flashCompletionDates = completedFlashDatesForDeck(
-                                        totalCards = deck.totalCards,
-                                        progress = flashcardProgressResult.data
-                                    ),
-                                    quizCompletionDates = quizProgressResult.data.map {
-                                        it.completedAt.toLocalDate()
-                                    },
-                                    completedQuizCount = quizProgressResult.data.size
-                                )
-                            }
+            // Load flashcard and quiz progress in parallel for each deck
+            val deckSnapshots = decks.map { deck ->
+                viewModelScope.async {
+                    val flashcardProgressResult = flashcardsRepository.getFlashcardProgress(deck.id)
+                    val quizProgressResult = quizRepository.getQuizProgress(deck.id)
 
-                            is Result.Failure -> {
-                                _state.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        error = "Failed to load quiz progress: ${quizProgressResult.error}",
-                                        studyDays = buildStudyDays(emptySet())
-                                    )
-                                }
-                                return@launch
-                            }
-                        }
+                    val flashcardsSwiped = when (flashcardProgressResult) {
+                        is Result.Success -> flashcardProgressResult.data.sumOf { it.swipesCount }
+                        is Result.Failure -> 0
                     }
 
-                    is Result.Failure -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                error = "Failed to load flashcard progress: ${flashcardProgressResult.error}",
-                                studyDays = buildStudyDays(emptySet())
-                            )
-                        }
-                        return@launch
+                    val flashCompletionDates = when (flashcardProgressResult) {
+                        is Result.Success -> completedFlashDatesForDeck(
+                            totalCards = deck.totalCards,
+                            progress = flashcardProgressResult.data
+                        )
+                        is Result.Failure -> emptySet()
                     }
+
+                    val (quizCompletionDates, completedQuizCount) = when (quizProgressResult) {
+                        is Result.Success -> Pair(
+                            quizProgressResult.data.map { it.completedAt.toLocalDate() },
+                            quizProgressResult.data.size
+                        )
+                        is Result.Failure -> Pair(emptyList(), 0)
+                    }
+
+                    DeckStudySnapshot(
+                        deckId = deck.id,
+                        totalCards = deck.totalCards,
+                        flashcardsSwiped = flashcardsSwiped,
+                        flashCompletionDates = flashCompletionDates,
+                        quizCompletionDates = quizCompletionDates,
+                        completedQuizCount = completedQuizCount
+                    )
                 }
-            }
+            }.awaitAll()
 
             val completedDaySet = deckSnapshots
                 .flatMap { snapshot ->

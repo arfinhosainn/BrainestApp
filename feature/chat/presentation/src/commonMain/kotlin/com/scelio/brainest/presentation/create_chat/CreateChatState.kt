@@ -1,10 +1,11 @@
 package com.scelio.brainest.presentation.create_chat
 
-import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Stable
 import com.scelio.brainest.presentation.util.UiText
 
+@Stable
 data class CreateChatState(
-    val queryTextState: TextFieldState = TextFieldState(),
+    val queryText: String = "",
     val isAddingParticipant: Boolean = false,
     val isLoadingParticipants: Boolean = false,
     val canAddParticipant: Boolean = false,

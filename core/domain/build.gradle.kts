@@ -14,7 +14,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization.json)
-                implementation(libs.supabase.auth.kt) // Add this line
+                implementation(libs.kotlinx.coroutines.core)
 
 
                 // Add KMP dependencies here

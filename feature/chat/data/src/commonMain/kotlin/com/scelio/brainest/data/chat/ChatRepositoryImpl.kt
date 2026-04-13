@@ -10,6 +10,7 @@ import com.scelio.brainest.database.mappers.toDomain
 import com.scelio.brainest.database.mappers.toEntity
 import com.scelio.brainest.domain.chat.ChatRepository
 import com.scelio.brainest.domain.chat.SupabaseChatService
+import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.models.Chat
 import com.scelio.brainest.domain.models.ChatMessage
 import com.scelio.brainest.domain.models.ChatWithLastMessage
@@ -37,7 +38,8 @@ class ChatRepositoryImpl(
     private val chatDao: ChatDao,
     private val openAI: OpenAIApiService,
     private val supabaseService: SupabaseChatService,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
+    private val logger: BrainestLogger
 ) : ChatRepository {
 
     override suspend fun createChat(request: CreateChatRequest): Chat {
@@ -59,11 +61,11 @@ class ChatRepositoryImpl(
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.syncChat(chat)) {
                 is Result.Success -> {
-
+                    // Successfully synced
                 }
 
                 is Result.Failure -> {
-                    println("Failed to sync chat to Supabase: ${result.error}")
+                    logger.warn("Failed to sync chat to Supabase: ${result.error}")
                 }
             }
         }
@@ -99,7 +101,7 @@ class ChatRepositoryImpl(
                 )
             ).extractedOutputText()
         }.onFailure { error ->
-            println("Failed to suggest chat title: ${error.message}")
+            logger.error("Failed to suggest chat title", error)
         }.getOrNull()
 
         return suggestedTitle
@@ -244,7 +246,7 @@ class ChatRepositoryImpl(
             }
 
             is Result.Failure -> {
-                println("Failed to fetch messages from Supabase: ${remoteResult.error}")
+                logger.error("Failed to fetch messages from Supabase: ${remoteResult.error}")
                 localMessages
             }
         }
@@ -319,7 +321,7 @@ class ChatRepositoryImpl(
                 }
 
                 is Result.Failure -> {
-                    println("Failed to fetch chats from Supabase: ${result.error}")
+                    logger.error("Failed to fetch chats from Supabase: ${result.error}")
                 }
             }
         }
@@ -339,7 +341,7 @@ class ChatRepositoryImpl(
                 }
 
                 is Result.Failure -> {
-                    println("Failed to sync title update: ${result.error}")
+                    logger.warn("Failed to sync title update: ${result.error}")
                 }
             }
         }
@@ -355,7 +357,7 @@ class ChatRepositoryImpl(
                 }
 
                 is Result.Failure -> {
-                    println("Failed to sync chat deletion: ${result.error}")
+                    logger.error("Failed to sync chat deletion: ${result.error}")
                 }
             }
         }
@@ -373,7 +375,7 @@ class ChatRepositoryImpl(
                 }
 
                 is Result.Failure -> {
-                    println("Failed to sync message deletion: ${result.error}")
+                    logger.error("Failed to sync message deletion: ${result.error}")
                 }
             }
         }
@@ -439,7 +441,7 @@ class ChatRepositoryImpl(
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.syncMessage(message)) {
                 is Result.Success -> Unit
-                is Result.Failure -> println("Failed to sync $label message: ${result.error}")
+                is Result.Failure -> logger.warn("Failed to sync $label message: ${result.error}")
             }
         }
     }
@@ -451,13 +453,13 @@ class ChatRepositoryImpl(
         coroutineScope.launch(Dispatchers.IO) {
             when (val syncResult = supabaseService.syncMessage(assistantMessage)) {
                 is Result.Success -> Unit
-                is Result.Failure -> println("Failed to sync assistant message: ${syncResult.error}")
+                is Result.Failure -> logger.warn("Failed to sync assistant message: ${syncResult.error}")
             }
 
             chatDao.getChat(chatId)?.toDomain()?.let { updatedChat ->
                 when (val chatSyncResult = supabaseService.syncChat(updatedChat)) {
                     is Result.Success -> Unit
-                    is Result.Failure -> println("Failed to sync updated chat: ${chatSyncResult.error}")
+                    is Result.Failure -> logger.warn("Failed to sync updated chat: ${chatSyncResult.error}")
                 }
             }
         }
@@ -486,7 +488,7 @@ class ChatRepositoryImpl(
                 )
             ).extractedOutputText()
         }.onFailure { error ->
-            println("Failed to repair math formatting: ${error.message}")
+            logger.error("Failed to repair math formatting", error)
         }.getOrNull()
 
         val normalizedRepaired = MathFormattingGuard.normalize(repaired.orEmpty())

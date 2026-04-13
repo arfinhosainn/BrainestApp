@@ -27,8 +27,20 @@ class BuildKonfigConventionPlugin: Plugin<Project> {
                     val deepinfraKey = gradleLocalProperties(rootDir, rootProject.providers)
                         .getProperty("DEEPINFRA_API_KEY")
                         ?: apiKey
+                    val supabaseUrl = gradleLocalProperties(rootDir, rootProject.providers)
+                        .getProperty("SUPABASE_URL")
+                        ?: throw IllegalStateException(
+                            "Missing SUPABASE_URL property in local.properties"
+                        )
+                    val supabaseKey = gradleLocalProperties(rootDir, rootProject.providers)
+                        .getProperty("SUPABASE_KEY")
+                        ?: throw IllegalStateException(
+                            "Missing SUPABASE_KEY property in local.properties"
+                        )
                     buildConfigField(FieldSpec.Type.STRING, "API_KEY", apiKey)
                     buildConfigField(FieldSpec.Type.STRING, "DEEPINFRA_API_KEY", deepinfraKey)
+                    buildConfigField(FieldSpec.Type.STRING, "SUPABASE_URL", supabaseUrl)
+                    buildConfigField(FieldSpec.Type.STRING, "SUPABASE_KEY", supabaseKey)
                 }
             }
         }

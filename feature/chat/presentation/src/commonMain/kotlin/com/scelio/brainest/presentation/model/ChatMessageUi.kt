@@ -1,7 +1,9 @@
 package com.scelio.brainest.presentation.model
 
+import androidx.compose.runtime.Stable
 import com.scelio.brainest.presentation.util.UiText
 
+@Stable
 data class ChatMessageUi(
     val id: String,
     val content: String,

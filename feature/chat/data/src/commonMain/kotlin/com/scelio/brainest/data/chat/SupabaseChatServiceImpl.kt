@@ -4,6 +4,7 @@ import com.scelio.brainest.data.logging.KermitLogger
 import com.scelio.brainest.data.mappers.SupabaseChatDto
 import com.scelio.brainest.data.mappers.toDomain
 import com.scelio.brainest.data.mappers.toSupabaseDto
+import com.scelio.brainest.data.util.toDataError
 import com.scelio.brainest.domain.chat.SupabaseChatService
 import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.models.Chat
@@ -13,11 +14,8 @@ import com.scelio.brainest.domain.util.EmptyResult
 import com.scelio.brainest.domain.util.Result
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
-import io.ktor.client.network.sockets.ConnectTimeoutException
-import io.ktor.client.network.sockets.SocketTimeoutException
 
 class SupabaseChatServiceImpl(
     private val supabase: SupabaseClient
@@ -34,7 +32,7 @@ class SupabaseChatServiceImpl(
 
             Result.Failure(e.toDataError())
         } catch (e: Exception) {
-            e.printStackTrace()
+            KermitLogger.error("SupabaseChatService syncChat failed", e)
             Result.Failure(e.toDataError())
         }
     }
@@ -123,39 +121,6 @@ class SupabaseChatServiceImpl(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Failure(e.toDataError())
-        }
-    }
-
-    private fun Exception.toDataError(): DataError.Remote {
-        return when (this) {
-            is RestException -> {
-                when (statusCode) {
-                    400 -> DataError.Remote.BAD_REQUEST
-                    401 -> DataError.Remote.UNAUTHORIZED
-                    403 -> DataError.Remote.FORBIDDEN
-                    404 -> DataError.Remote.NOT_FOUND
-                    408 -> DataError.Remote.REQUEST_TIMEOUT
-                    409 -> DataError.Remote.CONFLICT
-                    413 -> DataError.Remote.PAYLOAD_TOO_LARGE
-                    429 -> DataError.Remote.TOO_MANY_REQUESTS
-                    in 500..502 -> DataError.Remote.SERVER_ERROR
-                    503 -> DataError.Remote.SERVICE_UNAVAILABLE
-                    else -> DataError.Remote.UNKNOWN
-                }
-            }
-
-            is UnknownRestException -> DataError.Remote.UNKNOWN
-            is ConnectTimeoutException -> DataError.Remote.SERVER_ERROR
-            is SocketTimeoutException -> DataError.Remote.REQUEST_TIMEOUT
-            else -> {
-                if (this.message?.contains("Unable to resolve host") == true ||
-                    this.message?.contains("Network is unreachable") == true
-                ) {
-                    DataError.Remote.NO_INTERNET
-                } else {
-                    DataError.Remote.UNKNOWN
-                }
-            }
         }
     }
 }

@@ -47,14 +47,16 @@ fun BrainestPasswordTextField(
     enabled: Boolean = true,
     onFocusChanged: (Boolean) -> Unit = {},
 ) {
-    BrainestTextFieldLayout(
+    val interaction = rememberTextFieldInteraction(onFocusChanged)
+    val styleModifier = getTextFieldModifier(interaction.isFocused, isError, enabled)
+    
+    TextFieldLayoutContainer(
         title = title,
         isError = isError,
         supportingText = supportingText,
-        enabled = enabled,
-        onFocusChanged = onFocusChanged,
+        textFieldInteraction = interaction,
         modifier = modifier
-    ) { styleModifier, interactionSource ->
+    ) {
         BasicSecureTextField(
             state = state,
             modifier = styleModifier,
@@ -72,54 +74,69 @@ fun BrainestPasswordTextField(
                     MaterialTheme.colorScheme.extended.textPlaceholder
                 }
             ),
-            interactionSource = interactionSource,
+            interactionSource = interaction.interactionSource,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             decorator = { innerBox ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (state.text.isEmpty() && placeholder != null) {
-                            Text(
-                                text = placeholder,
-                                color = MaterialTheme.colorScheme.extended.textPlaceholder,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        innerBox()
-                    }
-
-                    Icon(
-                        imageVector = if (isPasswordVisible) {
-                            vectorResource(Res.drawable.eye_off_icon)
-                        } else {
-                            vectorResource(Res.drawable.eye_icon)
-                        },
-                        contentDescription = if (isPasswordVisible) {
-                            stringResource(Res.string.hide_password)
-                        } else {
-                            stringResource(Res.string.show_password)
-                        },
-                        tint = MaterialTheme.colorScheme.extended.textDisabled,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = ripple(
-                                    bounded = false,
-                                    radius = 24.dp
-                                ),
-                                onClick = onToggleVisibilityClick
-                            )
-                    )
-                }
+                BrainestPasswordDecoratorBox(
+                    state = state,
+                    placeholder = placeholder,
+                    isPasswordVisible = isPasswordVisible,
+                    onToggleVisibilityClick = onToggleVisibilityClick,
+                    innerBox = innerBox
+                )
             }
+        )
+    }
+}
+
+@Composable
+private fun BrainestPasswordDecoratorBox(
+    state: TextFieldState,
+    placeholder: String?,
+    isPasswordVisible: Boolean,
+    onToggleVisibilityClick: () -> Unit,
+    innerBox: @Composable () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            if (state.text.isEmpty() && placeholder != null) {
+                Text(
+                    text = placeholder,
+                    color = MaterialTheme.colorScheme.extended.textPlaceholder,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            innerBox()
+        }
+
+        Icon(
+            imageVector = if (isPasswordVisible) {
+                vectorResource(Res.drawable.eye_off_icon)
+            } else {
+                vectorResource(Res.drawable.eye_icon)
+            },
+            contentDescription = if (isPasswordVisible) {
+                stringResource(Res.string.hide_password)
+            } else {
+                stringResource(Res.string.show_password)
+            },
+            tint = MaterialTheme.colorScheme.extended.textDisabled,
+            modifier = Modifier
+                .size(24.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(
+                        bounded = false,
+                        radius = 24.dp
+                    ),
+                    onClick = onToggleVisibilityClick
+                )
         )
     }
 }

@@ -2,7 +2,9 @@ package com.scelio.brainest.presentation.quiz
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import org.koin.compose.viewmodel.koinViewModel
@@ -20,7 +22,7 @@ fun QuizSessionScreen(
     onBackClick: () -> Unit,
     viewModel: QuizSessionViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(deckId) {
         viewModel.load(deckId)
@@ -61,18 +63,20 @@ fun QuizSessionScreen(
 
     if (question != null) {
         val selectedIndex = state.selectedAnswers[question.id]
-        val options = question.options.mapIndexed { index, text ->
-            val optionState = when {
-                selectedIndex == null -> QuizOptionState.Default
-                index == question.correctIndex -> QuizOptionState.Correct
-                index == selectedIndex -> QuizOptionState.Incorrect
-                else -> QuizOptionState.Default
+        val options = remember(question.id, selectedIndex) {
+            question.options.mapIndexed { index, text ->
+                val optionState = when {
+                    selectedIndex == null -> QuizOptionState.Default
+                    index == question.correctIndex -> QuizOptionState.Correct
+                    index == selectedIndex -> QuizOptionState.Incorrect
+                    else -> QuizOptionState.Default
+                }
+                QuizOptionUi(
+                    id = index.toString(),
+                    text = text,
+                    state = optionState
+                )
             }
-            QuizOptionUi(
-                id = index.toString(),
-                text = text,
-                state = optionState
-            )
         }
 
         QuizScreen(

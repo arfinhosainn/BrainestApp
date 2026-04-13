@@ -7,10 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +52,18 @@ fun LoginRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val emailFieldState = rememberTextFieldState()
+    val passwordFieldState = rememberTextFieldState()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { emailFieldState.text.toString() }
+            .collect { viewModel.onAction(LoginAction.OnEmailChanged(it)) }
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { passwordFieldState.text.toString() }
+            .collect { viewModel.onAction(LoginAction.OnPasswordChanged(it)) }
+    }
+
     ObserveAsEvents(viewModel.events) { event ->
         when(event) {
             LoginEvent.Success -> onLoginSuccess()
@@ -55,6 +72,8 @@ fun LoginRoot(
 
     LoginScreen(
         state = state,
+        emailFieldState = emailFieldState,
+        passwordFieldState = passwordFieldState,
         onAction = { action ->
             when(action) {
                 LoginAction.OnForgotPasswordClick -> onForgotPasswordClick()
@@ -69,6 +88,8 @@ fun LoginRoot(
 @Composable
 fun LoginScreen(
     state: LoginState,
+    emailFieldState: TextFieldState,
+    passwordFieldState: TextFieldState,
     onAction: (LoginAction) -> Unit,
 ) {
     BrainestSnackbarScaffold {
@@ -82,7 +103,7 @@ fun LoginScreen(
                 .fillMaxSize()
         ) {
             BrainestTextField(
-                state = state.emailTextFieldState,
+                state = emailFieldState,
                 placeholder = stringResource(Res.string.email_placeholder),
                 keyboardType = KeyboardType.Email,
                 singleLine = true,
@@ -92,7 +113,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             BrainestPasswordTextField(
-                state = state.passwordTextFieldState,
+                state = passwordFieldState,
                 placeholder = stringResource(Res.string.password),
                 isPasswordVisible = state.isPasswordVisible,
                 onToggleVisibilityClick = {
@@ -145,8 +166,12 @@ fun LoginScreen(
 @Composable
 private fun LightThemePreview() {
     BrainestTheme {
+        val emailFieldState = rememberTextFieldState()
+        val passwordFieldState = rememberTextFieldState()
         LoginScreen(
             state = LoginState(),
+            emailFieldState = emailFieldState,
+            passwordFieldState = passwordFieldState,
             onAction = {}
         )
     }
@@ -156,8 +181,12 @@ private fun LightThemePreview() {
 @Composable
 private fun DarkThemePreview() {
     BrainestTheme(darkTheme = true) {
+        val emailFieldState = rememberTextFieldState()
+        val passwordFieldState = rememberTextFieldState()
         LoginScreen(
             state = LoginState(),
+            emailFieldState = emailFieldState,
+            passwordFieldState = passwordFieldState,
             onAction = {}
         )
     }

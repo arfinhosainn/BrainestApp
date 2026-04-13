@@ -1,8 +1,10 @@
 package com.scelio.brainest.presentation.model
 
+import androidx.compose.runtime.Stable
 import kotlin.time.Instant
 
 
+@Stable
 data class ChatItemUi(
     val id: String,
     val title: String,

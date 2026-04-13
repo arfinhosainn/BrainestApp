@@ -1,7 +1,6 @@
 package com.scelio.brainest.presentation.register
 
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import brainest.feature.auth.presentation.generated.resources.Res
@@ -54,16 +53,16 @@ class RegisterViewModel(
         )
 
 
-    private val isEmailValidFlow = snapshotFlow { state.value.emailTextState.text.toString() }
-        .map { email -> EmailValidator.validate(email) }
+    private val isEmailValidFlow = _state
+        .map { EmailValidator.validate(it.email) }
         .distinctUntilChanged()
 
-    private val isUsernameValidFlow = snapshotFlow { state.value.usernameTextState.text.toString() }
-        .map { username -> username.length in 3..20 }
+    private val isUsernameValidFlow = _state
+        .map { it.username.length in 3..20 }
         .distinctUntilChanged()
 
-    private val isPasswordValidFlow = snapshotFlow { state.value.passwordTextState.text.toString() }
-        .map { password -> PasswordValidator.validate(password).isValidPassword }
+    private val isPasswordValidFlow = _state
+        .map { PasswordValidator.validate(it.password).isValidPassword }
         .distinctUntilChanged()
 
     private val isRegisteringFlow = state
@@ -89,6 +88,9 @@ class RegisterViewModel(
 
     fun onAction(action: RegisterAction) {
         when (action) {
+            is RegisterAction.OnEmailChanged -> _state.update { it.copy(email = action.email, emailError = null) }
+            is RegisterAction.OnPasswordChanged -> _state.update { it.copy(password = action.password, passwordError = null) }
+            is RegisterAction.OnUsernameChanged -> _state.update { it.copy(username = action.username, usernameError = null) }
             RegisterAction.OnLoginClick -> Unit
             RegisterAction.OnRegisterClick -> register()
             RegisterAction.OnTogglePasswordVisibilityClick -> {
@@ -115,9 +117,9 @@ class RegisterViewModel(
             _state.update { it.copy(isRegistering = true) }
 
 
-            val email = state.value.emailTextState.text.toString()
-            val username = state.value.usernameTextState.text.toString()
-            val password = state.value.passwordTextState.text.toString()
+            val email = state.value.email
+            val username = state.value.username
+            val password = state.value.password
 
             authService
                 .register(
@@ -160,9 +162,9 @@ class RegisterViewModel(
         clearAllTextFieldErrors()
 
         val currentState = state.value
-        val email = currentState.emailTextState.text.toString()
-        val username = currentState.usernameTextState.text.toString()
-        val password = currentState.passwordTextState.text.toString()
+        val email = currentState.email
+        val username = currentState.username
+        val password = currentState.password
 
         val isEmailValid = EmailValidator.validate(email)
         val passwordValidationState = PasswordValidator.validate(password)

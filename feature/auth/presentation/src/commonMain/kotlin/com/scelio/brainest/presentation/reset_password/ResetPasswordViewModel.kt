@@ -1,6 +1,5 @@
 package com.scelio.brainest.presentation.reset_password
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +7,7 @@ import brainest.feature.auth.presentation.generated.resources.Res
 import brainest.feature.auth.presentation.generated.resources.error_reset_password_token_invalid
 import brainest.feature.auth.presentation.generated.resources.error_same_password
 import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.onFailure
 import com.scelio.brainest.domain.util.onSuccess
@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 
 class ResetPasswordViewModel(
     private val authService: AuthService,
+    private val logger: BrainestLogger,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -35,13 +36,12 @@ class ResetPasswordViewModel(
     private val deepLinkUrl = savedStateHandle.get<String>("deepLinkUrl")
         ?: ""
 
-
-    private val isPasswordValidFlow = snapshotFlow { state.value.passwordTextState.text.toString() }
-        .map { password -> PasswordValidator.validate(password).isValidPassword }
+    private val _state = MutableStateFlow(ResetPasswordState())
+    
+    private val isPasswordValidFlow = _state
+        .map { PasswordValidator.validate(it.password).isValidPassword }
         .distinctUntilChanged()
 
-
-    private val _state = MutableStateFlow(ResetPasswordState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -68,6 +68,9 @@ class ResetPasswordViewModel(
 
     fun onAction(action: ResetPasswordAction) {
         when (action) {
+            is ResetPasswordAction.OnPasswordChanged -> {
+                _state.update { it.copy(password = action.password) }
+            }
             ResetPasswordAction.OnSubmitClick -> resetPassword()
             ResetPasswordAction.OnTogglePasswordVisibilityClick -> {
                 _state.update {
@@ -92,7 +95,7 @@ class ResetPasswordViewModel(
                 )
             }
 
-            val newPassword = state.value.passwordTextState.text.toString()
+            val newPassword = state.value.password
             authService
                 .resetPassword(
                     newPassword = newPassword,
@@ -108,7 +111,7 @@ class ResetPasswordViewModel(
                     }
                 }
                 .onFailure { error ->
-                    println("error supabase: $error")
+                    logger.error("Reset password failed: $error")
                     val errorText = when (error) {
                         DataError.Remote.UNAUTHORIZED -> UiText.Resource(Res.string.error_reset_password_token_invalid)
                         DataError.Remote.CONFLICT -> UiText.Resource(Res.string.error_same_password)

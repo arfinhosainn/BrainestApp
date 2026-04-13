@@ -31,7 +31,7 @@ import brainest.feature.home.presentation.generated.resources.ic_vocab
 import brainest.feature.home.presentation.generated.resources.ic_yellow_fire
 import com.scelio.brainest.designsystem.components.vip.vipcard.VipUpgradeCard
 import org.koin.compose.viewmodel.koinViewModel
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun HomeRoute(
@@ -40,12 +40,8 @@ fun HomeRoute(
     onNotificationsClick: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    LaunchedEffect(Unit) {
-        viewModel.loadHome()
-    }
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {

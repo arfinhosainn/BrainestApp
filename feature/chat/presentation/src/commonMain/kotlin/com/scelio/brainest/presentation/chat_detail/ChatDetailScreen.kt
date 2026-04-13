@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -20,7 +22,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -51,12 +53,28 @@ fun ChatDetailScreen(
     viewModel: ChatDetailViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val latestState by rememberUpdatedState(state)
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val messageTextFieldState = rememberTextFieldState()
+
+    LaunchedEffect(state.messageText) {
+        if (messageTextFieldState.text.toString() != state.messageText) {
+            messageTextFieldState.edit {
+                replace(0, length, state.messageText)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { messageTextFieldState.text.toString() }
+            .collect { text ->
+                viewModel.onAction(ChatDetailAction.OnMessageTextChanged(text))
+            }
+    }
 
     LaunchedEffect(userId, chatId) {
         viewModel.setUserId(userId)
@@ -76,8 +94,8 @@ fun ChatDetailScreen(
         }
     }
 
-    LaunchedEffect(chatId, state.messages.size) {
-        if (state.messages.isNotEmpty() && (latestState.isNearBottom || state.messages.size <= 1)) {
+    LaunchedEffect(chatId, viewModel.messages.size) {
+        if (viewModel.messages.isNotEmpty() && (latestState.isNearBottom || viewModel.messages.size <= 1)) {
             listState.scrollToItem(0)
         }
     }
@@ -96,7 +114,7 @@ fun ChatDetailScreen(
             val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
             lastVisibleItem?.index == layoutInfo.totalItemsCount - 1
         }.distinctUntilChanged().collectLatest { atTopOfHistory ->
-            if (atTopOfHistory && latestState.messages.isNotEmpty()) {
+            if (atTopOfHistory && viewModel.messages.isNotEmpty()) {
                 viewModel.onAction(ChatDetailAction.OnScrollToTop)
             }
         }
@@ -139,7 +157,7 @@ fun ChatDetailScreen(
             bottomBar = {
                 MessageInputBox(
                     modifier = Modifier.imePadding(),
-                    textFieldState = viewModel.messageTextFieldState,
+                    textFieldState = messageTextFieldState,
                     selectedImages = emptyList(),
                     selectedDocument = null,
                     enabled = !state.isLoading,
@@ -166,7 +184,7 @@ fun ChatDetailScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 16.dp)
             ) {
-                if (state.isLoading && state.messages.isEmpty()) {
+                if (state.isLoading && viewModel.messages.isEmpty()) {
                     ChatConversationShimmer(
                         modifier = Modifier
                             .weight(1f)
@@ -182,7 +200,7 @@ fun ChatDetailScreen(
                         reverseLayout = true
                     ) {
                         items(
-                            items = state.messages,
+                            items = viewModel.messages,
                             key = { it.id }
                         ) { msg ->
                             BrainestChatBubble(

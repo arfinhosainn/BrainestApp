@@ -2,6 +2,7 @@ package com.scelio.brainest.quiz.data
 
 import com.scelio.brainest.domain.util.DataError
 import com.scelio.brainest.domain.util.Result
+import com.scelio.brainest.data.util.toDataError
 import com.scelio.brainest.flashcards.data.OpenAiContent
 import com.scelio.brainest.flashcards.data.OpenAiMessage
 import com.scelio.brainest.flashcards.data.OpenAiResponse
@@ -9,12 +10,8 @@ import com.scelio.brainest.flashcards.data.OpenAiResponseRequest
 import com.scelio.brainest.quiz.domain.QuizGenerationError
 import com.scelio.brainest.quiz.domain.QuizGenerationService
 import com.scelio.brainest.quiz.domain.QuizQuestionInput
-import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.network.sockets.ConnectTimeoutException
-import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -200,39 +197,6 @@ class QuizGenerationServiceImpl(
             return null
         }
         return text.substring(start, end + 1)
-    }
-
-    private fun Exception.toDataError(): DataError.Remote {
-        return when (this) {
-            is RestException -> {
-                when (statusCode) {
-                    400 -> DataError.Remote.BAD_REQUEST
-                    401 -> DataError.Remote.UNAUTHORIZED
-                    403 -> DataError.Remote.FORBIDDEN
-                    404 -> DataError.Remote.NOT_FOUND
-                    408 -> DataError.Remote.REQUEST_TIMEOUT
-                    409 -> DataError.Remote.CONFLICT
-                    413 -> DataError.Remote.PAYLOAD_TOO_LARGE
-                    429 -> DataError.Remote.TOO_MANY_REQUESTS
-                    in 500..502 -> DataError.Remote.SERVER_ERROR
-                    503 -> DataError.Remote.SERVICE_UNAVAILABLE
-                    else -> DataError.Remote.UNKNOWN
-                }
-            }
-
-            is UnknownRestException -> DataError.Remote.UNKNOWN
-            is ConnectTimeoutException -> DataError.Remote.SERVER_ERROR
-            is SocketTimeoutException -> DataError.Remote.REQUEST_TIMEOUT
-            else -> {
-                if (message?.contains("Unable to resolve host") == true ||
-                    message?.contains("Network is unreachable") == true
-                ) {
-                    DataError.Remote.NO_INTERNET
-                } else {
-                    DataError.Remote.UNKNOWN
-                }
-            }
-        }
     }
 }
 

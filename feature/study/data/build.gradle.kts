@@ -16,6 +16,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
 
                 implementation(projects.core.domain)
+                implementation(projects.core.data)
                 implementation(projects.feature.study.domain)
                 implementation(projects.feature.study.database)
 

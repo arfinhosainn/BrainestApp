@@ -1,11 +1,12 @@
 package com.scelio.brainest.presentation.chat_detail
 
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.chat.ChatRepository
+import com.scelio.brainest.domain.chat.generateFallbackChatTitle
+import com.scelio.brainest.domain.chat.normalizeGeneratedTitle
 import com.scelio.brainest.domain.models.CreateChatRequest
 import com.scelio.brainest.domain.models.SendMessageStreamEvent
 import com.scelio.brainest.domain.models.SendMessageRequest
@@ -27,26 +28,17 @@ class ChatDetailViewModel(
     private val _state = MutableStateFlow(ChatDetailState())
     val state = _state.asStateFlow()
 
+    // Separate SnapshotStateList for messages to avoid full list replacement on updates
+    private val _messages = mutableStateListOf<ChatMessageUi>()
+    val messages: List<ChatMessageUi> = _messages
+
     private val _events = Channel<ChatDetailEvent>()
     val events = _events.receiveAsFlow()
-
-    val messageTextFieldState = TextFieldState()
 
     private var currentUserId: String = ""
     private val pageSize = 20
     private var currentPage = 0
     private val sendMessageMutex = Mutex()
-
-    init {
-        viewModelScope.launch {
-            snapshotFlow { messageTextFieldState.text.toString() }
-                .collect { text ->
-                    _state.update {
-                        it.copy(canSendMessage = text.trim().isNotEmpty() && !it.isLoading)
-                    }
-                }
-        }
-    }
 
     fun onAction(action: ChatDetailAction) {
         when (action) {
@@ -56,6 +48,7 @@ class ChatDetailViewModel(
             is ChatDetailAction.OnBackClick -> clearSelectedChat()
             is ChatDetailAction.OnDismissMessageMenu -> dismissMessageMenu()
             is ChatDetailAction.OnRetryPaginationClick -> retryPagination()
+            is ChatDetailAction.OnMessageTextChanged -> onMessageTextChanged(action.text)
         }
     }
 
@@ -75,10 +68,10 @@ class ChatDetailViewModel(
                 it.copy(
                     isLoading = true,
                     error = null,
-                    messages = emptyList(),
                     endReached = false
                 )
             }
+            _messages.clear()
 
             try {
                 val chat = chatRepository.getChat(chatId)
@@ -96,15 +89,15 @@ class ChatDetailViewModel(
                 }
 
                 val history = chatRepository.getChatHistory(chatId)
-                val messages = history.messages
+                val loadedMessages = history.messages
                     .takeLast(pageSize)
                     .map { it.toUi() }
                     .reversed() // Most recent at bottom
 
+                _messages.addAll(loadedMessages)
                 _state.update {
                     it.copy(
                         chatUi = chat.toUi(),
-                        messages = messages,
                         isLoading = false,
                         endReached = history.messages.size <= pageSize
                     )
@@ -132,7 +125,7 @@ class ChatDetailViewModel(
 
     @OptIn(ExperimentalUuidApi::class)
     private fun sendMessage() {
-        val messageContent = messageTextFieldState.text.toString().trim()
+        val messageContent = _state.value.messageText.trim()
 
         if (messageContent.isEmpty()) return
 
@@ -152,7 +145,7 @@ class ChatDetailViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            canSendMessage = messageTextFieldState.text.toString().trim().isNotEmpty()
+                            canSendMessage = it.messageText.trim().isNotEmpty()
                         )
                     }
                     return@launch
@@ -177,15 +170,16 @@ class ChatDetailViewModel(
                     isLoading = true
                 )
 
+                // Add messages to the front of the list (most recent first)
+                _messages.add(0, userMessageUi)
+                _messages.add(0, assistantMessageUi)
                 _state.update {
                     it.copy(
-                        messages = listOf(assistantMessageUi, userMessageUi) + it.messages,
                         isLoading = true,
-                        canSendMessage = false
+                        canSendMessage = false,
+                        messageText = ""
                     )
                 }
-
-                messageTextFieldState.clearText()
                 var assistantPlaceholderIds = setOf(tempAssistantMessageId)
 
                 try {
@@ -200,48 +194,39 @@ class ChatDetailViewModel(
                             is SendMessageStreamEvent.Started -> {
                                 assistantPlaceholderIds =
                                     assistantPlaceholderIds + event.assistantMessageId
-                                _state.update { state ->
-                                    state.copy(
-                                        messages = state.messages.map { message ->
-                                            when (message.id) {
-                                                tempUserMessageId -> event.userMessage.toUi()
-                                                tempAssistantMessageId -> message.copy(id = event.assistantMessageId)
-                                                else -> message
-                                            }
-                                        }
-                                    )
+                                // Update user message in place
+                                val userIndex = _messages.indexOfFirst { it.id == tempUserMessageId }
+                                if (userIndex != -1) {
+                                    _messages[userIndex] = event.userMessage.toUi()
+                                }
+                                // Update assistant message id in place
+                                val assistantIndex = _messages.indexOfFirst { it.id == tempAssistantMessageId }
+                                if (assistantIndex != -1) {
+                                    _messages[assistantIndex] = _messages[assistantIndex].copy(id = event.assistantMessageId)
                                 }
                             }
 
                             is SendMessageStreamEvent.AssistantPartial -> {
                                 assistantPlaceholderIds =
                                     assistantPlaceholderIds + event.messageId
-                                _state.update { state ->
-                                    state.copy(
-                                        messages = state.messages.map { message ->
-                                            if (message.id == event.messageId) {
-                                                message.copy(
-                                                    content = event.content,
-                                                    isLoading = false
-                                                )
-                                            } else {
-                                                message
-                                            }
-                                        }
+                                // Update only the specific message being streamed
+                                val index = _messages.indexOfFirst { it.id == event.messageId }
+                                if (index != -1) {
+                                    _messages[index] = _messages[index].copy(
+                                        content = event.content,
+                                        isLoading = false
                                     )
                                 }
                             }
 
                             is SendMessageStreamEvent.Completed -> {
-                                _state.update { state ->
-                                    state.copy(
-                                        messages = state.messages.map { message ->
-                                            if (message.id == event.message.id) {
-                                                event.message.toUi()
-                                            } else {
-                                                message
-                                            }
-                                        },
+                                // Update only the completed message
+                                val index = _messages.indexOfFirst { it.id == event.message.id }
+                                if (index != -1) {
+                                    _messages[index] = event.message.toUi()
+                                }
+                                _state.update {
+                                    it.copy(
                                         isLoading = false,
                                         canSendMessage = false
                                     )
@@ -253,11 +238,10 @@ class ChatDetailViewModel(
                     loadRecentChats()
 
                 } catch (e: Exception) {
+                    // Remove failed messages from the list
+                    _messages.removeAll { it.id in assistantPlaceholderIds }
                     _state.update {
                         it.copy(
-                            messages = it.messages.filter { msg ->
-                                msg.id !in assistantPlaceholderIds
-                            },
                             canSendMessage = true,
                             isLoading = false
                         )
@@ -336,9 +320,10 @@ class ChatDetailViewModel(
                     .take(pageSize)
                     .map { it.toUi() }
 
+                // Prepend older messages to the front of the list
+                _messages.addAll(0, olderMessages)
                 _state.update {
                     it.copy(
-                        messages = olderMessages + it.messages,
                         isPaginationLoading = false,
                         endReached = endIndex >= history.messages.size
                     )
@@ -366,21 +351,30 @@ class ChatDetailViewModel(
     }
 
     private fun clearSelectedChat() {
+        _messages.clear()
         _state.update {
             it.copy(
                 chatUi = null,
                 isLoading = false,
-                messages = emptyList(),
                 error = null,
                 canSendMessage = false,
                 isPaginationLoading = false,
                 paginationError = null,
                 endReached = false,
-                isNearBottom = false
+                isNearBottom = false,
+                messageText = ""
             )
         }
-        messageTextFieldState.clearText()
         currentPage = 0
+    }
+
+    private fun onMessageTextChanged(text: String) {
+        _state.update {
+            it.copy(
+                messageText = text,
+                canSendMessage = text.trim().isNotEmpty() && !it.isLoading
+            )
+        }
     }
 
     private fun dismissMessageMenu() {
@@ -428,73 +422,6 @@ class ChatDetailViewModel(
                 state.copy(chatUi = state.chatUi?.copy(title = generatedTitle))
             }
             loadRecentChats()
-        }
-    }
-
-    private fun generateFallbackChatTitle(messageContent: String): String {
-        val firstLine = messageContent
-            .lineSequence()
-            .firstOrNull { it.isNotBlank() }
-            .orEmpty()
-            .replace(Regex("""[`*_#>\[\]\(\)]"""), " ")
-            .replace(Regex("""\s+"""), " ")
-            .trim()
-
-        if (firstLine.isBlank()) return "Untitled chat"
-
-        val withoutLeadIn = firstLine
-            .replace(
-                Regex(
-                    pattern = """^(can you|could you|would you|please|help me|i need help with|explain|solve|show me|tell me about|what is|how do i|how to)\s+""",
-                    option = RegexOption.IGNORE_CASE
-                ),
-                ""
-            )
-            .trim()
-            .ifBlank { firstLine }
-
-        val topicWords = withoutLeadIn
-            .split(Regex("""\s+"""))
-            .filter { it.isNotBlank() }
-            .take(7)
-            .mapIndexed { index, word ->
-                val normalized = word.trim { it.isWhitespace() || it == ',' || it == '.' || it == '?' || it == '!' || it == ':' || it == ';' }
-                if (normalized.isEmpty()) {
-                    ""
-                } else if (index == 0) {
-                    normalized.replaceFirstChar { char -> char.titlecase() }
-                } else {
-                    normalized.lowercase()
-                }
-            }
-            .filter { it.isNotBlank() }
-
-        val title = topicWords.joinToString(" ").trim()
-        if (title.isBlank()) return "Untitled chat"
-
-        return if (title.length > 48) {
-            title.take(45).trimEnd() + "..."
-        } else {
-            title
-        }
-    }
-
-    private fun normalizeGeneratedTitle(title: String): String {
-        val normalized = title
-            .lineSequence()
-            .firstOrNull { it.isNotBlank() }
-            .orEmpty()
-            .replace(Regex("""["'`]+"""), "")
-            .replace(Regex("""[.!?,:;]+$"""), "")
-            .replace(Regex("""\s+"""), " ")
-            .trim()
-
-        if (normalized.isBlank()) return ""
-
-        return if (normalized.length > 48) {
-            normalized.take(45).trimEnd() + "..."
-        } else {
-            normalized
         }
     }
 }

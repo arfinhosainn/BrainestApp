@@ -1,6 +1,5 @@
 package com.scelio.brainest.presentation.forgot_password
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
@@ -25,11 +24,12 @@ class ForgotPasswordViewModel(
 
     private var hasLoadedInitialData = false
 
-    private val isEmailValidFlow = snapshotFlow { state.value.emailTextFieldState.text.toString() }
-        .map { email -> EmailValidator.validate(email) }
+    private val _state = MutableStateFlow(ForgotPasswordState())
+    
+    private val isEmailValidFlow = _state
+        .map { EmailValidator.validate(it.email) }
         .distinctUntilChanged()
 
-    private val _state = MutableStateFlow(ForgotPasswordState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -45,6 +45,9 @@ class ForgotPasswordViewModel(
 
     fun onAction(action: ForgotPasswordAction) {
         when (action) {
+            is ForgotPasswordAction.OnEmailChanged -> {
+                _state.update { it.copy(email = action.email) }
+            }
             is ForgotPasswordAction.OnSubmitClick -> submitForgotPasswordRequest()
         }
     }
@@ -71,7 +74,7 @@ class ForgotPasswordViewModel(
                 )
             }
 
-            val email = state.value.emailTextFieldState.text.toString()
+            val email = state.value.email
             authService
                 .forgotPassword(email)
                 .onSuccess {

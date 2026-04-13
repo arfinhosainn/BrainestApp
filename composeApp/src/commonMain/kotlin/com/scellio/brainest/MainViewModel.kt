@@ -2,10 +2,10 @@ package com.scellio.brainest
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.scelio.brainest.domain.auth.SessionManager
+import com.scelio.brainest.domain.auth.SessionStatus
+import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.onboarding.OnboardingSyncer
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.channels.Channel
@@ -20,8 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val supabaseClient: SupabaseClient,
-    private val onboardingSyncer: OnboardingSyncer
+    private val sessionManager: SessionManager,
+    private val onboardingSyncer: OnboardingSyncer,
+    private val logger: BrainestLogger
 ) : ViewModel() {
 
     private val eventChannel = Channel<MainEvent>()
@@ -44,19 +45,18 @@ class MainViewModel(
             initialValue = MainState()
         )
 
-    // ✅ Move to IO dispatcher
     private fun checkInitialAuthState() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val session = supabaseClient.auth.currentSessionOrNull()
+                val isLoggedIn = sessionManager.isAuthenticated()
                 _state.update {
                     it.copy(
                         isCheckingAuth = false,
-                        isLoggedIn = session != null
+                        isLoggedIn = isLoggedIn
                     )
                 }
             } catch (e: Exception) {
-                println("Error checking auth state: ${e.message}")
+                logger.error("Error checking auth state", e)
                 _state.update {
                     it.copy(
                         isCheckingAuth = false,
@@ -68,7 +68,7 @@ class MainViewModel(
     }
 
     private fun observeSessionStatus() {
-        supabaseClient.auth.sessionStatus
+        sessionManager.sessionStatusFlow()
             .onEach { status ->
                 when (status) {
                     is SessionStatus.Authenticated -> {
@@ -79,10 +79,7 @@ class MainViewModel(
                             )
                         }
                         viewModelScope.launch(Dispatchers.IO) {
-                            val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id
-                            if (userId != null) {
-                                onboardingSyncer.sync(userId)
-                            }
+                            onboardingSyncer.sync(status.userId)
                         }
                     }
 

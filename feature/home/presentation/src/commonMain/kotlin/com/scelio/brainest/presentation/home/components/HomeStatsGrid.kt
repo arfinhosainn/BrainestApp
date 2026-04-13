@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import brainest.feature.home.presentation.generated.resources.Res
@@ -23,7 +24,7 @@ fun HomeStatsGrid(
     stats: List<HomeStatCardUi>,
     modifier: Modifier = Modifier,
 ) {
-    val rows = stats.chunked(2)
+    val rows = remember(stats) { stats.chunked(2) }
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),

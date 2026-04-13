@@ -1,18 +1,15 @@
 package com.scelio.brainest.presentation.register
 
-import androidx.compose.foundation.text.input.TextFieldState
 import com.scelio.brainest.presentation.util.UiText
 
 data class RegisterState(
-    val paramOne: String = "default",
-    val paramTwo: List<String> = emptyList(),
-    val emailTextState: TextFieldState = TextFieldState(),
+    val email: String = "",
     val isEmailValid: Boolean = false,
     val emailError: UiText? = null,
-    val passwordTextState: TextFieldState = TextFieldState(),
+    val password: String = "",
     val isPasswordValid: Boolean = false,
     val passwordError: UiText? = null,
-    val usernameTextState: TextFieldState = TextFieldState(),
+    val username: String = "",
     val isUsernameValid: Boolean = false,
     val usernameError: UiText? = null,
     val registrationError: UiText? = null,

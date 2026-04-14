@@ -16,6 +16,7 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlinx.serialization.json.jsonPrimitive
 
 class SupabaseAuthService(
     private val supabaseClient: SupabaseClient,
@@ -152,5 +153,71 @@ class SupabaseAuthService(
         return session.user?.id
     }
 
+    override suspend fun getCurrentUser(): User? {
+        return try {
+            val session = supabaseClient.auth.currentSessionOrNull()
+            
+            val user = session?.user
+            
+            if (user == null) {
+                logger.debug("[SupabaseAuthService] getCurrentUser - no user found, trying to refresh session")
+                supabaseClient.auth.refreshCurrentSession()
+                val newSession = supabaseClient.auth.currentSessionOrNull()
+                val refreshedUser = newSession?.user ?: return null
+                
+                val usernameRaw = refreshedUser.userMetadata?.get("username")
+                val username = usernameRaw?.jsonPrimitive?.content
+                
+                val finalUsername = username?.takeIf { it.isNotEmpty() } ?: refreshedUser.email?.substringBefore("@") ?: "User"
+                val createdAt = refreshedUser.createdAt?.toString()
+                
+                User(
+                    id = refreshedUser.id,
+                    email = refreshedUser.email ?: "",
+                    username = finalUsername,
+                    hasVerifiedEmail = refreshedUser.emailConfirmedAt != null,
+                    profilePictureUrl = refreshedUser.userMetadata?.get("avatar_url") as? String,
+                    createdAt = createdAt
+                )
+            } else {
+                val usernameRaw = user.userMetadata?.get("username")
+                val username = usernameRaw?.jsonPrimitive?.content
+                logger.debug("[SupabaseAuthService] From session - username: $username")
+                
+                val finalUsername = username?.takeIf { it.isNotEmpty() } ?: user.email?.substringBefore("@") ?: "User"
+                val createdAt = user.createdAt?.toString()
+                
+                User(
+                    id = user.id,
+                    email = user.email ?: "",
+                    username = finalUsername,
+                    hasVerifiedEmail = user.emailConfirmedAt != null,
+                    profilePictureUrl = user.userMetadata?.get("avatar_url") as? String,
+                    createdAt = createdAt
+                )
+            }
+        } catch (e: Exception) {
+            logger.error("[SupabaseAuthService] getCurrentUser failed: ${e.message}")
+            null
+        }
+    }
+
+    override suspend fun signOut() {
+        supabaseClient.auth.signOut()
+    }
+
+    override suspend fun updateUsername(newUsername: String): Result<Unit, DataError.Remote> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data = buildJsonObject {
+                    put("username", newUsername)
+                }
+            }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            logger.error("[SupabaseAuthService] Failed to update username: ${e.message}")
+            Result.Failure(e.toDataError())
+        }
+    }
 
 }

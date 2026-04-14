@@ -131,7 +131,7 @@ fun SettingScreen(
             leadingIcon = vectorResource(Res.drawable.ic_logout),
             onClick = onLogoutClick,
             showTrailingIcon = false,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = Color(0xFFF4F7F6),
             borderColor = Color.Transparent
         )
     }

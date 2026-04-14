@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -63,6 +64,7 @@ fun ProfileCard(
     var draftName by rememberSaveable(name) { mutableStateOf(name) }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    var hasFocused by rememberSaveable { mutableStateOf(false) }
 
     fun commitName() {
         val updatedName = draftName.trim()
@@ -73,10 +75,11 @@ fun ProfileCard(
         }
 
         isEditing = false
+        hasFocused = false
         keyboardController?.hide()
     }
 
-    LaunchedEffect(name, isEditing) {
+    LaunchedEffect(name) {
         if (!isEditing) {
             draftName = name
         }
@@ -84,6 +87,8 @@ fun ProfileCard(
 
     LaunchedEffect(isEditing) {
         if (isEditing) {
+            hasFocused = false
+            delay(50) // Small delay to ensure composition is complete
             focusRequester.requestFocus()
         }
     }
@@ -135,8 +140,11 @@ fun ProfileCard(
                             .fillMaxWidth()
                             .focusRequester(focusRequester)
                             .onFocusChanged { focusState ->
-                                if (isEditing && !focusState.isFocused) {
+                                if (hasFocused && !focusState.isFocused) {
                                     commitName()
+                                }
+                                if (focusState.isFocused) {
+                                    hasFocused = true
                                 }
                             },
                         decorationBox = { innerTextField ->

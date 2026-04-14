@@ -19,7 +19,9 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
                 implementation(projects.core.presentation)
-
+                implementation(libs.bundles.koin.common)
+                implementation(libs.jetbrains.compose.navigation)
+                implementation(libs.kotlinx.datetime)
 
 
             }

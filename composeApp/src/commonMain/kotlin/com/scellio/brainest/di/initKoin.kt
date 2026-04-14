@@ -10,6 +10,7 @@ import com.scelio.brainest.presentation.di.chatPresentationModule
 import com.scelio.brainest.presentation.di.corePresentationModule
 import com.scelio.brainest.presentation.di.flashcardsPresentationModule
 import com.scelio.brainest.presentation.di.homePresentationModule
+import com.scelio.brainest.presentation.di.settingsPresentationModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 
@@ -22,6 +23,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             corePresentationModule,
             chatPresentationModule,
             homePresentationModule,
+            settingsPresentationModule,
             onboardingPresentationModule,
             flashcardsPresentationModule,
             appModule,

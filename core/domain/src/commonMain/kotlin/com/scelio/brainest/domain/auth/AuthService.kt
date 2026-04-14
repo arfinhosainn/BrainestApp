@@ -34,6 +34,10 @@ interface AuthService {
 
     suspend fun currentUserId(): String?
 
+    suspend fun getCurrentUser(): User?
 
+    suspend fun updateUsername(newUsername: String): Result<Unit, DataError.Remote>
+
+    suspend fun signOut()
 
 }

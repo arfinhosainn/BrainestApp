@@ -8,6 +8,7 @@ import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
 import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
+import com.scelio.brainest.flashcards.database.entities.WeeklyPointsEntity
 
 @Database(
     entities = [
@@ -15,9 +16,10 @@ import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
         StudySourceEntity::class,
         QuizQuestionEntity::class,
         FlashcardProgressEntity::class,
-        QuizProgressEntity::class
+        QuizProgressEntity::class,
+        WeeklyPointsEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @ConstructedBy(BrainestStudyDatabaseConstructor::class)

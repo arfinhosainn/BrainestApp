@@ -14,4 +14,5 @@ enum class StudyDayStatus {
 data class StudyDayUi(
     val label: String,
     val status: StudyDayStatus,
+    val points: Int? = null
 )

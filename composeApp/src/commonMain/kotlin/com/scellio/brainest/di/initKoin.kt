@@ -4,6 +4,7 @@ import com.scelio.brainest.data.di.chatDataModule
 import com.scelio.brainest.data.di.coreDataModule
 import com.scelio.brainest.flashcards.data.flashcardsDataModule
 import com.scelio.brainest.data.di.onboardingDataModule
+import com.scelio.brainest.home.data.di.homeDataModule
 import com.brainest.presentation.di.onboardingPresentationModule
 import com.scelio.brainest.presentation.di.authPresentationModule
 import com.scelio.brainest.presentation.di.chatPresentationModule
@@ -29,7 +30,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             appModule,
             chatDataModule,
             onboardingDataModule,
-            flashcardsDataModule
+            flashcardsDataModule,
+            homeDataModule
 
         )
     }

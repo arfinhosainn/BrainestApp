@@ -4,9 +4,12 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scelio.brainest.domain.auth.AuthService
+import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.flashcards.domain.FlashcardProgress
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
+import com.scelio.brainest.home.domain.WeeklyPointsRepository
+import com.scelio.brainest.home.domain.WeeklyPointsSchedule
 import com.scelio.brainest.presentation.home.components.StudyDayUi
 import com.scelio.brainest.presentation.home.components.StudyDayStatus
 import com.scelio.brainest.quiz.domain.QuizRepository
@@ -25,6 +28,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import kotlin.random.Random
 
 @Stable
 data class HomeState(
@@ -34,6 +38,7 @@ data class HomeState(
     val completedQuizzes: Int = 0,
     val streakDays: Int = 0,
     val completedDaysThisWeek: Int = 0,
+    val earnedPoints: Int = 0,
     val studyDays: List<StudyDayUi> = defaultStudyDays(),
     val error: String? = null
 )
@@ -50,14 +55,18 @@ private data class DeckStudySnapshot(
 class HomeViewModel(
     private val authService: AuthService,
     private val flashcardsRepository: FlashcardsRepository,
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val weeklyPointsRepository: WeeklyPointsRepository,
+    private val logger: BrainestLogger
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(HomeState(isLoading = true))
+    private var cachedWeeklySchedule: WeeklyPointsSchedule? = null
+
+    // Start with isLoading = false so UI shows immediately without flash
+    private val _state = MutableStateFlow(HomeState(isLoading = false))
     val state: StateFlow<HomeState> = _state
 
     fun loadHome() {
-        if (_state.value.isLoading) return
         refreshHome()
     }
 
@@ -67,35 +76,37 @@ class HomeViewModel(
 
     private fun refreshHome() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-
             val userId = authService.currentUserId()
             if (userId == null) {
                 _state.update {
                     it.copy(
-                        isLoading = false,
                         error = "No authenticated user found.",
-                        studyDays = buildStudyDays(emptySet())
+                        studyDays = buildStudyDays(emptySet(), cachedWeeklySchedule)
                     )
                 }
                 return@launch
             }
 
+            val weekStart = today().minus(today().dayOfWeek.ordinal, DateTimeUnit.DAY)
+            
+            // Load schedule only once per session (or if week changed)
+            // Load in parallel with decks to avoid blocking
+            val scheduleDeferred = if (cachedWeeklySchedule == null || cachedWeeklySchedule?.weekStartDate != weekStart) {
+                viewModelScope.async { loadOrCreateWeeklySchedule(userId, weekStart) }
+            } else null
+            
             val decksResult = flashcardsRepository.listDecks(userId)
             if (decksResult is Result.Failure) {
                 _state.update {
                     it.copy(
-                        isLoading = false,
                         error = "Failed to load decks: ${decksResult.error}",
-                        studyDays = buildStudyDays(emptySet())
+                        studyDays = buildStudyDays(emptySet(), cachedWeeklySchedule)
                     )
                 }
                 return@launch
             }
 
             val decks = (decksResult as Result.Success).data
-
-            // Load flashcard and quiz progress in parallel for each deck
             val deckSnapshots = decks.map { deck ->
                 viewModelScope.async {
                     val flashcardProgressResult = flashcardsRepository.getFlashcardProgress(deck.id)
@@ -144,18 +155,77 @@ class HomeViewModel(
             val completedQuizzes = deckSnapshots.sumOf { it.completedQuizCount }
             val streakDays = calculateStreak(completedDaySet)
 
+            // Wait for schedule to be ready (fast if cached/local)
+            scheduleDeferred?.await()
+            val schedule = cachedWeeklySchedule
+
+            val earnedPoints = completedDaySet.sumOf { date ->
+                schedule?.getPointsForDay(date.dayOfWeek.ordinal + 1) ?: 0
+            }
+
+            // Single atomic state update - no loading flicker
             _state.update {
                 it.copy(
-                    isLoading = false,
                     completedDecks = completedDecks,
                     completedQuizzes = completedQuizzes,
                     streakDays = streakDays,
+                    earnedPoints = earnedPoints,
                     completedDaysThisWeek = completedDaySet.count { isInCurrentWeek(it) },
-                    studyDays = buildStudyDays(completedDaySet),
+                    studyDays = buildStudyDays(completedDaySet, schedule),
                     error = null
                 )
             }
         }
+    }
+
+    private suspend fun loadOrCreateWeeklySchedule(
+        userId: String,
+        weekStart: LocalDate
+    ): WeeklyPointsSchedule? {
+        if (cachedWeeklySchedule != null &&
+            cachedWeeklySchedule?.userId == userId &&
+            cachedWeeklySchedule?.weekStartDate == weekStart) {
+            return cachedWeeklySchedule
+        }
+
+        val result = weeklyPointsRepository.getWeeklySchedule(userId, weekStart)
+
+        return when (result) {
+            is Result.Success -> {
+                result.data?.let { schedule ->
+                    cachedWeeklySchedule = schedule
+                    schedule
+                } ?: run {
+                    val newSchedule = generateWeeklySchedule(userId, weekStart)
+                    weeklyPointsRepository.saveWeeklySchedule(newSchedule)
+                    cachedWeeklySchedule = newSchedule
+                    newSchedule
+                }
+            }
+            else -> {
+                logger.error("[HomeViewModel] Failed to load weekly schedule")
+                generateWeeklySchedule(userId, weekStart)
+            }
+        }
+    }
+
+    private fun generateWeeklySchedule(
+        userId: String,
+        weekStart: LocalDate
+    ): WeeklyPointsSchedule {
+        fun randomPoints() = if (Random.nextBoolean()) 8 else 2
+
+        return WeeklyPointsSchedule(
+            userId = userId,
+            weekStartDate = weekStart,
+            mondayPoints = randomPoints(),
+            tuesdayPoints = randomPoints(),
+            wednesdayPoints = randomPoints(),
+            thursdayPoints = randomPoints(),
+            fridayPoints = randomPoints(),
+            saturdayPoints = randomPoints(),
+            sundayPoints = randomPoints()
+        )
     }
 
     private fun completedFlashDatesForDeck(
@@ -174,6 +244,7 @@ class HomeViewModel(
 
 private fun buildStudyDays(
     completedDays: Set<LocalDate>,
+    schedule: WeeklyPointsSchedule?,
     now: LocalDate = today()
 ): List<StudyDayUi> {
     val weekStart = now.minus(now.dayOfWeek.ordinal, DateTimeUnit.DAY)
@@ -186,9 +257,16 @@ private fun buildStudyDays(
             else -> StudyDayStatus.Missed
         }
 
+        val points = if (status == StudyDayStatus.Current || status == StudyDayStatus.Upcoming) {
+            schedule?.getPointsForDay(date.dayOfWeek.ordinal + 1)
+        } else {
+            null
+        }
+
         StudyDayUi(
             label = date.dayOfWeek.shortLabel(),
-            status = status
+            status = status,
+            points = points
         )
     }
 }
@@ -241,4 +319,4 @@ private fun DayOfWeek.shortLabel(): String {
     }
 }
 
-internal fun defaultStudyDays(): List<StudyDayUi> = buildStudyDays(emptySet())
+internal fun defaultStudyDays(): List<StudyDayUi> = buildStudyDays(emptySet(), null)

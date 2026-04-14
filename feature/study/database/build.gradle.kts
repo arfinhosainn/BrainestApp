@@ -13,6 +13,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.datetime)
+                implementation(projects.feature.home.domain)
                 implementation(projects.feature.study.domain)
             }
         }

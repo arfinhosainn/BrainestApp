@@ -17,6 +17,7 @@ kotlin {
                 implementation(compose.components.resources)
 
                 implementation(projects.core.domain)
+                implementation(projects.feature.home.domain)
                 implementation(projects.core.designsystem)
                 implementation(projects.feature.study.domain)
                 implementation(projects.feature.settings.presentation)

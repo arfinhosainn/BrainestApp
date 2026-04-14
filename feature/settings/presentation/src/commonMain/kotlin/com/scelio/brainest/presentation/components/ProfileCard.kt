@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.settings.presentation.generated.resources.Res
 import brainest.feature.settings.presentation.generated.resources.ic_pen
+import brainest.feature.settings.presentation.generated.resources.ic_checkmark
 import com.scelio.brainest.designsystem.BrainestPrimary
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.navbar.home.CircularProfilePicture
@@ -210,7 +211,7 @@ fun ProfileCard(
                 )
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_pen),
+                    painter = painterResource(if (isEditing) Res.drawable.ic_checkmark else Res.drawable.ic_pen),
                     contentDescription = if (isEditing) "Save name" else "Edit name",
                     modifier = Modifier.size(25.dp),
                     tint = Color.White

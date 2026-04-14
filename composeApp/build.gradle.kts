@@ -27,6 +27,7 @@ kotlin {
             implementation(projects.feature.study.domain)
             implementation(projects.feature.study.presentation)
             implementation(projects.feature.home.presentation)
+            implementation(projects.feature.settings.presentation)
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.bundles.koin.common)
             implementation(libs.supabase.postgrest.kt)

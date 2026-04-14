@@ -66,7 +66,7 @@ fun SettingMenuItem(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = contentColor,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f)

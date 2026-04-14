@@ -47,10 +47,10 @@ private fun PreviewConsecutiveStudyDaysCard() {
                 StudyDayUi("Mon", StudyDayStatus.Completed),
                 StudyDayUi("Tue", StudyDayStatus.Completed),
                 StudyDayUi("Wed", StudyDayStatus.Missed),
-                StudyDayUi("Thu", StudyDayStatus.Current),
-                StudyDayUi("Fri", StudyDayStatus.Upcoming),
-                StudyDayUi("Sat", StudyDayStatus.Upcoming),
-                StudyDayUi("Sun", StudyDayStatus.Upcoming),
+                StudyDayUi("Thu", StudyDayStatus.Current, points = 8),
+                StudyDayUi("Fri", StudyDayStatus.Upcoming, points = 2),
+                StudyDayUi("Sat", StudyDayStatus.Upcoming, points = 8),
+                StudyDayUi("Sun", StudyDayStatus.Upcoming, points = 2),
             ),
         )
     }

@@ -12,6 +12,7 @@ import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
 import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
+import com.scelio.brainest.flashcards.database.entities.WeeklyPointsEntity
 import kotlinx.coroutines.flow.Flow
 
 data class StudySetSummaryRow(
@@ -164,4 +165,14 @@ interface StudyDao {
         """
     )
     fun observeDeckProgressSummaries(userId: String): Flow<List<DeckProgressSummaryRow>>
+
+    // Weekly Points DAO methods
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertWeeklyPoints(weeklyPoints: WeeklyPointsEntity)
+
+    @Query("SELECT * FROM user_weekly_points WHERE userId = :userId AND weekStartDate = :weekStartDate")
+    suspend fun getWeeklyPoints(userId: String, weekStartDate: String): WeeklyPointsEntity?
+
+    @Query("DELETE FROM user_weekly_points WHERE userId = :userId AND weekStartDate = :weekStartDate")
+    suspend fun deleteWeeklyPoints(userId: String, weekStartDate: String)
 }

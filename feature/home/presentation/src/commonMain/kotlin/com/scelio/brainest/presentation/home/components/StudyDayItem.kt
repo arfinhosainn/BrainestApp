@@ -20,8 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import brainest.feature.home.presentation.generated.resources.Res
-import brainest.feature.home.presentation.generated.resources.ic_cancel
 import brainest.feature.home.presentation.generated.resources.ic_check
+import brainest.feature.home.presentation.generated.resources.ic_close
+import brainest.feature.home.presentation.generated.resources.ic_2point
+import brainest.feature.home.presentation.generated.resources.ic_8point
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -32,13 +34,13 @@ internal fun StudyDayItem(
     val shape = RoundedCornerShape(16.dp)
     val backgroundColor = when (day.status) {
         StudyDayStatus.Completed -> Color(0xFFFEF5EA)
-        StudyDayStatus.Missed -> Color.White
-        StudyDayStatus.Current -> Color.White
+        StudyDayStatus.Missed -> Color(0xFFFEF5EA)
+        StudyDayStatus.Current -> Color.Unspecified
         StudyDayStatus.Upcoming -> Color.White
     }
     val borderColor = when (day.status) {
         StudyDayStatus.Completed -> null
-        StudyDayStatus.Missed -> Color(0xFFF1EFEA)
+        StudyDayStatus.Missed -> null
         StudyDayStatus.Current -> Color(0xFFFFA225)
         StudyDayStatus.Upcoming -> Color(0xFFF1EFEA)
     }
@@ -77,14 +79,21 @@ internal fun StudyDayItem(
             }
             StudyDayStatus.Missed -> {
                 Icon(
-                    imageVector = vectorResource(Res.drawable.ic_cancel),
+                    imageVector = vectorResource(Res.drawable.ic_close),
                     contentDescription = "Missed",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(35.dp),
                 )
             }
             StudyDayStatus.Current,
-            StudyDayStatus.Upcoming -> StatusBadge(day.status)
+            StudyDayStatus.Upcoming -> {
+                // Show points for upcoming/current days to motivate users
+                if (day.points != null && day.points > 0) {
+                    PointsBadge(day.points)
+                } else {
+                    StatusBadge(day.status)
+                }
+            }
         }
 
         Text(
@@ -106,4 +115,23 @@ private fun StatusBadge(
     }
 
     Spacer(modifier = modifier.size(32.dp))
+}
+
+@Composable
+private fun PointsBadge(
+    points: Int,
+    modifier: Modifier = Modifier,
+) {
+    val icon = when {
+        points >= 8 -> vectorResource(Res.drawable.ic_8point)
+        points >= 2 -> vectorResource(Res.drawable.ic_2point)
+        else -> return
+    }
+    
+    Icon(
+        imageVector = icon,
+        contentDescription = "$points points",
+        tint = Color.Unspecified,
+        modifier = modifier.size(32.dp),
+    )
 }

@@ -14,10 +14,17 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.json)
 
                 implementation(projects.core.domain)
+                implementation(projects.core.data)
+                implementation(projects.feature.home.domain)
+                implementation(projects.feature.study.database)
                 implementation(projects.feature.chat.domain)
                 implementation(projects.feature.chat.database)
+                implementation(libs.bundles.koin.common)
+                implementation(libs.supabase.postgrest.kt)
             }
         }
 

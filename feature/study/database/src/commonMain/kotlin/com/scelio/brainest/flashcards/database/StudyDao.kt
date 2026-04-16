@@ -12,6 +12,7 @@ import com.scelio.brainest.flashcards.database.entities.FlashcardProgressEntity
 import com.scelio.brainest.flashcards.database.entities.QuizQuestionEntity
 import com.scelio.brainest.flashcards.database.entities.QuizProgressEntity
 import com.scelio.brainest.flashcards.database.entities.StudySourceEntity
+import com.scelio.brainest.flashcards.database.entities.UserAchievementsEntity
 import com.scelio.brainest.flashcards.database.entities.WeeklyPointsEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -175,4 +176,11 @@ interface StudyDao {
 
     @Query("DELETE FROM user_weekly_points WHERE userId = :userId AND weekStartDate = :weekStartDate")
     suspend fun deleteWeeklyPoints(userId: String, weekStartDate: String)
+
+    // User achievements cache methods
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertUserAchievements(achievements: UserAchievementsEntity)
+
+    @Query("SELECT * FROM user_achievements WHERE userId = :userId LIMIT 1")
+    suspend fun getUserAchievements(userId: String): UserAchievementsEntity?
 }

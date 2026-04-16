@@ -39,6 +39,7 @@ fun QuizOptionItem(
     text: String,
     state: QuizOptionState,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -64,7 +65,7 @@ fun QuizOptionItem(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(enabled = enabled, onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         color = containerColor,
         border = BorderStroke(1.dp, borderColor)
@@ -137,6 +138,11 @@ private fun OptionBadge(
     }
     if (label != null) {
         val colorScheme = MaterialTheme.colorScheme
+        val icon = when (state) {
+            QuizOptionState.Correct -> "\u2713"
+            QuizOptionState.Incorrect -> "\u2715"
+            else -> ""
+        }
         val backgroundColor = when (state) {
             QuizOptionState.Correct -> colorScheme.tertiary
             QuizOptionState.Incorrect -> colorScheme.error
@@ -153,12 +159,21 @@ private fun OptionBadge(
                 .background(backgroundColor)
                 .padding(horizontal = 10.dp, vertical = 4.dp)
         ) {
-            Text(
-                text = label,
-                color = contentColor,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = icon,
+                    color = contentColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = label,
+                    color = contentColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }

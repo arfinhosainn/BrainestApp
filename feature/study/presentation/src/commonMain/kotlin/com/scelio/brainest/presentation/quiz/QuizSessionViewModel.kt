@@ -66,6 +66,7 @@ class QuizSessionViewModel(
 
     fun selectOption(optionIndex: Int) {
         val question = _state.value.questions.getOrNull(_state.value.currentIndex) ?: return
+        if (_state.value.selectedAnswers.containsKey(question.id)) return
         _state.update { state ->
             state.copy(
                 selectedAnswers = state.selectedAnswers + (question.id to optionIndex)

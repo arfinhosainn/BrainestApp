@@ -84,7 +84,6 @@ fun QuizSessionScreen(
             questionIndex = state.currentIndex + 1,
             totalQuestions = totalQuestions,
             question = question.question,
-            questionSubtitle = "Select the correct answer",
             options = options,
             timeLeftText = "05:42",
             totalTimeText = "10:00",
@@ -97,6 +96,7 @@ fun QuizSessionScreen(
             onPreviousClick = { viewModel.goPrevious() },
             onNextClick = { viewModel.goNext() },
             onHintClick = {},
+            optionsEnabled = selectedIndex == null,
             modifier = Modifier
         )
     } else {

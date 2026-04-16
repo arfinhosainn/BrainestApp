@@ -2,18 +2,20 @@ package com.scelio.brainest.designsystem.components.navbar.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,13 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.crown
-import brainest.core.designsystem.generated.resources.ic_bell
+import brainest.core.designsystem.generated.resources.ic_diamond
 import brainest.core.designsystem.generated.resources.ic_settings
 import brainest.core.designsystem.generated.resources.vip
 import com.scelio.brainest.designsystem.BrainestTheme
@@ -82,77 +83,69 @@ fun HomeTopNavBar(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            DiamondCountChip(
+                diamondCount = 300,
+                onClick = onNotificationsClick,
+            )
             TopNavIconButton(
                 imageVector = vectorResource(Res.drawable.ic_settings),
                 contentDescription = "Settings",
                 onClick = onSettingsClick,
             )
-            // Bell with badge
-            BadgedIconButton(
-                imageVector = vectorResource(Res.drawable.ic_bell),
-                contentDescription = "Notifications",
-                badgeCount = notificationCount,
-                onClick = onNotificationsClick,
-            )
         }
     }
 }
 
 @Composable
-private fun BadgedIconButton(
-    imageVector: ImageVector,
-    contentDescription: String?,
-    badgeCount: Int,
+private fun DiamondCountChip(
+    diamondCount: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    Box(modifier = modifier) {
-        Box(
+    Box(
+        modifier = modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true),
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Row(
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(color = Color.White.copy(alpha = 0.3f))
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = ripple(bounded = true, radius = 24.dp),
-                    onClick = onClick,
-                )
-                .padding(8.dp),
-            contentAlignment = Alignment.Center,
+                .padding(start = 18.dp)
+                .clip(RoundedCornerShape(18.dp))
+                .background(Color(0xFF141414).copy(alpha = .3f))
+                .padding(start = 24.dp, end = 14.dp)
+                .height(34.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
         ) {
-            Icon(
-                imageVector = imageVector,
-                contentDescription = contentDescription,
-                modifier = Modifier.size(24.dp),
-                tint = Color.White,
+            Text(
+                text = diamondCount.toString(),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = Color.White,
             )
         }
 
-        // Red badge
-        if (badgeCount > 0) {
-            Box(
-                modifier = Modifier
-                    .size(18.dp)
-                    .align(Alignment.TopEnd)
-                    .background(Color.Red, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = badgeCount.toString(),
-                    color = Color.White,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 10.sp,
-                )
-            }
-        }
+        Icon(
+            imageVector = vectorResource(Res.drawable.ic_diamond),
+            contentDescription = "Diamonds",
+            modifier = Modifier
+                .size(34.dp)
+                .offset(x = (4).dp),
+            tint = Color.Unspecified,
+        )
     }
 }
 
 @Composable
 private fun TopNavIconButton(
-    imageVector: ImageVector,
+    imageVector: androidx.compose.ui.graphics.vector.ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

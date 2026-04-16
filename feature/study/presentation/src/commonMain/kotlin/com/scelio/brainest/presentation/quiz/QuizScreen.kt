@@ -1,32 +1,47 @@
 package com.scelio.brainest.presentation.quiz
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.quizbackground
 import com.scelio.brainest.designsystem.BrainestTheme
+import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.presentation.quiz.components.QuizBottomBar
 import com.scelio.brainest.presentation.quiz.components.QuizOptionItem
 import com.scelio.brainest.presentation.quiz.components.QuizOptionState
 import com.scelio.brainest.presentation.quiz.components.QuizQuestionCard
 import com.scelio.brainest.presentation.quiz.components.QuizTopAppBar
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class QuizOptionUi(
@@ -41,7 +56,6 @@ fun QuizScreen(
     questionIndex: Int,
     totalQuestions: Int,
     question: String,
-    questionSubtitle: String = "",
     options: List<QuizOptionUi>,
     timeLeftText: String,
     totalTimeText: String,
@@ -52,87 +66,142 @@ fun QuizScreen(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onHintClick: () -> Unit,
+    optionsEnabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
-    val colorScheme = MaterialTheme.colorScheme
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(colorScheme.surface)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-                .background(colorScheme.primaryContainer.copy(alpha = 0.12f))
+        // Background Image
+        Image(
+            painter = painterResource(Res.drawable.quizbackground),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
         )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp)
-                .padding(bottom = 96.dp)
+                .verticalScroll(scrollState)
+                .statusBarsPadding()
+                .padding(horizontal = 20.dp)
         ) {
-            QuizTopAppBar(
-                title = title,
-                timeLeftText = timeLeftText,
-                totalTimeText = totalTimeText,
-                progress = progress,
-                onBackClick = onBackClick
-            )
+            // 1. Custom Top Bar (Centered Title + Back Button)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // 2. Progress Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(timeLeftText, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
 
+                // Custom Progress Bar
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(12.dp)
+                        .background(Color.White.copy(alpha = 0.3f), CircleShape)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress)
+                            .fillMaxHeight()
+                            .background(Color.White, CircleShape)
+                    )
+                }
+
+                Text(totalTimeText, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 3. Question Index
             Text(
                 text = "$questionIndex/$totalQuestions",
-                style = MaterialTheme.typography.labelLarge,
-                color = colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontFamily = BricolageGrotesq
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            QuizQuestionCard(
-                title = question,
-                subtitle = questionSubtitle
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+            // 4. Question Text (Directly on background)
             Text(
-                text = "Choose the correct answer:",
-                style = MaterialTheme.typography.titleSmall,
-                color = colorScheme.onSurface,
-                fontWeight = FontWeight.SemiBold
+                text = question,
+                style = MaterialTheme.typography.headlineMedium,
+                fontSize = 23.sp,
+                color = Color.White,
+                fontFamily = BricolageGrotesq,
+                fontWeight = FontWeight.Medium,
+                lineHeight = 36.sp
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(48.dp)) // Fixed spacer instead of weight(1f) to allow scrolling
 
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            // 5. Options List
+            Column(
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.padding(bottom = 120.dp) // Space for fixed bottom bar
+            ) {
                 options.forEach { option ->
                     QuizOptionItem(
                         text = option.text,
                         state = option.state,
-                        onClick = { onOptionClick(option.id) }
+                        onClick = { onOptionClick(option.id) },
+                        enabled = optionsEnabled
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
 
-        QuizBottomBar(
-            hintCount = hintCount,
-            onHintClick = onHintClick,
-            onPreviousClick = onPreviousClick,
-            onNextClick = onNextClick,
+        // 6. Bottom Navigation Bar with solid background
+        Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
-        )
+                .fillMaxWidth(),
+            color = Color(0xFF2DCA7E),
+            shadowElevation = 0.dp // Add a slight shadow to separate it from the content
+        ) {
+            QuizBottomBar(
+                hintCount = hintCount,
+                onHintClick = onHintClick,
+                onPreviousClick = onPreviousClick,
+                onNextClick = onNextClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .padding(bottom = 12.dp) // Extra padding for safe area
+            )
+        }
     }
 }
 
@@ -155,7 +224,8 @@ fun QuizResultsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .statusBarsPadding()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             QuizTopAppBar(
@@ -230,7 +300,6 @@ private fun PreviewQuizScreen() {
                 questionIndex = 14,
                 totalQuestions = 20,
                 question = "With over 222 million units sold, what is Apple's highest-selling iPhone model?",
-                questionSubtitle = "Select the correct answer",
                 options = listOf(
                     QuizOptionUi(
                         id = "a",
@@ -261,7 +330,8 @@ private fun PreviewQuizScreen() {
                 onOptionClick = {},
                 onPreviousClick = {},
                 onNextClick = {},
-                onHintClick = {}
+                onHintClick = {},
+                optionsEnabled = true
             )
         }
     }

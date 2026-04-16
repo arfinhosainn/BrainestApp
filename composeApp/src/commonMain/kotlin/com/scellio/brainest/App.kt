@@ -114,7 +114,7 @@ fun App(
                 }
             ) { innerPadding ->
                 val layoutDirection = LocalLayoutDirection.current
-                val navHostPadding = if (isChatDetailRoute) {
+                val navHostPadding = if (isChatDetailRoute || isQuizRoute) {
                     PaddingValues(
                         start = innerPadding.calculateStartPadding(layoutDirection),
                         end = innerPadding.calculateEndPadding(layoutDirection),

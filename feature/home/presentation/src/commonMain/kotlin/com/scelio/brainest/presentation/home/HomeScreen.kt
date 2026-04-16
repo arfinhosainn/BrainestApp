@@ -57,7 +57,7 @@ fun HomeRoute(
         streakDays = state.streakDays,
         earnedPoints = state.earnedPoints,
         studyDays = state.studyDays,
-        notificationCount = 1,
+        notificationCount = state.totalPoints,
         modifier = modifier,
         onSettingsClick = onSettingsClick,
         onNotificationsClick = onNotificationsClick

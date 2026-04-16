@@ -7,11 +7,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -35,10 +35,7 @@ import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.crown
 import brainest.core.designsystem.generated.resources.ic_diamond
 import brainest.core.designsystem.generated.resources.ic_settings
-import brainest.core.designsystem.generated.resources.vip
 import com.scelio.brainest.designsystem.BrainestTheme
-import com.scelio.brainest.designsystem.extended
-import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -84,7 +81,7 @@ fun HomeTopNavBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             DiamondCountChip(
-                diamondCount = 300,
+                diamondCount = notificationCount,
                 onClick = onNotificationsClick,
             )
             TopNavIconButton(
@@ -181,6 +178,7 @@ private fun HomeTopNavBarPreview() {
         Surface(color = Color(0xFF1B5E3E)) {
             HomeTopNavBar(
                 userName = "Arfin Hossin",
+                notificationCount = 12
             )
         }
     }

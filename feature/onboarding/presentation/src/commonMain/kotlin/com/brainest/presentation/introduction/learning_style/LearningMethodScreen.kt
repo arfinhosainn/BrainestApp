@@ -18,10 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.flashcards
+import brainest.feature.onboarding.presentation.generated.resources.how_do_you_learn_best
+import brainest.feature.onboarding.presentation.generated.resources.interactive_exercises
+import brainest.feature.onboarding.presentation.generated.resources.learning_style_label
+import brainest.feature.onboarding.presentation.generated.resources.personalize_experience_short
+import brainest.feature.onboarding.presentation.generated.resources.quizzes_practice
+import brainest.feature.onboarding.presentation.generated.resources.reading_summaries
+import brainest.feature.onboarding.presentation.generated.resources.video_lessons
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.brainest.presentation.introduction.components.SelectionOption
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class LearningMethodsData(
@@ -85,7 +95,7 @@ private fun LearningMethodScreenPreview() {
     val sampleOptions = listOf(
         LearningMethodsData(
             id = "videos",
-            label = "Video Lessons",
+            label = stringResource(Res.string.video_lessons),
             icon = {
                 Box(
                     modifier = Modifier
@@ -96,7 +106,7 @@ private fun LearningMethodScreenPreview() {
         ),
         LearningMethodsData(
             id = "quizzes",
-            label = "Quizzes & Practice Tests",
+            label = stringResource(Res.string.quizzes_practice),
             icon = {
                 Box(
                     modifier = Modifier
@@ -107,7 +117,7 @@ private fun LearningMethodScreenPreview() {
         ),
         LearningMethodsData(
             id = "flashcards",
-            label = "Flashcards",
+            label = stringResource(Res.string.flashcards),
             icon = {
                 Box(
                     modifier = Modifier
@@ -118,7 +128,7 @@ private fun LearningMethodScreenPreview() {
         ),
         LearningMethodsData(
             id = "reading",
-            label = "Reading & Summaries",
+            label = stringResource(Res.string.reading_summaries),
             icon = {
                 Box(
                     modifier = Modifier
@@ -129,7 +139,7 @@ private fun LearningMethodScreenPreview() {
         ),
         LearningMethodsData(
             id = "interactive",
-            label = "Interactive Exercises",
+            label = stringResource(Res.string.interactive_exercises),
             icon = {
                 Box(
                     modifier = Modifier
@@ -144,9 +154,9 @@ private fun LearningMethodScreenPreview() {
         var selectedId by remember { mutableStateOf<String?>(null) }
 
         LearningMethodScreen(
-            title = "How do you learn best?",
-            subtitle = "We'll personalize your experience based on your style",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.how_do_you_learn_best),
+            subtitle = stringResource(Res.string.personalize_experience_short),
+            stepLabel = stringResource(Res.string.learning_style_label),
             currentStep = 4,
             totalSteps = 5,
             options = sampleOptions,
@@ -163,27 +173,27 @@ private fun LearningMethodScreenWithSelectionPreview() {
     val sampleOptions = listOf(
         LearningMethodsData(
             id = "videos",
-            label = "Video Lessons",
+            label = stringResource(Res.string.video_lessons),
             icon = null
         ),
         LearningMethodsData(
             id = "quizzes",
-            label = "Quizzes & Practice Tests",
+            label = stringResource(Res.string.quizzes_practice),
             icon = null
         ),
         LearningMethodsData(
             id = "flashcards",
-            label = "Flashcards",
+            label = stringResource(Res.string.flashcards),
             icon = null
         ),
         LearningMethodsData(
             id = "reading",
-            label = "Reading & Summaries",
+            label = stringResource(Res.string.reading_summaries),
             icon = null
         ),
         LearningMethodsData(
             id = "interactive",
-            label = "Interactive Exercises",
+            label = stringResource(Res.string.interactive_exercises),
             icon = null
         )
     )
@@ -192,9 +202,9 @@ private fun LearningMethodScreenWithSelectionPreview() {
         var selectedId by remember { mutableStateOf<String?>("flashcards") }
 
         LearningMethodScreen(
-            title = "How do you learn best?",
-            subtitle = "We'll personalize your experience based on your style",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.how_do_you_learn_best),
+            subtitle = stringResource(Res.string.personalize_experience_short),
+            stepLabel = stringResource(Res.string.learning_style_label),
             currentStep = 4,
             totalSteps = 5,
             options = sampleOptions,
@@ -204,4 +214,3 @@ private fun LearningMethodScreenWithSelectionPreview() {
         )
     }
 }
-

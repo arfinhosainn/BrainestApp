@@ -32,8 +32,13 @@ import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.ic_camera
 import brainest.feature.chat.presentation.generated.resources.ic_document
 import brainest.feature.chat.presentation.generated.resources.ic_gallery
+import brainest.feature.chat.presentation.generated.resources.open_attachment_menu
+import brainest.feature.chat.presentation.generated.resources.take_photo
+import brainest.feature.chat.presentation.generated.resources.upload_file
+import brainest.feature.chat.presentation.generated.resources.upload_photo
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private val FabMenuContainerColor = Color(0xFF787880).copy(alpha = 0.30f)
@@ -61,7 +66,7 @@ fun AttachmentFabMenu(
         ) {
             Icon(
                 imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,
-                contentDescription = "Open attachment menu",
+                contentDescription = stringResource(Res.string.open_attachment_menu),
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -75,7 +80,7 @@ fun AttachmentFabMenu(
 
         ) {
             DropdownMenuItem(
-                text = { Text("Take Photo") },
+                text = { Text(stringResource(Res.string.take_photo)) },
                 onClick = {
                     expanded = false
                     onGalleryClick()
@@ -103,7 +108,7 @@ fun AttachmentFabMenu(
             Spacer(Modifier.height(15.dp))
 
             DropdownMenuItem(
-                text = { Text("Upload Photo") },
+                text = { Text(stringResource(Res.string.upload_photo)) },
                 onClick = {
                     expanded = false
                     onCameraClick()
@@ -130,7 +135,7 @@ fun AttachmentFabMenu(
             Spacer(Modifier.height(15.dp))
 
             DropdownMenuItem(
-                text = { Text("Upload File") },
+                text = { Text(stringResource(Res.string.upload_file)) },
                 onClick = {
                     expanded = false
                     onDocumentClick()

@@ -12,11 +12,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import brainest.feature.home.presentation.generated.resources.Res
+import brainest.feature.home.presentation.generated.resources.home_bronze_class_label
+import brainest.feature.home.presentation.generated.resources.home_lessons_label
+import brainest.feature.home.presentation.generated.resources.home_streak_label
+import brainest.feature.home.presentation.generated.resources.home_vocabulary_label
 import brainest.feature.home.presentation.generated.resources.ic_bronze
 import brainest.feature.home.presentation.generated.resources.ic_lesson
 import brainest.feature.home.presentation.generated.resources.ic_vocab
 import brainest.feature.home.presentation.generated.resources.ic_yellow_fire
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -68,22 +73,22 @@ private fun PreviewHomeStatsGrid() {
             stats = listOf(
                 HomeStatCardUi(
                     value = "2 Days",
-                    label = "Streak",
+                    label = stringResource(Res.string.home_streak_label),
                     icon = Res.drawable.ic_yellow_fire,
                 ),
                 HomeStatCardUi(
                     value = "2 / 490",
-                    label = "Lessons",
+                    label = stringResource(Res.string.home_lessons_label),
                     icon = Res.drawable.ic_lesson,
                 ),
                 HomeStatCardUi(
                     value = "3 words",
-                    label = "Vocabulary",
+                    label = stringResource(Res.string.home_vocabulary_label),
                     icon = Res.drawable.ic_vocab,
                 ),
                 HomeStatCardUi(
                     value = "138 P",
-                    label = "Bronze Class",
+                    label = stringResource(Res.string.home_bronze_class_label),
                     icon = Res.drawable.ic_bronze,
                 ),
             ),

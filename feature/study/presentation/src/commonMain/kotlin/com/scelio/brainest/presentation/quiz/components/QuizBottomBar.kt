@@ -42,6 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import brainest.feature.study.presentation.generated.resources.Res
 import brainest.feature.study.presentation.generated.resources.ic_bulb
+import brainest.feature.study.presentation.generated.resources.quiz_hint
+import brainest.feature.study.presentation.generated.resources.quiz_hints_left
+import brainest.feature.study.presentation.generated.resources.quiz_next
+import brainest.feature.study.presentation.generated.resources.quiz_no_hints
+import brainest.feature.study.presentation.generated.resources.quiz_previous
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -52,6 +58,9 @@ fun QuizBottomBar(
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val contentColor = Color(0xFF2D2D3A)
+    val accentGreen = Color(0xFF19C472)
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -59,19 +68,20 @@ fun QuizBottomBar(
     ) {
         OutlinedButton(
             onClick = onPreviousClick,
-            modifier = Modifier.height(48.dp)
+            modifier = Modifier.height(48.dp),
+            border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(contentColor.copy(alpha = 0.2f)))
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                 contentDescription = null,
-                tint = Color.White,
+                tint = contentColor,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Previous",
+                text = stringResource(Res.string.quiz_previous),
                 fontWeight = FontWeight.SemiBold,
-                color = Color.White
+                color = contentColor
             )
         }
 
@@ -88,12 +98,12 @@ fun QuizBottomBar(
             onClick = onNextClick,
             modifier = Modifier.height(48.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
+                containerColor = accentGreen,
+                contentColor = Color.White
             )
         ) {
             Text(
-                text = "Next",
+                text = stringResource(Res.string.quiz_next),
                 fontWeight = FontWeight.SemiBold,
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -129,7 +139,7 @@ private fun HintButton(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = if (count > 0) "You have $count hints" else "No hints left",
+                        text = if (count > 0) stringResource(Res.string.quiz_hints_left, count) else stringResource(Res.string.quiz_no_hints),
                         color = MaterialTheme.colorScheme.inverseOnSurface,
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier
@@ -182,7 +192,7 @@ private fun HintButton(
             ) {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_bulb),
-                    contentDescription = "Hint"
+                    contentDescription = stringResource(Res.string.quiz_hint)
                 )
             }
         }

@@ -32,10 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.brainest
+import brainest.feature.chat.presentation.generated.resources.chats
 import brainest.feature.chat.presentation.generated.resources.empty_chat
+import brainest.feature.chat.presentation.generated.resources.new_chat
+import brainest.feature.chat.presentation.generated.resources.no_recent_chats
+import brainest.feature.chat.presentation.generated.resources.recents
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.presentation.model.ChatItemUi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ChatHistoryDrawer(
@@ -58,7 +64,7 @@ fun ChatHistoryDrawer(
     ) {
         item {
             Text(
-                text = "Brainest",
+                text = stringResource(Res.string.brainest),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 fontFamily = BricolageGrotesq
@@ -91,7 +97,7 @@ fun ChatHistoryDrawer(
                 }
                 Spacer(Modifier.width(drawerLeadingSpacing))
                 Text(
-                    text = "New chat",
+                    text = stringResource(Res.string.new_chat),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
@@ -123,7 +129,7 @@ fun ChatHistoryDrawer(
                     }
                     Spacer(Modifier.width(drawerLeadingSpacing))
                     Text(
-                        text = "Chats",
+                        text = stringResource(Res.string.chats),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -145,7 +151,7 @@ fun ChatHistoryDrawer(
 
         item {
             Text(
-                text = "Recents",
+                text = stringResource(Res.string.recents),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -156,7 +162,7 @@ fun ChatHistoryDrawer(
         if (recentChats.isEmpty()) {
             item {
                 Text(
-                    text = "No recent chats yet",
+                    text = stringResource(Res.string.no_recent_chats),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = drawerItemHorizontalPadding, top = 4.dp)

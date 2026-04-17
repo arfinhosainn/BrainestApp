@@ -16,6 +16,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
 import com.scelio.brainest.presentation.quiz.QuizResultsScreen
 
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.quiz
+import brainest.feature.study.presentation.generated.resources.quiz_loading
+import brainest.feature.study.presentation.generated.resources.quiz_no_questions
+import org.jetbrains.compose.resources.stringResource
+
 @Composable
 fun QuizSessionScreen(
     deckId: String,
@@ -33,7 +39,7 @@ fun QuizSessionScreen(
 
     if (state.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "Loading quiz...", style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(Res.string.quiz_loading), style = MaterialTheme.typography.bodyMedium)
         }
         return
     }
@@ -80,7 +86,7 @@ fun QuizSessionScreen(
         }
 
         QuizScreen(
-            title = "Quiz",
+            title = stringResource(Res.string.quiz),
             questionIndex = state.currentIndex + 1,
             totalQuestions = totalQuestions,
             question = question.question,
@@ -102,7 +108,7 @@ fun QuizSessionScreen(
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "No quiz questions available.",
+                text = stringResource(Res.string.quiz_no_questions),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

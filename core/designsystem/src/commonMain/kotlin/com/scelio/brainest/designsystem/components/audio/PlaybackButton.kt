@@ -21,7 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import brainest.core.designsystem.generated.resources.Res
+import brainest.core.designsystem.generated.resources.paused
+import brainest.core.designsystem.generated.resources.play
+import brainest.core.designsystem.generated.resources.stopped
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -52,9 +57,9 @@ fun EchoPlaybackButton(
                 PlaybackState.STOPPED -> Icons.Filled.PlayArrow
             },
             contentDescription = when (playbackState) {
-                PlaybackState.PLAYING -> "Play"
-                PlaybackState.PAUSED -> "Paused"
-                PlaybackState.STOPPED -> "Stopped"
+                PlaybackState.PLAYING -> stringResource(Res.string.play)
+                PlaybackState.PAUSED -> stringResource(Res.string.paused)
+                PlaybackState.STOPPED -> stringResource(Res.string.stopped)
             }
         )
     }

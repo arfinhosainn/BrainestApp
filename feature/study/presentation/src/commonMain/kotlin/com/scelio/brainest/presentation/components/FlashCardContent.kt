@@ -19,7 +19,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.flashcard_answer_format
+import brainest.feature.study.presentation.generated.resources.flashcard_hint
+import brainest.feature.study.presentation.generated.resources.flashcard_question_format
 import com.scelio.brainest.flashcards.domain.Flashcard
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FlashCardContent(
@@ -53,7 +58,7 @@ fun FlashCardContent(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Question ${cardIndex + 1}",
+                            text = stringResource(Res.string.flashcard_question_format, cardIndex + 1),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -66,7 +71,7 @@ fun FlashCardContent(
                         if (isInteractive) {
                             Spacer(Modifier.height(16.dp))
                             Text(
-                                text = "Tap to flip • Swipe to continue",
+                                text = stringResource(Res.string.flashcard_hint),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
                             )
@@ -89,7 +94,7 @@ fun FlashCardContent(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Answer ${cardIndex + 1}",
+                            text = stringResource(Res.string.flashcard_answer_format, cardIndex + 1),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                         )
@@ -102,7 +107,7 @@ fun FlashCardContent(
                         if (isInteractive) {
                             Spacer(Modifier.height(16.dp))
                             Text(
-                                text = "Tap to flip • Swipe to continue",
+                                text = stringResource(Res.string.flashcard_hint),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f)
                             )

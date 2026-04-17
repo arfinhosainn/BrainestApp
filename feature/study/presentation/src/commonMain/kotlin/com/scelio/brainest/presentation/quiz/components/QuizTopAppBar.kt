@@ -31,7 +31,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.quiz_back
+import brainest.feature.study.presentation.generated.resources.quiz_playing_title
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -113,7 +117,7 @@ private fun QuizBackButton(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
-            contentDescription = "Back",
+            contentDescription = stringResource(Res.string.quiz_back),
             modifier = Modifier.size(18.dp).offset(x = iconOffset),
             tint = MaterialTheme.colorScheme.onSurface
         )
@@ -125,7 +129,7 @@ private fun QuizBackButton(
 private fun PreviewQuizTopAppBar() {
     BrainestTheme {
         QuizTopAppBar(
-            title = "Playing quiz",
+            title = stringResource(Res.string.quiz_playing_title),
             timeLeftText = "05:42",
             totalTimeText = "10:00",
             progress = 0.58f,

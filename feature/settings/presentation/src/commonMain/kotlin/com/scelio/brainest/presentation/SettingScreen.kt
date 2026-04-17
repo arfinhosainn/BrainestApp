@@ -35,10 +35,18 @@ import brainest.feature.settings.presentation.generated.resources.ic_key
 import brainest.feature.settings.presentation.generated.resources.ic_language
 import brainest.feature.settings.presentation.generated.resources.ic_logout
 import brainest.feature.settings.presentation.generated.resources.ic_support
+import brainest.feature.settings.presentation.generated.resources.settings_back
+import brainest.feature.settings.presentation.generated.resources.settings_change_password
+import brainest.feature.settings.presentation.generated.resources.settings_hotline
+import brainest.feature.settings.presentation.generated.resources.settings_language
+import brainest.feature.settings.presentation.generated.resources.settings_logout
+import brainest.feature.settings.presentation.generated.resources.settings_support
+import brainest.feature.settings.presentation.generated.resources.settings_title
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.extended
 import com.scelio.brainest.presentation.components.ProfileCard
 import com.scelio.brainest.presentation.components.SettingMenuItem
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -76,12 +84,12 @@ fun SettingScreen(
             ) {
                 Icon(
                     imageVector =  vectorResource(Res.drawable.ic_arrow_left),
-                    contentDescription = "Back"
+                    contentDescription = stringResource(Res.string.settings_back)
                 )
             }
 
             Text(
-                text = "Setting",
+                text = stringResource(Res.string.settings_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 24.sp,
@@ -103,22 +111,22 @@ fun SettingScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             SettingMenuItem(
-                title = "Change Password",
+                title = stringResource(Res.string.settings_change_password),
                 leadingIcon = vectorResource(Res.drawable.ic_key),
                 onClick = onChangePasswordClick
             )
             SettingMenuItem(
-                title = "Support",
+                title = stringResource(Res.string.settings_support),
                 leadingIcon = vectorResource(Res.drawable.ic_support),
                 onClick = onSupportClick
             )
             SettingMenuItem(
-                title = "Language",
+                title = stringResource(Res.string.settings_language),
                 leadingIcon = vectorResource(Res.drawable.ic_language),
                 onClick = onLanguageClick
             )
             SettingMenuItem(
-                title = "Hotline",
+                title = stringResource(Res.string.settings_hotline),
                 leadingIcon = vectorResource(Res.drawable.ic_support),
                 onClick = onHotlineClick
             )
@@ -127,7 +135,7 @@ fun SettingScreen(
         Spacer(modifier = Modifier.height(30.dp))
 
         SettingMenuItem(
-            title = "Logout",
+            title = stringResource(Res.string.settings_logout),
             leadingIcon = vectorResource(Res.drawable.ic_logout),
             onClick = onLogoutClick,
             showTrailingIcon = false,

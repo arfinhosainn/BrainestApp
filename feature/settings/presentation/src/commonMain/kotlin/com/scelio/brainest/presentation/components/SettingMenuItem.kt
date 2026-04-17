@@ -24,7 +24,9 @@ import brainest.feature.settings.presentation.generated.resources.Res
 import brainest.feature.settings.presentation.generated.resources.ic_arrow_right
 import brainest.feature.settings.presentation.generated.resources.ic_logout
 import brainest.feature.settings.presentation.generated.resources.ic_pen
+import brainest.feature.settings.presentation.generated.resources.settings_support
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -89,7 +91,7 @@ fun SettingMenuItem(
 private fun SettingMenuItemPreview() {
     BrainestTheme {
         SettingMenuItem(
-            title = "Support",
+            title = stringResource(Res.string.settings_support),
             leadingIcon = vectorResource(Res.drawable.ic_logout),
             onClick = {}
         )
@@ -101,7 +103,7 @@ private fun SettingMenuItemPreview() {
 private fun SettingMenuItemDarkPreview() {
     BrainestTheme(darkTheme = true) {
         SettingMenuItem(
-            title = "Support",
+            title = stringResource(Res.string.settings_support),
             leadingIcon = vectorResource(Res.drawable.ic_logout),
             onClick = {},
             containerColor = Color.Black,

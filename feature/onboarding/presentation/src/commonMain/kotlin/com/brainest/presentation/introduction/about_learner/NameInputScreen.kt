@@ -24,10 +24,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.personalize_experience
+import brainest.feature.onboarding.presentation.generated.resources.what_is_your_name
+import brainest.feature.onboarding.presentation.generated.resources.your_name
+import brainest.feature.onboarding.presentation.generated.resources.your_profile_label
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun NameInputScreen(
@@ -40,7 +46,7 @@ fun NameInputScreen(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     stepLabel: String? = null,
-    placeholder: String = "Your Name",
+    placeholder: String = stringResource(Res.string.your_name),
     accentColor: Color = BrainestSuccess,
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = 1
@@ -127,15 +133,15 @@ private fun NameInputEmptyScreenPreview() {
         var name by remember { mutableStateOf("") }
 
         NameInputScreen(
-            title = "What's your name?",
-            subtitle = "This helps us personalize your experience",
-            stepLabel = "Dog's personality",
+            title = stringResource(Res.string.what_is_your_name),
+            subtitle = stringResource(Res.string.personalize_experience),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 1,
             totalSteps = 5,
             inputValue = name,
             onInputValueChange = { name = it },
             onContinueClicked = { /* Navigate next */ },
-            placeholder = "Your Name"
+            placeholder = stringResource(Res.string.your_name)
         )
     }
 }
@@ -147,16 +153,15 @@ private fun NameInputFilledScreenPreview() {
         var name by remember { mutableStateOf("John") }
 
         NameInputScreen(
-            title = "What's your name?",
-            subtitle = "This helps us personalize your experience",
-            stepLabel = "Step",
+            title = stringResource(Res.string.what_is_your_name),
+            subtitle = stringResource(Res.string.personalize_experience),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 1,
             totalSteps = 3,
             inputValue = name,
             onInputValueChange = { name = it },
             onContinueClicked = { /* Navigate next */ },
-            placeholder = "Your Name"
+            placeholder = stringResource(Res.string.your_name)
         )
     }
 }
-

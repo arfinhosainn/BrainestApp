@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import brainest.core.designsystem.generated.resources.Res
+import brainest.core.designsystem.generated.resources.cancel
+import brainest.core.designsystem.generated.resources.delete
+import brainest.core.designsystem.generated.resources.delete_profile_picture_description
+import brainest.core.designsystem.generated.resources.delete_profile_picture_title
 import brainest.core.designsystem.generated.resources.dismiss_dialog
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
@@ -117,10 +121,10 @@ fun DestructiveConfirmationDialog(
 fun DestructiveConfirmationDialogPreview() {
     BrainestTheme(darkTheme = true) {
         DestructiveConfirmationDialog(
-            title = "Delete profile picture?",
-            description = "This will permanently delete your profile picture. This cannot be undone.",
-            confirmButtonText = "Delete",
-            cancelButtonText = "Cancel",
+            title = stringResource(Res.string.delete_profile_picture_title),
+            description = stringResource(Res.string.delete_profile_picture_description),
+            confirmButtonText = stringResource(Res.string.delete),
+            cancelButtonText = stringResource(Res.string.cancel),
             onConfirmClick = {},
             onCancelClick = {},
             onDismiss = {}

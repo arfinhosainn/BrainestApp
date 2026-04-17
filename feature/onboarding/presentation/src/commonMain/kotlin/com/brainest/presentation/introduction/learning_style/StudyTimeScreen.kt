@@ -18,10 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.afternoon
+import brainest.feature.onboarding.presentation.generated.resources.early_morning
+import brainest.feature.onboarding.presentation.generated.resources.evening
+import brainest.feature.onboarding.presentation.generated.resources.learning_style_label
+import brainest.feature.onboarding.presentation.generated.resources.morning
+import brainest.feature.onboarding.presentation.generated.resources.night
+import brainest.feature.onboarding.presentation.generated.resources.schedule_sessions_time
+import brainest.feature.onboarding.presentation.generated.resources.when_do_you_study
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.brainest.presentation.introduction.components.SelectionOption
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class StudyTimeData(
@@ -85,7 +95,7 @@ private fun StudyTimeScreenPreview() {
     val sampleOptions = listOf(
         StudyTimeData(
             id = "early_morning",
-            label = "Early Morning (5AM - 8AM)",
+            label = stringResource(Res.string.early_morning),
             icon = {
                 Box(
                     modifier = Modifier
@@ -96,7 +106,7 @@ private fun StudyTimeScreenPreview() {
         ),
         StudyTimeData(
             id = "morning",
-            label = "Morning (8AM - 12PM)",
+            label = stringResource(Res.string.morning),
             icon = {
                 Box(
                     modifier = Modifier
@@ -107,7 +117,7 @@ private fun StudyTimeScreenPreview() {
         ),
         StudyTimeData(
             id = "afternoon",
-            label = "Afternoon (12PM - 5PM)",
+            label = stringResource(Res.string.afternoon),
             icon = {
                 Box(
                     modifier = Modifier
@@ -118,7 +128,7 @@ private fun StudyTimeScreenPreview() {
         ),
         StudyTimeData(
             id = "evening",
-            label = "Evening (5PM - 9PM)",
+            label = stringResource(Res.string.evening),
             icon = {
                 Box(
                     modifier = Modifier
@@ -129,7 +139,7 @@ private fun StudyTimeScreenPreview() {
         ),
         StudyTimeData(
             id = "night",
-            label = "Night (9PM - 12AM)",
+            label = stringResource(Res.string.night),
             icon = {
                 Box(
                     modifier = Modifier
@@ -144,9 +154,9 @@ private fun StudyTimeScreenPreview() {
         var selectedId by remember { mutableStateOf<String?>(null) }
 
         StudyTimeScreen(
-            title = "When do you usually study?",
-            subtitle = "We'll schedule your sessions at the right time",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.when_do_you_study),
+            subtitle = stringResource(Res.string.schedule_sessions_time),
+            stepLabel = stringResource(Res.string.learning_style_label),
             currentStep = 5,
             totalSteps = 5,
             options = sampleOptions,
@@ -161,20 +171,20 @@ private fun StudyTimeScreenPreview() {
 @Composable
 private fun StudyTimeScreenWithSelectionPreview() {
     val sampleOptions = listOf(
-        StudyTimeData(id = "early_morning", label = "Early Morning (5AM - 8AM)", icon = null),
-        StudyTimeData(id = "morning", label = "Morning (8AM - 12PM)", icon = null),
-        StudyTimeData(id = "afternoon", label = "Afternoon (12PM - 5PM)", icon = null),
-        StudyTimeData(id = "evening", label = "Evening (5PM - 9PM)", icon = null),
-        StudyTimeData(id = "night", label = "Night (9PM - 12AM)", icon = null)
+        StudyTimeData(id = "early_morning", label = stringResource(Res.string.early_morning), icon = null),
+        StudyTimeData(id = "morning", label = stringResource(Res.string.morning), icon = null),
+        StudyTimeData(id = "afternoon", label = stringResource(Res.string.afternoon), icon = null),
+        StudyTimeData(id = "evening", label = stringResource(Res.string.evening), icon = null),
+        StudyTimeData(id = "night", label = stringResource(Res.string.night), icon = null)
     )
 
     BrainestTheme(darkTheme = true) {
         var selectedId by remember { mutableStateOf<String?>("evening") }
 
         StudyTimeScreen(
-            title = "When do you usually study?",
-            subtitle = "We'll schedule your sessions at the right time",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.when_do_you_study),
+            subtitle = stringResource(Res.string.schedule_sessions_time),
+            stepLabel = stringResource(Res.string.learning_style_label),
             currentStep = 5,
             totalSteps = 5,
             options = sampleOptions,

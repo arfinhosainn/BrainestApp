@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="home_streak_label">Streak</string>
+    <string name="home_decks_label">Decks</string>
+    <string name="home_quizzes_label">Quizzes</string>
+    <string name="home_earned_label">Earned</string>
+    <string name="home_days_value">%1$d Days</string>
+    <string name="home_points_value">%1$d Pts</string>
+    <string name="home_consecutive_study_days">Consecutive study days</string>
+    <string name="home_completed">Completed</string>
+    <string name="home_missed">Missed</string>
+    <string name="home_points">%1$d points</string>
+    <string name="home_student">Student</string>
+    <string name="home_error_no_authenticated_user">No authenticated user found.</string>
+    <string name="home_error_failed_to_load_decks">Failed to load decks: %1$s</string>
+    <string name="home_day_mon">Mon</string>
+    <string name="home_day_tue">Tue</string>
+    <string name="home_day_wed">Wed</string>
+    <string name="home_day_thu">Thu</string>
+    <string name="home_day_fri">Fri</string>
+    <string name="home_day_sat">Sat</string>
+    <string name="home_day_sun">Sun</string>
+    <string name="home_lessons_label">Lessons</string>
+    <string name="home_vocabulary_label">Vocabulary</string>
+    <string name="home_bronze_class_label">Bronze Class</string>
+</resources>

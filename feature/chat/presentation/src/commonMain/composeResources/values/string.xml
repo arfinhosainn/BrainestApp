@@ -13,4 +13,52 @@
     <string name="only_you">Only you</string>
     <string name="today_x">Today, %1$s</string>
     <string name="yesterday_x">Yesterday, %1$s</string>
+
+    <!-- Search -->
+    <string name="search">Search</string>
+    <string name="search_conversations">Search conversations...</string>
+    <string name="no_conversations_found">No conversations found for \"%1$s\"</string>
+
+    <!-- Chat Detail -->
+    <string name="ask_anything">Ask Anything</string>
+    <string name="open_recent_chats">Open recent chats</string>
+    <string name="close_chat">Close chat</string>
+    <string name="send_message">Send message</string>
+    <string name="record_voice">Record voice</string>
+    <string name="new_chat">New chat</string>
+    <string name="chats">Chats</string>
+    <string name="recents">Recents</string>
+    <string name="no_recent_chats">No recent chats yet</string>
+    <string name="history">History</string>
+    <string name="close_history">Close history</string>
+
+    <!-- Attachments -->
+    <string name="open_attachment_menu">Open attachment menu</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="upload_file">Upload File</string>
+    <string name="remove_image">Remove image</string>
+    <string name="remove_document">Remove document</string>
+    <string name="image_x">Image %1$d</string>
+
+    <!-- Input Box -->
+    <string name="add_message_about_document">Add a message about this document</string>
+    <string name="add_caption_x_images">Add a caption (%1$d images)</string>
+    <string name="add_caption_1_image">Add a caption (1 image)</string>
+    <string name="ask_follow_up">Ask a Follow-Up</string>
+    <string name="follow_up_placeholder">Here\'s my follow-up question...</string>
+
+    <!-- Errors and Info -->
+    <string name="chat_not_found">Chat not found</string>
+    <string name="failed_to_load_chat">Failed to load chat</string>
+    <string name="just_now">Just now</string>
+    <string name="failed_to_send">Failed to send</string>
+    <string name="not_logged_in">Not logged in</string>
+    <string name="failed_to_create_chat">Failed to create chat</string>
+    <string name="failed_to_load_more_messages">Failed to load more messages</string>
+    <string name="failed_to_search_chats">Failed to search chats</string>
+    <string name="failed_to_delete_chat">Failed to delete chat</string>
+    <string name="delete">Delete</string>
+    <string name="navigate">Navigate</string>
+    <string name="brainest">Brainest</string>
 </resources>

@@ -31,6 +31,11 @@ import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+import brainest.feature.study.presentation.generated.resources.audio_record
+import brainest.feature.study.presentation.generated.resources.audio_upload
+import brainest.feature.study.presentation.generated.resources.documents_upload
+import org.jetbrains.compose.resources.stringResource
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadDocsBottomSheet(
@@ -61,7 +66,7 @@ fun UploadDocsBottomSheet(
             Spacer(modifier = Modifier.height(4.dp))
 
             BrainestButton(
-                text = "Record Audio",
+                text = stringResource(Res.string.audio_record),
                 onClick = onRecordAudio,
                 modifier = modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -79,7 +84,7 @@ fun UploadDocsBottomSheet(
                 backgroundColor = BrainestDraftEssay
             )
             BrainestButton(
-                text = "Upload Audio",
+                text = stringResource(Res.string.audio_upload),
                 onClick = onUploadAudio,
                 modifier = modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -99,7 +104,7 @@ fun UploadDocsBottomSheet(
             )
 
             BrainestButton(
-                text = "Upload Documents",
+                text = stringResource(Res.string.documents_upload),
                 onClick = onUploadDocument,
                 modifier = modifier.fillMaxWidth(),
                 trailingIcon = {

@@ -17,10 +17,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.already_have_account
+import brainest.feature.onboarding.presentation.generated.resources.get_started
 import brainest.feature.onboarding.presentation.generated.resources.getstarted
+import brainest.feature.onboarding.presentation.generated.resources.welcome_title
 import com.brainest.presentation.introduction.components.LoginBottomSheet
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -74,7 +78,7 @@ fun WelcomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Let's Play with many\nquiz themes",
+                            text = stringResource(Res.string.welcome_title),
                             style = Typography.titleLarge,
                             fontWeight = FontWeight.ExtraBold,
                             textAlign = TextAlign.Center
@@ -91,7 +95,7 @@ fun WelcomeScreen(
                             )
                         ) {
                             Text(
-                                text = "Get Started",
+                                text = stringResource(Res.string.get_started),
                                 style = TextStyle(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
@@ -105,7 +109,7 @@ fun WelcomeScreen(
 
                         TextButton(onClick = { showBottomSheet = true }) {
                             Text(
-                                text = "Already have an account",
+                                text = stringResource(Res.string.already_have_account),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,

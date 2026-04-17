@@ -29,12 +29,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.improve_style
+import brainest.feature.chat.presentation.generated.resources.no_conversations_found
 import com.scelio.brainest.designsystem.components.buttons.BrainestFloatingActionButton
 import com.scelio.brainest.presentation.chat_list.components.ChatListHeader
 import com.scelio.brainest.presentation.chat_list.components.ChatListItem
 import com.scelio.brainest.presentation.components.SearchBar
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -131,7 +133,7 @@ fun ChatListScreen(
                 if (state.chats.isEmpty() && state.searchText.isNotEmpty()) {
                     item {
                         Text(
-                            text = "No conversations found for \"${state.searchText}\"",
+                            text = stringResource(Res.string.no_conversations_found, state.searchText),
                             modifier = Modifier.padding(16.dp),
                             style = MaterialTheme.typography.bodyMedium
                         )

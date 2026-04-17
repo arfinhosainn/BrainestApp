@@ -3,6 +3,17 @@ package com.scelio.brainest.presentation.home
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import brainest.feature.home.presentation.generated.resources.Res
+import brainest.feature.home.presentation.generated.resources.home_day_fri
+import brainest.feature.home.presentation.generated.resources.home_day_mon
+import brainest.feature.home.presentation.generated.resources.home_day_sat
+import brainest.feature.home.presentation.generated.resources.home_day_sun
+import brainest.feature.home.presentation.generated.resources.home_day_thu
+import brainest.feature.home.presentation.generated.resources.home_day_tue
+import brainest.feature.home.presentation.generated.resources.home_day_wed
+import brainest.feature.home.presentation.generated.resources.home_error_failed_to_load_decks
+import brainest.feature.home.presentation.generated.resources.home_error_no_authenticated_user
+import brainest.feature.home.presentation.generated.resources.home_student
 import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.logging.BrainestLogger
 import com.scelio.brainest.domain.util.Result
@@ -32,12 +43,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import kotlin.random.Random
 
 @Stable
 data class HomeState(
     val isLoading: Boolean = false,
-    val userName: String = "Student",
+    val userName: String = "",
     val completedDecks: Int = 0,
     val completedQuizzes: Int = 0,
     val streakDays: Int = 0,
@@ -86,7 +99,7 @@ class HomeViewModel(
             if (userId == null) {
                 _state.update {
                     it.copy(
-                        error = "No authenticated user found.",
+                        error = getString(Res.string.home_error_no_authenticated_user),
                         studyDays = buildStudyDays(emptySet(), cachedWeeklySchedule)
                     )
                 }
@@ -96,6 +109,10 @@ class HomeViewModel(
             val accountCreatedDate = authService.getCurrentUser()
                 ?.createdAt
                 ?.toLocalDateOrNull()
+            val userName = authService.getCurrentUser()
+                ?.username
+                ?.takeIf { it.isNotBlank() }
+                ?: getString(Res.string.home_student)
             val weekStart = today().minus(today().dayOfWeek.ordinal, DateTimeUnit.DAY)
 
             val achievementsDeferred = viewModelScope.async {
@@ -112,7 +129,7 @@ class HomeViewModel(
             if (decksResult is Result.Failure) {
                 _state.update {
                     it.copy(
-                        error = "Failed to load decks: ${decksResult.error}",
+                        error = getString(Res.string.home_error_failed_to_load_decks, decksResult.error.toString()),
                         studyDays = buildStudyDays(
                             completedDays = emptySet(),
                             schedule = cachedWeeklySchedule,
@@ -213,6 +230,7 @@ class HomeViewModel(
             // Single atomic state update - no loading flicker
             _state.update {
                 it.copy(
+                    userName = userName,
                     completedDecks = completedDecks,
                     completedQuizzes = completedQuizzes,
                     streakDays = totalStreakDays,
@@ -381,15 +399,15 @@ private fun String.toLocalDateOrNull(): LocalDate? {
     }
 }
 
-private fun DayOfWeek.shortLabel(): String {
+private fun DayOfWeek.shortLabel(): StringResource {
     return when (this) {
-        DayOfWeek.MONDAY -> "Mon"
-        DayOfWeek.TUESDAY -> "Tue"
-        DayOfWeek.WEDNESDAY -> "Wed"
-        DayOfWeek.THURSDAY -> "Thu"
-        DayOfWeek.FRIDAY -> "Fri"
-        DayOfWeek.SATURDAY -> "Sat"
-        DayOfWeek.SUNDAY -> "Sun"
+        DayOfWeek.MONDAY -> Res.string.home_day_mon
+        DayOfWeek.TUESDAY -> Res.string.home_day_tue
+        DayOfWeek.WEDNESDAY -> Res.string.home_day_wed
+        DayOfWeek.THURSDAY -> Res.string.home_day_thu
+        DayOfWeek.FRIDAY -> Res.string.home_day_fri
+        DayOfWeek.SATURDAY -> Res.string.home_day_sat
+        DayOfWeek.SUNDAY -> Res.string.home_day_sun
     }
 }
 

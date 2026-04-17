@@ -12,6 +12,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.happy
+import brainest.core.designsystem.generated.resources.profile_picture
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -19,7 +21,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun CircularProfilePicture() {
     Image(
         imageVector = vectorResource(Res.drawable.happy),
-        contentDescription = "Profile picture",
+        contentDescription = stringResource(Res.string.profile_picture),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(56.dp)

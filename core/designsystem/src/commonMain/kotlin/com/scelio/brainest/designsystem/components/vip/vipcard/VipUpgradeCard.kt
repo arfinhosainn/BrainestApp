@@ -21,15 +21,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.ic_grass_crown
+import brainest.core.designsystem.generated.resources.upgrade_to
+import brainest.core.designsystem.generated.resources.vip_account
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun VipUpgradeCard(
     modifier: Modifier = Modifier,
-    titleLineOne: String = "Upgrade to",
-    titleLineTwo: String = "VIP account",
+    titleLineOne: String = stringResource(Res.string.upgrade_to),
+    titleLineTwo: String = stringResource(Res.string.vip_account),
 ) {
     val cardShape = RoundedCornerShape(28.dp)
     val cardColor = Color(0xFF7BCB63)

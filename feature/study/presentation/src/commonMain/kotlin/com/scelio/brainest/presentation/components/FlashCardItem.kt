@@ -32,9 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.flashcard_item_cards
+import brainest.feature.study.presentation.generated.resources.flashcard_item_generated
+import brainest.feature.study.presentation.generated.resources.flashcard_item_review
+import brainest.feature.study.presentation.generated.resources.flashcard_item_swiped
 import brainest.feature.study.presentation.generated.resources.ic_flashcard
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -122,9 +127,9 @@ fun FlashcardItem(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    StatBlock(label = "Generated", value = generatedAt)
-                    StatBlock(label = "Cards", value = totalCards.toString())
-                    StatBlock(label = "Swiped", value = totalSwiped.toString())
+                    StatBlock(label = stringResource(Res.string.flashcard_item_generated), value = generatedAt)
+                    StatBlock(label = stringResource(Res.string.flashcard_item_cards), value = totalCards.toString())
+                    StatBlock(label = stringResource(Res.string.flashcard_item_swiped), value = totalSwiped.toString())
                 }
 
                 Spacer(Modifier.height(18.dp))
@@ -137,7 +142,7 @@ fun FlashcardItem(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                 ) {
                     Text(
-                        text = "REVIEW",
+                        text = stringResource(Res.string.flashcard_item_review),
                         fontSize = 13.sp,
                         fontFamily = BricolageGrotesq,
                         fontWeight = FontWeight.ExtraBold,

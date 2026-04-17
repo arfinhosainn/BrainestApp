@@ -48,10 +48,14 @@ import androidx.compose.ui.unit.sp
 import brainest.feature.settings.presentation.generated.resources.Res
 import brainest.feature.settings.presentation.generated.resources.ic_pen
 import brainest.feature.settings.presentation.generated.resources.ic_checkmark
+import brainest.feature.settings.presentation.generated.resources.settings_edit_name
+import brainest.feature.settings.presentation.generated.resources.settings_save_name
+import brainest.feature.settings.presentation.generated.resources.settings_your_name
 import com.scelio.brainest.designsystem.BrainestPrimary
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.navbar.home.CircularProfilePicture
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -153,7 +157,7 @@ fun ProfileCard(
                                 Box(contentAlignment = Alignment.CenterStart) {
                                     if (draftName.isBlank()) {
                                         Text(
-                                            text = "Your name",
+                                            text = stringResource(Res.string.settings_your_name),
                                             style = MaterialTheme.typography.headlineMedium.copy(
                                                 color = Color.White.copy(alpha = 0.65f),
                                                 fontWeight = FontWeight.SemiBold
@@ -212,7 +216,11 @@ fun ProfileCard(
             ) {
                 Icon(
                     painter = painterResource(if (isEditing) Res.drawable.ic_checkmark else Res.drawable.ic_pen),
-                    contentDescription = if (isEditing) "Save name" else "Edit name",
+                    contentDescription = if (isEditing) {
+                        stringResource(Res.string.settings_save_name)
+                    } else {
+                        stringResource(Res.string.settings_edit_name)
+                    },
                     modifier = Modifier.size(25.dp),
                     tint = Color.White
                 )

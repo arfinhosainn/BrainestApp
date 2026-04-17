@@ -35,6 +35,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.listening
+import brainest.feature.study.presentation.generated.resources.mic_permission_blocked
+import brainest.feature.study.presentation.generated.resources.mic_permission_needed
+import brainest.feature.study.presentation.generated.resources.mic_permission_requesting
+import brainest.feature.study.presentation.generated.resources.preparing_study_set
+import brainest.feature.study.presentation.generated.resources.preparing_study_set_hint
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.audio.ArcPlayback
 import com.scelio.brainest.designsystem.components.audio.PlaybackState
@@ -60,6 +67,7 @@ import com.scelio.brainest.flashcards.domain.StudySession
 import com.scelio.brainest.presentation.permission.Permission
 import com.scelio.brainest.presentation.permission.PermissionState
 import com.scelio.brainest.presentation.permission.rememberPermissionController
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -155,7 +163,7 @@ fun AudioRecordingScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Listening...",
+                                    text = stringResource(Res.string.listening),
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         fontSize = 20.sp,
                                         lineHeight = 28.sp
@@ -171,13 +179,13 @@ fun AudioRecordingScreen(
                             Text(
                                 text = when (permissionState) {
                                     PermissionState.PERMANENTLY_DENIED ->
-                                        "Microphone permission is blocked. Enable it in Settings."
+                                        stringResource(Res.string.mic_permission_blocked)
 
                                     PermissionState.DENIED ->
-                                        "Microphone permission is needed to record audio."
+                                        stringResource(Res.string.mic_permission_needed)
 
                                     PermissionState.NOT_DETERMINED ->
-                                        "Requesting microphone permission..."
+                                        stringResource(Res.string.mic_permission_requesting)
 
                                     PermissionState.GRANTED -> ""
                                 },
@@ -294,7 +302,7 @@ fun AudioRecordingScreen(
                     modifier = Modifier.padding(horizontal = 32.dp)
                 ) {
                     Text(
-                        text = "Preparing study set...",
+                        text = stringResource(Res.string.preparing_study_set),
                         style = MaterialTheme.typography.titleMedium,
                         color = AudioTextPrimary,
                         textAlign = TextAlign.Center
@@ -309,7 +317,7 @@ fun AudioRecordingScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "This can take a few seconds.",
+                        text = stringResource(Res.string.preparing_study_set_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AudioTextSecondary,
                         textAlign = TextAlign.Center

@@ -1,6 +1,7 @@
 package com.scelio.brainest.presentation.home.components
 
 import androidx.compose.runtime.Stable
+import org.jetbrains.compose.resources.StringResource
 
 @Stable
 enum class StudyDayStatus {
@@ -12,7 +13,7 @@ enum class StudyDayStatus {
 
 @Stable
 data class StudyDayUi(
-    val label: String,
+    val label: StringResource,
     val status: StudyDayStatus,
     val points: Int? = null
 )

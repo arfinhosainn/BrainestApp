@@ -23,11 +23,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.biology
+import brainest.feature.onboarding.presentation.generated.resources.chemistry
+import brainest.feature.onboarding.presentation.generated.resources.computer_science
+import brainest.feature.onboarding.presentation.generated.resources.economics
+import brainest.feature.onboarding.presentation.generated.resources.english
+import brainest.feature.onboarding.presentation.generated.resources.geography
+import brainest.feature.onboarding.presentation.generated.resources.history
+import brainest.feature.onboarding.presentation.generated.resources.literature
+import brainest.feature.onboarding.presentation.generated.resources.math
+import brainest.feature.onboarding.presentation.generated.resources.none_of_the_above
+import brainest.feature.onboarding.presentation.generated.resources.personalize_learning_experience
+import brainest.feature.onboarding.presentation.generated.resources.physics
+import brainest.feature.onboarding.presentation.generated.resources.psychology
+import brainest.feature.onboarding.presentation.generated.resources.science
+import brainest.feature.onboarding.presentation.generated.resources.what_subjects_studying
+import brainest.feature.onboarding.presentation.generated.resources.your_profile_label
 import com.brainest.presentation.introduction.components.MultiSelectChip
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class MultiSelectOptionData(
@@ -50,7 +68,7 @@ fun SelectSubjectScreen(
     stepLabel: String? = null,
     accentColor: Color = BrainestSuccess,
     onNoneOfTheAboveClicked: (() -> Unit)? = null,
-    noneOfTheAboveText: String = "None of the above",
+    noneOfTheAboveText: String = stringResource(Res.string.none_of_the_above),
     allowEmptySelection: Boolean = false
 ) {
     val hasSelection = selectedOptionIds.isNotEmpty()
@@ -112,27 +130,27 @@ fun SelectSubjectScreen(
 @Composable
 private fun PreviewSelectSubjectScreen() {
     val subjects = listOf(
-        MultiSelectOptionData("math", "Mathematics"),
-        MultiSelectOptionData("science", "Science"),
-        MultiSelectOptionData("physics", "Physics"),
-        MultiSelectOptionData("chemistry", "Chemistry"),
-        MultiSelectOptionData("biology", "Biology"),
-        MultiSelectOptionData("history", "History"),
-        MultiSelectOptionData("geography", "Geography"),
-        MultiSelectOptionData("english", "English"),
-        MultiSelectOptionData("literature", "Literature"),
-        MultiSelectOptionData("computer_science", "Computer Science"),
-        MultiSelectOptionData("economics", "Economics"),
-        MultiSelectOptionData("psychology", "Psychology")
+        MultiSelectOptionData("math", stringResource(Res.string.math)),
+        MultiSelectOptionData("science", stringResource(Res.string.science)),
+        MultiSelectOptionData("physics", stringResource(Res.string.physics)),
+        MultiSelectOptionData("chemistry", stringResource(Res.string.chemistry)),
+        MultiSelectOptionData("biology", stringResource(Res.string.biology)),
+        MultiSelectOptionData("history", stringResource(Res.string.history)),
+        MultiSelectOptionData("geography", stringResource(Res.string.geography)),
+        MultiSelectOptionData("english", stringResource(Res.string.english)),
+        MultiSelectOptionData("literature", stringResource(Res.string.literature)),
+        MultiSelectOptionData("computer_science", stringResource(Res.string.computer_science)),
+        MultiSelectOptionData("economics", stringResource(Res.string.economics)),
+        MultiSelectOptionData("psychology", stringResource(Res.string.psychology))
     )
 
     BrainestTheme(darkTheme = true) {
         var selectedIds by remember { mutableStateOf(setOf("biology")) }
 
         SelectSubjectScreen(
-            title = "What subjects are you studying?",
-            subtitle = "Select all that apply, we'll personalize your learning experience",
-            stepLabel = "Command skills",
+            title = stringResource(Res.string.what_subjects_studying),
+            subtitle = stringResource(Res.string.personalize_learning_experience),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 1,
             totalSteps = 2,
             options = subjects,
@@ -154,27 +172,27 @@ private fun PreviewSelectSubjectScreen() {
 @Composable
 private fun MultiSelectionScreenEmptyPreview() {
     val subjects = listOf(
-        MultiSelectOptionData("math", "Mathematics"),
-        MultiSelectOptionData("science", "Science"),
-        MultiSelectOptionData("physics", "Physics"),
-        MultiSelectOptionData("chemistry", "Chemistry"),
-        MultiSelectOptionData("biology", "Biology"),
-        MultiSelectOptionData("history", "History"),
-        MultiSelectOptionData("geography", "Geography"),
-        MultiSelectOptionData("english", "English"),
-        MultiSelectOptionData("literature", "Literature"),
-        MultiSelectOptionData("computer_science", "Computer Science"),
-        MultiSelectOptionData("economics", "Economics"),
-        MultiSelectOptionData("psychology", "Psychology")
+        MultiSelectOptionData("math", stringResource(Res.string.math)),
+        MultiSelectOptionData("science", stringResource(Res.string.science)),
+        MultiSelectOptionData("physics", stringResource(Res.string.physics)),
+        MultiSelectOptionData("chemistry", stringResource(Res.string.chemistry)),
+        MultiSelectOptionData("biology", stringResource(Res.string.biology)),
+        MultiSelectOptionData("history", stringResource(Res.string.history)),
+        MultiSelectOptionData("geography", stringResource(Res.string.geography)),
+        MultiSelectOptionData("english", stringResource(Res.string.english)),
+        MultiSelectOptionData("literature", stringResource(Res.string.literature)),
+        MultiSelectOptionData("computer_science", stringResource(Res.string.computer_science)),
+        MultiSelectOptionData("economics", stringResource(Res.string.economics)),
+        MultiSelectOptionData("psychology", stringResource(Res.string.psychology))
     )
 
     BrainestTheme {
         var selectedIds by remember { mutableStateOf(setOf<String>()) }
 
         SelectSubjectScreen(
-            title = "What subjects are you studying?",
-            subtitle = "Mark all that your dog knows for sure!",
-            stepLabel = "Command skills",
+            title = stringResource(Res.string.what_subjects_studying),
+            subtitle = stringResource(Res.string.personalize_learning_experience),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 1,
             totalSteps = 2,
             options = subjects,

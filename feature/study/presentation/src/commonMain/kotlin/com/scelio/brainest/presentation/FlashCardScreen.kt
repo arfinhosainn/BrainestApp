@@ -34,6 +34,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.flashcard_dont_know
+import brainest.feature.study.presentation.generated.resources.flashcard_dont_know_button
+import brainest.feature.study.presentation.generated.resources.flashcard_know
+import brainest.feature.study.presentation.generated.resources.flashcard_know_button
+import brainest.feature.study.presentation.generated.resources.flashcard_reviewed_count
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
@@ -41,6 +47,7 @@ import com.scelio.brainest.flashcards.domain.Flashcard
 import com.scelio.brainest.presentation.components.FlashCardContent
 import com.scelio.brainest.presentation.components.FlashCardCounters
 import com.scelio.brainest.presentation.components.SwipeCard
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -108,7 +115,7 @@ fun FlashCardScreen(
         // ── "X of Y cards reviewed" ───────────────────────────────────────
         if (cards.isNotEmpty()) {
             Text(
-                text = "$currentIndex of ${cards.size} cards reviewed",
+                text = stringResource(Res.string.flashcard_reviewed_count, currentIndex, cards.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -188,7 +195,7 @@ fun FlashCardScreen(
                 ) {
                     FlashCardCounters(
                         count = dontKnowCount,
-                        label = "DON'T KNOW",
+                        label = stringResource(Res.string.flashcard_dont_know),
                         backgroundColor = Color.Transparent,
                         countColor = Color.Black,
                         labelColor = ColorDontKnowAccent,
@@ -196,7 +203,7 @@ fun FlashCardScreen(
                     )
                     FlashCardCounters(
                         count = knowCount,
-                        label = "KNOW",
+                        label = stringResource(Res.string.flashcard_know),
                         backgroundColor = Color.Transparent,
                         countColor = Color.Black,
                         labelColor = ColorKnowAccent,
@@ -230,7 +237,7 @@ fun FlashCardScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     BrainestButton(
-                        text = "Don't Know",
+                        text = stringResource(Res.string.flashcard_dont_know_button),
                         onClick = { markDontKnow() },
                         modifier = Modifier.weight(1f).height(60.dp),
                         leadingIcon = {
@@ -249,7 +256,7 @@ fun FlashCardScreen(
 
 
                     BrainestButton(
-                        text = "Know",
+                        text = stringResource(Res.string.flashcard_know_button),
                         onClick = { markKnow() },
                         modifier = Modifier.weight(1f).height(60.dp),
                         leadingIcon = {

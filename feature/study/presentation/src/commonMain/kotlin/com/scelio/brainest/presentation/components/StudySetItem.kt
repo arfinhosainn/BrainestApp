@@ -31,7 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.study.presentation.generated.resources.Res
 import brainest.feature.study.presentation.generated.resources.ic_flashcard
+import brainest.feature.study.presentation.generated.resources.stat_completed
+import brainest.feature.study.presentation.generated.resources.stat_flashcards
+import brainest.feature.study.presentation.generated.resources.stat_quiz
+import brainest.feature.study.presentation.generated.resources.stat_swiped
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -132,10 +137,10 @@ fun StudySetItem(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    StatBlock(label = "Flashcards", value = flashcardsCount.toString())
-                    StatBlock(label = "Quiz", value = quizCount.toString())
-                    StatBlock(label = "Swiped", value = flashcardsSwiped.toString())
-                    StatBlock(label = "Completed", value = quizzesCompleted.toString())
+                    StatBlock(label = stringResource(Res.string.stat_flashcards), value = flashcardsCount.toString())
+                    StatBlock(label = stringResource(Res.string.stat_quiz), value = quizCount.toString())
+                    StatBlock(label = stringResource(Res.string.stat_swiped), value = flashcardsSwiped.toString())
+                    StatBlock(label = stringResource(Res.string.stat_completed), value = quizzesCompleted.toString())
                 }
             }
         }

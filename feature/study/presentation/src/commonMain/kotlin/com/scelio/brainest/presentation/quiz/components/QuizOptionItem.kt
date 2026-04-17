@@ -24,7 +24,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.quiz_option_correct_answer
+import brainest.feature.study.presentation.generated.resources.quiz_option_your_answer
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 enum class QuizOptionState {
@@ -132,8 +136,8 @@ private fun OptionBadge(
     state: QuizOptionState
 ) {
     val label = when (state) {
-        QuizOptionState.Correct -> "Correct answer"
-        QuizOptionState.Incorrect -> "Your answer"
+        QuizOptionState.Correct -> stringResource(Res.string.quiz_option_correct_answer)
+        QuizOptionState.Incorrect -> stringResource(Res.string.quiz_option_your_answer)
         else -> null
     }
     if (label != null) {

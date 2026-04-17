@@ -1,14 +1,10 @@
 package com.brainest.presentation.introduction.about_learner
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,10 +14,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.elementary
+import brainest.feature.onboarding.presentation.generated.resources.high_school
+import brainest.feature.onboarding.presentation.generated.resources.middle_school
+import brainest.feature.onboarding.presentation.generated.resources.postgraduate
+import brainest.feature.onboarding.presentation.generated.resources.tailor_learning_path
+import brainest.feature.onboarding.presentation.generated.resources.undergraduate
+import brainest.feature.onboarding.presentation.generated.resources.what_is_your_grade
+import brainest.feature.onboarding.presentation.generated.resources.your_profile_label
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.brainest.presentation.introduction.components.SelectionOption
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -89,27 +95,27 @@ private fun SelectionScreenWithSelectionPreview() {
     val sampleOptions = listOf(
         SelectionOptionData(
             id = "elementary",
-            label = "Elementary (Grade 1-5)",
+            label = stringResource(Res.string.elementary),
             icon = null
         ),
         SelectionOptionData(
             id = "middle_school",
-            label = "Middle School (Grade 6-8)",
+            label = stringResource(Res.string.middle_school),
             icon = null
         ),
         SelectionOptionData(
             id = "high_school",
-            label = "High School (Grade 9-12)",
+            label = stringResource(Res.string.high_school),
             icon = null
         ),
         SelectionOptionData(
             id = "undergraduate",
-            label = "Undergraduate",
+            label = stringResource(Res.string.undergraduate),
             icon = null
         ),
         SelectionOptionData(
             id = "postgraduate",
-            label = "Postgraduate",
+            label = stringResource(Res.string.postgraduate),
             icon = null
         )
     )
@@ -118,9 +124,9 @@ private fun SelectionScreenWithSelectionPreview() {
         var selectedId by remember { mutableStateOf<String?>("high_school") }
 
         GradeScreen(
-            title = "What's your grade level?",
-            subtitle = "We'll tailor your learning path accordingly",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.what_is_your_grade),
+            subtitle = stringResource(Res.string.tailor_learning_path),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 2,
             totalSteps = 5,
             options = sampleOptions,
@@ -138,27 +144,27 @@ private fun SelectionScreenWithSelectionPreviewDark() {
     val sampleOptions = listOf(
         SelectionOptionData(
             id = "elementary",
-            label = "Elementary (Grade 1-5)",
+            label = stringResource(Res.string.elementary),
             icon = null
         ),
         SelectionOptionData(
             id = "middle_school",
-            label = "Middle School (Grade 6-8)",
+            label = stringResource(Res.string.middle_school),
             icon = null
         ),
         SelectionOptionData(
             id = "high_school",
-            label = "High School (Grade 9-12)",
+            label = stringResource(Res.string.high_school),
             icon = null
         ),
         SelectionOptionData(
             id = "undergraduate",
-            label = "Undergraduate",
+            label = stringResource(Res.string.undergraduate),
             icon = null
         ),
         SelectionOptionData(
             id = "postgraduate",
-            label = "Postgraduate",
+            label = stringResource(Res.string.postgraduate),
             icon = null
         )
     )
@@ -167,9 +173,9 @@ private fun SelectionScreenWithSelectionPreviewDark() {
         var selectedId by remember { mutableStateOf<String?>("high_school") }
 
         GradeScreen(
-            title = "What's your grade level?",
-            subtitle = "We'll tailor your learning path accordingly",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.what_is_your_grade),
+            subtitle = stringResource(Res.string.tailor_learning_path),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 2,
             totalSteps = 5,
             options = sampleOptions,
@@ -179,4 +185,3 @@ private fun SelectionScreenWithSelectionPreviewDark() {
         )
     }
 }
-

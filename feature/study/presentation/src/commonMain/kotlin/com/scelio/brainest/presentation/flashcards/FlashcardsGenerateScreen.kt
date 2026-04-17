@@ -28,10 +28,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.flashcards_empty
+import brainest.feature.study.presentation.generated.resources.flashcards_empty_hint
+import brainest.feature.study.presentation.generated.resources.generating_flashcards
+import brainest.feature.study.presentation.generated.resources.upload_documents
 import com.scelio.brainest.presentation.components.FlashcardItem
 import com.scelio.brainest.presentation.components.UploadDocsBottomSheet
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
 import kotlinx.datetime.Instant as KxInstant
@@ -112,13 +118,13 @@ fun FlashcardsGenerateScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "No flashcards yet.",
+                        text = stringResource(Res.string.flashcards_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Tap + to generate your first deck.",
+                        text = stringResource(Res.string.flashcards_empty_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -133,7 +139,7 @@ fun FlashcardsGenerateScreen(
             ) {
                 CircularProgressIndicator()
                 Text(
-                    text = "Generating flashcards...",
+                    text = stringResource(Res.string.generating_flashcards),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 12.dp)
                 )
@@ -163,7 +169,7 @@ fun FlashcardsGenerateScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Upload documents"
+                contentDescription = stringResource(Res.string.upload_documents)
             )
         }
     }

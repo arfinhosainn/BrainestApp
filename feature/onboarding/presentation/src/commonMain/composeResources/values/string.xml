@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- Onboarding Steps -->
+    <string name="onboarding_step1_title">Chat with Your AI Tutor</string>
+    <string name="onboarding_step1_desc">Ask questions and get personalized help with math, science, and more.</string>
+    <string name="onboarding_step2_title">Snap &amp; Solve Questions</string>
+    <string name="onboarding_step2_desc">Take a photo of any question and get instant step by step AI explanations.</string>
+    <string name="onboarding_step3_title">Create Flashcards &amp; Quizzes</string>
+    <string name="onboarding_step3_desc">Turn lessons into flashcards and quick quizzes to test your knowledge.</string>
+
+    <!-- User Review Screen -->
+    <string name="continue_label">Continue</string>
+    <string name="join_others">Join 50,000+ others achieving their goals</string>
+    <string name="trusted_by_thousands">Trusted by thousands</string>
+    <string name="rating_score">4.8</string>
+    <string name="app_store_rating">Average rating on the App Store</string>
+    
+    <string name="review1_title">Exactly what I needed!</string>
+    <string name="review1_name">Felicia2</string>
+    <string name="review1_content">Simple, fast, and effective! I have reached the heaviest weight of my life and was feeling pretty hopeless. This app is simple, ADHD friendly, and helps me to really be aware of the foods I eat.</string>
+    
+    <string name="review2_title">Game changer!</string>
+    <string name="review2_name">Alex_Dev</string>
+    <string name="review2_content">Finally an app that doesn\'t feel like a chore. The food logging is actually fun and the UI is incredibly smooth.</string>
+    
+    <string name="review3_title">Highly Recommend</string>
+    <string name="review3_name">SarahM</string>
+    <string name="review3_content">I\'ve tried every tracker out there, but Brainest is the only one that stuck. The simplicity is its superpower.</string>
+
+    <!-- Onboarding Questions -->
+    <string name="what_is_your_name">What\'s your name?</string>
+    <string name="personalize_experience">This helps us personalize your experience</string>
+    <string name="about_you">About You</string>
+    <string name="your_name">Your Name</string>
+    
+    <string name="what_is_your_grade">What\'s your grade level?</string>
+    <string name="tailor_learning_path">We\'ll tailor your learning path accordingly</string>
+    
+    <string name="what_subjects_studying">What subjects are you studying?</string>
+    <string name="select_all_apply">Select all that apply</string>
+    <string name="personalize_learning_experience">Select all that apply, we\'ll personalize your learning experience</string>
+    
+    <string name="what_is_your_goal">What\'s your main goal?</string>
+    <string name="build_plan_goal">We\'ll build a plan that gets you there</string>
+    <string name="goals_label">Goals</string>
+    
+    <string name="what_challenges_facing">What challenges are you facing?</string>
+    <string name="challenges_label">Challenges</string>
+    
+    <string name="how_many_hours_study">How many hours do you study daily?</string>
+    <string name="help_plan_schedule">This helps us plan your schedule</string>
+    <string name="survey_label">Survey</string>
+    
+    <string name="how_do_you_learn_best">How do you learn best?</string>
+    <string name="personalize_experience_short">We\'ll personalize your experience</string>
+    <string name="learning_style_label">Learning Style</string>
+    
+    <string name="when_do_you_study">When do you usually study?</string>
+    <string name="schedule_sessions_time">We\'ll schedule your sessions at the right time</string>
+    
+    <string name="select_your_language">Select your language</string>
+    <string name="localize_experience">We\'ll localize the experience for you</string>
+    <string name="personalization_label">Personalization</string>
+    <string name="welcome_title">Let\'s Play with many\nquiz themes</string>
+    <string name="get_started">Get Started</string>
+    <string name="already_have_account">Already have an account</string>
+    <string name="finish">Finish</string>
+
+    <!-- Options -->
+    <string name="elementary">Elementary (Grade 1-5)</string>
+    <string name="middle_school">Middle School (Grade 6-8)</string>
+    <string name="high_school">High School (Grade 9-12)</string>
+    <string name="undergraduate">Undergraduate</string>
+    <string name="postgraduate">Postgraduate</string>
+    
+    <string name="math">Mathematics</string>
+    <string name="science">Science</string>
+    <string name="physics">Physics</string>
+    <string name="chemistry">Chemistry</string>
+    <string name="biology">Biology</string>
+    <string name="history">History</string>
+    <string name="geography">Geography</string>
+    <string name="english">English</string>
+    <string name="literature">Literature</string>
+    <string name="computer_science">Computer Science</string>
+    <string name="economics">Economics</string>
+    <string name="psychology">Psychology</string>
+    
+    <string name="improve_grades">Improve My Grades</string>
+    <string name="prepare_exams">Prepare for Exams</string>
+    <string name="learn_new_skills">Learn New Skills</string>
+    <string name="stay_consistent">Stay Consistent Daily</string>
+    <string name="get_ahead">Get Ahead of Class</string>
+    
+    <string name="staying_focused">Staying focused</string>
+    <string name="time_management">Time management</string>
+    <string name="understanding_concepts">Understanding concepts</string>
+    <string name="exam_anxiety">Exam anxiety</string>
+    <string name="motivation">Motivation</string>
+    <string name="note_taking">Note-taking</string>
+    
+    <string name="video_lessons">Video Lessons</string>
+    <string name="quizzes_practice">Quizzes and Practice Tests</string>
+    <string name="flashcards">Flashcards</string>
+    <string name="reading_summaries">Reading and Summaries</string>
+    <string name="interactive_exercises">Interactive Exercises</string>
+    
+    <string name="early_morning">Early Morning (5AM - 8AM)</string>
+    <string name="morning">Morning (8AM - 12PM)</string>
+    <string name="afternoon">Afternoon (12PM - 5PM)</string>
+    <string name="evening">Evening (5PM - 9PM)</string>
+    <string name="night">Night (9PM - 12AM)</string>
+    
+    <string name="arabic">Arabic</string>
+    <string name="chinese">Chinese</string>
+    <string name="french">French</string>
+    <string name="spanish">Spanish</string>
+    <string name="german">German</string>
+    <string name="ukrainian">Ukrainian</string>
+    <string name="none_of_the_above">None of the above</string>
+    <string name="your_profile_label">Your Profile</string>
+    <string name="your_goals_label">Your Goals</string>
+    <string name="daily_study_hours">Daily study hours</string>
+    <string name="select_average_study_time">Select your average study time</string>
+    <string name="preferred_language_title">What's your preferred language?</string>
+    <string name="preferred_language_subtitle">We'll deliver your content in the language you're most comfortable with</string>
+
+    <!-- Permissions -->
+    <string name="enable_permission">Enable Permission</string>
+    <string name="best_experience_access">To get the best experience, we\'d like access to:</string>
+    <string name="camera">Camera</string>
+    <string name="microphone">Microphone</string>
+    <string name="notifications">Notifications</string>
+    <string name="camera_permission_description">Snap photos of your math problems to solve them instantly.</string>
+    <string name="microphone_permission_description">Use voice commands to ask questions and get help.</string>
+    <string name="notifications_permission_description">Stay updated with reminders and learning alerts.</string>
+    <string name="allow_permissions">Allow Permissions</string>
+    <string name="skip_for_now">Skip for now</string>
+    <string name="permission_granted">Permission granted</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="permission_permanently_denied">Permanently denied - open Settings to enable</string>
+    <string name="permission_state_granted">Granted</string>
+    <string name="permission_state_denied">Denied</string>
+
+    <!-- Login Bottom Sheet -->
+    <string name="continue_with_apple">Continue with Apple</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="continue_with_email">Continue with Email</string>
+</resources>

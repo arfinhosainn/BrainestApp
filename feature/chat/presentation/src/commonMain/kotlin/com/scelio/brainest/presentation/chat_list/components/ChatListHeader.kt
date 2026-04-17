@@ -23,7 +23,11 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.close_history
+import brainest.feature.chat.presentation.generated.resources.history
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.min
 
@@ -54,7 +58,7 @@ fun ChatListHeader(
     TopAppBar(
         title = {
             Text(
-                text = "History",
+                text = stringResource(Res.string.history),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = FontFamily.Serif
@@ -64,7 +68,7 @@ fun ChatListHeader(
             IconButton(onClick = onCloseClicked) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Close history",
+                    contentDescription = stringResource(Res.string.close_history),
                 )
             }
         },

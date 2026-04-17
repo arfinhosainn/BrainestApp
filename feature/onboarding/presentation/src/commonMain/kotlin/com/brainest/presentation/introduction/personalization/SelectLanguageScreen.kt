@@ -25,12 +25,16 @@ import brainest.feature.onboarding.presentation.generated.resources.chinese
 import brainest.feature.onboarding.presentation.generated.resources.english
 import brainest.feature.onboarding.presentation.generated.resources.french
 import brainest.feature.onboarding.presentation.generated.resources.german
+import brainest.feature.onboarding.presentation.generated.resources.preferred_language_subtitle
+import brainest.feature.onboarding.presentation.generated.resources.preferred_language_title
 import brainest.feature.onboarding.presentation.generated.resources.spanish
 import brainest.feature.onboarding.presentation.generated.resources.ukrainian
+import brainest.feature.onboarding.presentation.generated.resources.your_profile_label
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.brainest.presentation.introduction.components.SelectionOption
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -95,7 +99,7 @@ private fun LanguageSelectionScreenPreview() {
     val sampleOptions = listOf(
         LanguageData(
             id = "english",
-            label = "English",
+            label = stringResource(Res.string.english),
             icon = {
                 Box(
                     modifier = Modifier
@@ -113,7 +117,7 @@ private fun LanguageSelectionScreenPreview() {
         ),
         LanguageData(
             id = "arabic",
-            label = "Arabic",
+            label = stringResource(Res.string.arabic),
             icon = {
                 Box(
                     modifier = Modifier
@@ -130,7 +134,7 @@ private fun LanguageSelectionScreenPreview() {
         ),
         LanguageData(
             id = "french",
-            label = "French",
+            label = stringResource(Res.string.french),
             icon = {
                 Box(
                     modifier = Modifier
@@ -147,7 +151,7 @@ private fun LanguageSelectionScreenPreview() {
         ),
         LanguageData(
             id = "spanish",
-            label = "Spanish",
+            label = stringResource(Res.string.spanish),
             icon = {
                 Box(
                     modifier = Modifier
@@ -164,7 +168,7 @@ private fun LanguageSelectionScreenPreview() {
         ),
         LanguageData(
             id = "german",
-            label = "German",
+            label = stringResource(Res.string.german),
             icon = {
                 Box(
                     modifier = Modifier
@@ -181,7 +185,7 @@ private fun LanguageSelectionScreenPreview() {
         ),
         LanguageData(
             id = "chinese",
-            label = "Chinese",
+            label = stringResource(Res.string.chinese),
             icon = {
                 Box(
                     modifier = Modifier
@@ -198,7 +202,7 @@ private fun LanguageSelectionScreenPreview() {
         ),
         LanguageData(
             id = "ukrainian",
-            label = "Ukrainian",
+            label = stringResource(Res.string.ukrainian),
             icon = {
                 Box(
                     modifier = Modifier
@@ -219,9 +223,9 @@ private fun LanguageSelectionScreenPreview() {
         var selectedId by remember { mutableStateOf<String?>(null) }
 
         LanguageSelectionScreen(
-            title = "What's your preferred language?",
-            subtitle = "We'll deliver your content in the language you're most comfortable with",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.preferred_language_title),
+            subtitle = stringResource(Res.string.preferred_language_subtitle),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 1,
             totalSteps = 5,
             options = sampleOptions,
@@ -236,21 +240,21 @@ private fun LanguageSelectionScreenPreview() {
 @Composable
 private fun LanguageSelectionScreenWithSelectionPreview() {
     val sampleOptions = listOf(
-        LanguageData(id = "english", label = "🇬🇧  English", icon = null),
-        LanguageData(id = "french", label = "🇫🇷  French", icon = null),
-        LanguageData(id = "spanish", label = "🇪🇸  Spanish", icon = null),
-        LanguageData(id = "german", label = "🇩🇪  German", icon = null),
-        LanguageData(id = "chinese", label = "🇨🇳  Chinese", icon = null),
-        LanguageData(id = "malay", label = "🇲🇾  Malay", icon = null)
+        LanguageData(id = "english", label = stringResource(Res.string.english), icon = null),
+        LanguageData(id = "french", label = stringResource(Res.string.french), icon = null),
+        LanguageData(id = "spanish", label = stringResource(Res.string.spanish), icon = null),
+        LanguageData(id = "german", label = stringResource(Res.string.german), icon = null),
+        LanguageData(id = "chinese", label = stringResource(Res.string.chinese), icon = null),
+        LanguageData(id = "ukrainian", label = stringResource(Res.string.ukrainian), icon = null)
     )
 
     BrainestTheme (darkTheme = true){
         var selectedId by remember { mutableStateOf<String?>("english") }
 
         LanguageSelectionScreen(
-            title = "What's your preferred language?",
-            subtitle = "We'll deliver your content in the language you're most comfortable with",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.preferred_language_title),
+            subtitle = stringResource(Res.string.preferred_language_subtitle),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 1,
             totalSteps = 5,
             options = sampleOptions,

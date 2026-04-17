@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="settings_back">Back</string>
+    <string name="settings_title">Setting</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_support">Support</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_hotline">Hotline</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_your_name">Your name</string>
+    <string name="settings_save_name">Save name</string>
+    <string name="settings_edit_name">Edit name</string>
+</resources>

@@ -23,6 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.image_x
+import brainest.feature.chat.presentation.generated.resources.remove_image
+import org.jetbrains.compose.resources.stringResource
+
 @Composable
  fun ImagePreviewItem(
     index: Int,
@@ -36,7 +41,7 @@ import coil3.compose.AsyncImage
     ) {
         AsyncImage(
             model = "data:image/jpeg;base64,$base64Image",
-            contentDescription = "Image ${index + 1}",
+            contentDescription = stringResource(Res.string.image_x, index + 1),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -55,7 +60,7 @@ import coil3.compose.AsyncImage
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Remove image",
+                contentDescription = stringResource(Res.string.remove_image),
                 modifier = Modifier.size(14.dp)
             )
         }

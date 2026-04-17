@@ -31,11 +31,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.continue_label
+import brainest.feature.onboarding.presentation.generated.resources.finish
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.presentation.util.statusBarsPaddingIfAndroid
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -78,7 +82,7 @@ fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = currentStep.title,
+                            text = stringResource(currentStep.titleRes),
                             style = Typography.titleLarge,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 28.sp,
@@ -90,7 +94,7 @@ fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = currentStep.description,
+                            text = stringResource(currentStep.descriptionRes),
                             style = Typography.bodySmall,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
@@ -113,7 +117,11 @@ fun IntroductionScreen(onFinishOnboarding: () -> Unit) {
                 ) {
                     Spacer(modifier = Modifier.height(35.dp))
                     BrainestButton(
-                        text = if (pagerState.currentPage == onboardingPages.lastIndex) "Finish" else "Continue",
+                        text = if (pagerState.currentPage == onboardingPages.lastIndex) {
+                            stringResource(Res.string.finish)
+                        } else {
+                            stringResource(Res.string.continue_label)
+                        },
                         onClick = {
                             if (pagerState.currentPage < onboardingPages.lastIndex) {
                                 scope.launch {

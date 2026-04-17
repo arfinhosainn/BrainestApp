@@ -26,12 +26,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.app_store_rating
+import brainest.feature.onboarding.presentation.generated.resources.continue_label
+import brainest.feature.onboarding.presentation.generated.resources.join_others
+import brainest.feature.onboarding.presentation.generated.resources.rating_score
+import brainest.feature.onboarding.presentation.generated.resources.review1_content
+import brainest.feature.onboarding.presentation.generated.resources.review1_name
+import brainest.feature.onboarding.presentation.generated.resources.review1_title
+import brainest.feature.onboarding.presentation.generated.resources.review2_content
+import brainest.feature.onboarding.presentation.generated.resources.review2_name
+import brainest.feature.onboarding.presentation.generated.resources.review2_title
+import brainest.feature.onboarding.presentation.generated.resources.review3_content
+import brainest.feature.onboarding.presentation.generated.resources.review3_name
+import brainest.feature.onboarding.presentation.generated.resources.review3_title
 import brainest.feature.onboarding.presentation.generated.resources.star
+import brainest.feature.onboarding.presentation.generated.resources.trusted_by_thousands
 import com.brainest.presentation.introduction.components.ReviewCard
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -50,7 +65,7 @@ fun UserReviewScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BrainestButton(
-                    text = "Continue",
+                    text = stringResource(Res.string.continue_label),
                     onClick = onContinueClick,
                     enabled = true,
                     textStyles = TextStyle(
@@ -72,7 +87,7 @@ fun UserReviewScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Join 50,000+ others achieving their goals",
+                    text = stringResource(Res.string.join_others),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
@@ -91,7 +106,7 @@ fun UserReviewScreen(
 
             // --- Header Section ---
             Text(
-                text = "Trusted by thousands",
+                text = stringResource(Res.string.trusted_by_thousands),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -103,7 +118,7 @@ fun UserReviewScreen(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "4.8",
+                    text = stringResource(Res.string.rating_score),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(end = 8.dp)
@@ -119,7 +134,7 @@ fun UserReviewScreen(
             }
 
             Text(
-                text = "Average rating on the App Store",
+                text = stringResource(Res.string.app_store_rating),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
                 modifier = Modifier.padding(top = 8.dp)
@@ -136,19 +151,19 @@ fun UserReviewScreen(
             ) {
                 // Primary Focused Card
                 ReviewCard(
-                    title = "Exactly what I needed!",
-                    reviewerName = "Felicia2",
+                    title = stringResource(Res.string.review1_title),
+                    reviewerName = stringResource(Res.string.review1_name),
                     rating = 5,
-                    content = "Simple, fast, and effective! I have reached the heaviest weight of my life and was feeling pretty hopeless. This app is simple, ADHD friendly, and helps me to really be aware of the foods I eat.",
+                    content = stringResource(Res.string.review1_content),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 // Secondary Faded Card 1
                 ReviewCard(
-                    title = "Game changer!",
-                    reviewerName = "Alex_Dev",
+                    title = stringResource(Res.string.review2_title),
+                    reviewerName = stringResource(Res.string.review2_name),
                     rating = 5,
-                    content = "Finally an app that doesn't feel like a chore. The food logging is actually fun and the UI is incredibly smooth.",
+                    content = stringResource(Res.string.review2_content),
                     modifier = Modifier
                         .fillMaxWidth()
 
@@ -156,10 +171,10 @@ fun UserReviewScreen(
 
                 // Secondary Faded Card 2 (To ensure scrolling is visible)
                 ReviewCard(
-                    title = "Highly Recommend",
-                    reviewerName = "SarahM",
+                    title = stringResource(Res.string.review3_title),
+                    reviewerName = stringResource(Res.string.review3_name),
                     rating = 5,
-                    content = "I've tried every tracker out there, but Brainest is the only one that stuck. The simplicity is its superpower.",
+                    content = stringResource(Res.string.review3_content),
                     modifier = Modifier
                         .fillMaxWidth()
 

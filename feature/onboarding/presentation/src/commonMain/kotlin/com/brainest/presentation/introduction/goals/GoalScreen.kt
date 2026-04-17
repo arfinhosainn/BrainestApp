@@ -19,11 +19,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.build_plan_goal
+import brainest.feature.onboarding.presentation.generated.resources.get_ahead
+import brainest.feature.onboarding.presentation.generated.resources.improve_grades
+import brainest.feature.onboarding.presentation.generated.resources.learn_new_skills
+import brainest.feature.onboarding.presentation.generated.resources.prepare_exams
+import brainest.feature.onboarding.presentation.generated.resources.stay_consistent
+import brainest.feature.onboarding.presentation.generated.resources.what_is_your_goal
+import brainest.feature.onboarding.presentation.generated.resources.your_profile_label
 import com.brainest.presentation.introduction.about_learner.SelectionOptionData
 import com.brainest.presentation.introduction.components.OnboardingStepLayout
 import com.brainest.presentation.introduction.components.SelectionOption
 import com.scelio.brainest.designsystem.BrainestSuccess
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -89,7 +99,7 @@ private fun SelectionScreenPreview() {
     val sampleOptions = listOf(
         SelectGradeOption(
             id = "improve_grades",
-            label = "Improve My Grades",
+            label = stringResource(Res.string.improve_grades),
             icon = {
                 Box(
                     modifier = Modifier
@@ -100,7 +110,7 @@ private fun SelectionScreenPreview() {
         ),
         SelectGradeOption(
             id = "prepare_exams",
-            label = "Prepare for Exams",
+            label = stringResource(Res.string.prepare_exams),
             icon = {
                 Box(
                     modifier = Modifier
@@ -111,7 +121,7 @@ private fun SelectionScreenPreview() {
         ),
         SelectGradeOption(
             id = "learn_new_skills",
-            label = "Learn New Skills",
+            label = stringResource(Res.string.learn_new_skills),
             icon = {
                 Box(
                     modifier = Modifier
@@ -122,7 +132,7 @@ private fun SelectionScreenPreview() {
         ),
         SelectGradeOption(
             id = "stay_consistent",
-            label = "Stay Consistent Daily",
+            label = stringResource(Res.string.stay_consistent),
             icon = {
                 Box(
                     modifier = Modifier
@@ -133,7 +143,7 @@ private fun SelectionScreenPreview() {
         ),
         SelectGradeOption(
             id = "get_ahead",
-            label = "Get Ahead of Class",
+            label = stringResource(Res.string.get_ahead),
             icon = {
                 Box(
                     modifier = Modifier
@@ -148,9 +158,9 @@ private fun SelectionScreenPreview() {
         var selectedId by remember { mutableStateOf<String?>(null) }
 
         GoalScreen(
-            title = "What's your main goal?",
-            subtitle = "We'll build a plan that gets you there",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.what_is_your_goal),
+            subtitle = stringResource(Res.string.build_plan_goal),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 3,
             totalSteps = 5,
             options = sampleOptions,
@@ -167,27 +177,27 @@ private fun SelectionScreenWithSelectionPreview() {
     val sampleOptions = listOf(
         SelectGradeOption(
             id = "improve_grades",
-            label = "Improve My Grades",
+            label = stringResource(Res.string.improve_grades),
             icon = null
         ),
         SelectGradeOption(
             id = "prepare_exams",
-            label = "Prepare for Exams",
+            label = stringResource(Res.string.prepare_exams),
             icon = null
         ),
         SelectGradeOption(
             id = "learn_new_skills",
-            label = "Learn New Skills",
+            label = stringResource(Res.string.learn_new_skills),
             icon = null
         ),
         SelectGradeOption(
             id = "stay_consistent",
-            label = "Stay Consistent Daily",
+            label = stringResource(Res.string.stay_consistent),
             icon = null
         ),
         SelectGradeOption(
             id = "get_ahead",
-            label = "Get Ahead of Class",
+            label = stringResource(Res.string.get_ahead),
             icon = null
         )
     )
@@ -196,9 +206,9 @@ private fun SelectionScreenWithSelectionPreview() {
         var selectedId by remember { mutableStateOf<String?>("prepare_exams") }
 
         GoalScreen(
-            title = "What's your main goal?",
-            subtitle = "We'll build a plan that gets you there",
-            stepLabel = "Your Profile",
+            title = stringResource(Res.string.what_is_your_goal),
+            subtitle = stringResource(Res.string.build_plan_goal),
+            stepLabel = stringResource(Res.string.your_profile_label),
             currentStep = 3,
             totalSteps = 5,
             options = sampleOptions,

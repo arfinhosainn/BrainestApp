@@ -52,10 +52,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.arrow_right
+import brainest.feature.chat.presentation.generated.resources.delete
+import brainest.feature.chat.presentation.generated.resources.navigate
 import com.scelio.brainest.presentation.model.ChatItemUi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 @Composable
@@ -119,7 +122,7 @@ fun ChatListItemUi(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
+                        contentDescription = stringResource(Res.string.delete),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(24.dp)
                     )
@@ -186,7 +189,7 @@ fun ChatListItemUi(
 
                     Icon(
                         painter = painterResource(Res.drawable.arrow_right),
-                        contentDescription = "Navigate",
+                        contentDescription = stringResource(Res.string.navigate),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
@@ -195,4 +198,3 @@ fun ChatListItemUi(
         }
     }
 }
-

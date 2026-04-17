@@ -16,7 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.core.designsystem.generated.resources.Res
+import brainest.core.designsystem.generated.resources.stats_decks
+import brainest.core.designsystem.generated.resources.stats_others
+import brainest.core.designsystem.generated.resources.stats_quizzes
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -35,7 +40,7 @@ fun StatsCard(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        StatItem(label = "Decks", value = decks.toString())
+        StatItem(label = stringResource(Res.string.stats_decks), value = decks.toString())
 
         VerticalDivider(
             modifier = Modifier.height(48.dp),
@@ -43,7 +48,7 @@ fun StatsCard(
             color = Color.White.copy(alpha = 0.4f)
         )
 
-        StatItem(label = "Quizzes", value = quizzes.toString())
+        StatItem(label = stringResource(Res.string.stats_quizzes), value = quizzes.toString())
 
         VerticalDivider(
             modifier = Modifier.height(48.dp),
@@ -51,7 +56,7 @@ fun StatsCard(
             color = Color.White.copy(alpha = 0.4f)
         )
 
-        StatItem(label = "Others", value = others.toString())
+        StatItem(label = stringResource(Res.string.stats_others), value = others.toString())
     }
 }
 

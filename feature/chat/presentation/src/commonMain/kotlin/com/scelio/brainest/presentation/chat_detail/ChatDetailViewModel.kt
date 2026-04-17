@@ -4,6 +4,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.chat_not_found
+import brainest.feature.chat.presentation.generated.resources.failed_to_create_chat
+import brainest.feature.chat.presentation.generated.resources.failed_to_load_chat
+import brainest.feature.chat.presentation.generated.resources.failed_to_load_more_messages
+import brainest.feature.chat.presentation.generated.resources.failed_to_send
+import brainest.feature.chat.presentation.generated.resources.just_now
+import brainest.feature.chat.presentation.generated.resources.new_chat
+import brainest.feature.chat.presentation.generated.resources.not_logged_in
 import com.scelio.brainest.domain.chat.ChatRepository
 import com.scelio.brainest.domain.chat.generateFallbackChatTitle
 import com.scelio.brainest.domain.chat.normalizeGeneratedTitle
@@ -18,6 +27,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import org.jetbrains.compose.resources.getString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -79,11 +89,11 @@ class ChatDetailViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            error = UiText.DynamicString("Chat not found")
+                            error = UiText.Resource(Res.string.chat_not_found)
                         )
                     }
                     _events.send(
-                        ChatDetailEvent.OnError(UiText.DynamicString("Chat not found"))
+                        ChatDetailEvent.OnError(UiText.Resource(Res.string.chat_not_found))
                     )
                     return@launch
                 }
@@ -109,14 +119,12 @@ class ChatDetailViewModel(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = UiText.DynamicString(
-                            e.message ?: "Failed to load chat"
-                        )
+                        error = e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_load_chat)
                     )
                 }
                 _events.send(
                     ChatDetailEvent.OnError(
-                        UiText.DynamicString(e.message ?: "Failed to load chat")
+                        e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_load_chat)
                     )
                 )
             }
@@ -159,14 +167,14 @@ class ChatDetailViewModel(
                     id = tempUserMessageId,
                     content = messageContent,
                     isFromUser = true,
-                    timestamp = UiText.DynamicString("Just now"),
+                    timestamp = UiText.Resource(Res.string.just_now),
                     isLoading = false
                 )
                 val assistantMessageUi = ChatMessageUi(
                     id = tempAssistantMessageId,
                     content = "",
                     isFromUser = false,
-                    timestamp = UiText.DynamicString("Just now"),
+                    timestamp = UiText.Resource(Res.string.just_now),
                     isLoading = true
                 )
 
@@ -246,7 +254,7 @@ class ChatDetailViewModel(
                             isLoading = false
                         )
                     }
-                    _events.send(ChatDetailEvent.OnError(UiText.DynamicString(e.message ?: "Failed to send")))
+                    _events.send(ChatDetailEvent.OnError(e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_send)))
                 }
             } finally {
                 sendMessageMutex.unlock()
@@ -258,7 +266,7 @@ class ChatDetailViewModel(
         _state.value.chatUi?.id?.let { return it }
 
         if (currentUserId.isBlank()) {
-            _events.send(ChatDetailEvent.OnError(UiText.DynamicString("Not logged in")))
+            _events.send(ChatDetailEvent.OnError(UiText.Resource(Res.string.not_logged_in)))
             return null
         }
 
@@ -266,7 +274,7 @@ class ChatDetailViewModel(
             val chat = chatRepository.createChat(
                 CreateChatRequest(
                     userId = currentUserId,
-                    title = "New chat",
+                    title = getString(Res.string.new_chat),
                     systemPrompt = ChatSystemPrompt
                 )
             )
@@ -276,7 +284,7 @@ class ChatDetailViewModel(
         } catch (e: Exception) {
             _events.send(
                 ChatDetailEvent.OnError(
-                    UiText.DynamicString(e.message ?: "Failed to create chat")
+                    e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_create_chat)
                 )
             )
             null
@@ -335,9 +343,7 @@ class ChatDetailViewModel(
                 _state.update {
                     it.copy(
                         isPaginationLoading = false,
-                        paginationError = UiText.DynamicString(
-                            e.message ?: "Failed to load more messages"
-                        )
+                        paginationError = e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_load_more_messages)
                     )
                 }
             }
@@ -397,7 +403,7 @@ class ChatDetailViewModel(
             }.onFailure { error ->
                 _events.send(
                     ChatDetailEvent.OnError(
-                        UiText.DynamicString(error.message ?: "Failed to load recent chats")
+                        error.message?.let { UiText.DynamicString(error.message ?: "") } ?: UiText.Resource(Res.string.failed_to_load_chat)
                     )
                 )
             }
@@ -406,7 +412,8 @@ class ChatDetailViewModel(
 
     private suspend fun updateChatTitleIfNeeded(chatId: String, messageContent: String) {
         val currentTitle = _state.value.chatUi?.title?.trim().orEmpty()
-        if (currentTitle.isNotBlank() && !currentTitle.equals("New chat", ignoreCase = true)) {
+        val defaultNewChatTitle = getString(Res.string.new_chat)
+        if (currentTitle.isNotBlank() && !currentTitle.equals(defaultNewChatTitle, ignoreCase = true)) {
             return
         }
 

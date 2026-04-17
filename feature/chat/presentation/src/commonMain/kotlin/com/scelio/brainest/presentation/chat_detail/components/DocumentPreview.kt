@@ -18,7 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.remove_document
 import com.scelio.brainest.presentation.chat_detail.UploadedDocument
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
  fun DocumentPreview(
@@ -55,7 +58,7 @@ import com.scelio.brainest.presentation.chat_detail.UploadedDocument
             IconButton(onClick = onClear) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Remove document"
+                    contentDescription = stringResource(Res.string.remove_document)
                 )
             }
         }

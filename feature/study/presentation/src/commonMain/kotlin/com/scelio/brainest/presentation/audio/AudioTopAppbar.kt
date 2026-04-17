@@ -28,7 +28,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.audio_title
+import brainest.feature.study.presentation.generated.resources.quiz_back
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -40,7 +44,7 @@ fun AudioTopAppBar(
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "Audio",
+                text = stringResource(Res.string.audio_title),
                 style = MaterialTheme.typography.titleSmall,
                 color = Color(0xFF1E2633),
                 fontWeight = FontWeight.SemiBold
@@ -49,7 +53,7 @@ fun AudioTopAppBar(
         navigationIcon = {
             AudioTopIconButton(
                 icon = Icons.AutoMirrored.Filled.ArrowBackIos,
-                contentDescription = "Back",
+                contentDescription = stringResource(Res.string.quiz_back),
                 onClick = onBackClick
             )
         },

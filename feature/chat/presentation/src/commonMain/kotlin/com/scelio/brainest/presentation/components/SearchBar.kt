@@ -34,8 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.ic_search
+import brainest.feature.chat.presentation.generated.resources.search
+import brainest.feature.chat.presentation.generated.resources.search_conversations
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -60,7 +63,7 @@ fun SearchBar(
         ) {
             Icon(
                 painter = painterResource(Res.drawable.ic_search),
-                contentDescription = "Search",
+                contentDescription = stringResource(Res.string.search),
                 tint = Color.Unspecified,
                 modifier = Modifier.size(20.dp)
             )
@@ -95,7 +98,7 @@ fun SearchBar(
                     ) {
                         if (searchQuery.isEmpty()) {
                             Text(
-                                text = "Search conversations...",
+                                text = stringResource(Res.string.search_conversations),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f)
                             )

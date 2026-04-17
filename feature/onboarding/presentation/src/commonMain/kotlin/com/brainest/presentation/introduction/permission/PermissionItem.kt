@@ -30,7 +30,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.permission_denied
+import brainest.feature.onboarding.presentation.generated.resources.permission_granted
+import brainest.feature.onboarding.presentation.generated.resources.permission_permanently_denied
+import brainest.feature.onboarding.presentation.generated.resources.permission_state_denied
+import brainest.feature.onboarding.presentation.generated.resources.permission_state_granted
 import com.scelio.brainest.presentation.permission.PermissionState
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PermissionItem(
@@ -69,14 +76,14 @@ fun PermissionItem(
                 when {
                     targetState == PermissionState.GRANTED -> Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Granted",
+                        contentDescription = stringResource(Res.string.permission_state_granted),
                         tint = Color(0xFF4CAF50),
                         modifier = Modifier.size(24.dp)
                     )
                     targetState == PermissionState.DENIED ||
                             targetState == PermissionState.PERMANENTLY_DENIED -> Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Denied",
+                        contentDescription = stringResource(Res.string.permission_state_denied),
                         tint = Color(0xFFE57373),
                         modifier = Modifier.size(24.dp)
                     )
@@ -106,9 +113,9 @@ fun PermissionItem(
 
             Text(
                 text = when (state) {
-                    PermissionState.GRANTED            -> "Permission granted"
-                    PermissionState.DENIED             -> "Permission denied"
-                    PermissionState.PERMANENTLY_DENIED -> "Permanently denied — open Settings to enable"
+                    PermissionState.GRANTED -> stringResource(Res.string.permission_granted)
+                    PermissionState.DENIED -> stringResource(Res.string.permission_denied)
+                    PermissionState.PERMANENTLY_DENIED -> stringResource(Res.string.permission_permanently_denied)
                     PermissionState.NOT_DETERMINED     -> description
                 },
                 style = MaterialTheme.typography.bodyMedium.copy(

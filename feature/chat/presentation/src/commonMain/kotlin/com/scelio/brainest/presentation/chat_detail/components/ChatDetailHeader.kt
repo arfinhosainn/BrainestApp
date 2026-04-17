@@ -21,8 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.ask_anything
+import brainest.feature.chat.presentation.generated.resources.close_chat
+import brainest.feature.chat.presentation.generated.resources.open_recent_chats
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.extended
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +40,7 @@ fun ChatDetailHeader(
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "Ask Anything",
+                text = stringResource(Res.string.ask_anything),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -53,7 +58,7 @@ fun ChatDetailHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Open recent chats",
+                    contentDescription = stringResource(Res.string.open_recent_chats),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.extended.textSecondary
                 )
@@ -72,7 +77,7 @@ fun ChatDetailHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Close chat",
+                    contentDescription = stringResource(Res.string.close_chat),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.extended.textSecondary
                 )

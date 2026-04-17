@@ -20,10 +20,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import brainest.feature.home.presentation.generated.resources.Res
+import brainest.feature.home.presentation.generated.resources.home_completed
+import brainest.feature.home.presentation.generated.resources.home_missed
+import brainest.feature.home.presentation.generated.resources.home_points
 import brainest.feature.home.presentation.generated.resources.ic_check
 import brainest.feature.home.presentation.generated.resources.ic_close
 import brainest.feature.home.presentation.generated.resources.ic_2point
 import brainest.feature.home.presentation.generated.resources.ic_8point
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -72,7 +76,7 @@ internal fun StudyDayItem(
             StudyDayStatus.Completed -> {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_check),
-                    contentDescription = "Completed",
+                    contentDescription = stringResource(Res.string.home_completed),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(35.dp),
                 )
@@ -80,7 +84,7 @@ internal fun StudyDayItem(
             StudyDayStatus.Missed -> {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_close),
-                    contentDescription = "Missed",
+                    contentDescription = stringResource(Res.string.home_missed),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(35.dp),
                 )
@@ -97,7 +101,7 @@ internal fun StudyDayItem(
         }
 
         Text(
-            text = day.label,
+            text = stringResource(day.label),
             style = MaterialTheme.typography.labelMedium,
             color = labelColor,
         )
@@ -130,7 +134,7 @@ private fun PointsBadge(
     
     Icon(
         imageVector = icon,
-        contentDescription = "$points points",
+        contentDescription = stringResource(Res.string.home_points, points),
         tint = Color.Unspecified,
         modifier = modifier.size(32.dp),
     )

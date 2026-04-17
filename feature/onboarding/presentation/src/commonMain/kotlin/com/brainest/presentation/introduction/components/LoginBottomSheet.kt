@@ -23,12 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.onboarding.presentation.generated.resources.Res
 import brainest.feature.onboarding.presentation.generated.resources.apple
+import brainest.feature.onboarding.presentation.generated.resources.continue_with_apple
+import brainest.feature.onboarding.presentation.generated.resources.continue_with_email
+import brainest.feature.onboarding.presentation.generated.resources.continue_with_google
 import brainest.feature.onboarding.presentation.generated.resources.google
 import brainest.feature.onboarding.presentation.generated.resources.mail
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.designsystem.extended
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -64,7 +68,7 @@ fun LoginBottomSheet(
             // Continue with Apple
 
             BrainestButton(
-                text = "Continue with Apple",
+                text = stringResource(Res.string.continue_with_apple),
                 onClick = onContinueWithApple,
                 modifier = modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -83,7 +87,7 @@ fun LoginBottomSheet(
 
             // Continue with Google
             BrainestButton(
-                text = "Continue with Google",
+                text = stringResource(Res.string.continue_with_google),
                 onClick = onContinueWithGoogle,
                 modifier = modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -106,7 +110,7 @@ fun LoginBottomSheet(
 
             // Continue with Email
             BrainestButton(
-                text = "Continue with Email",
+                text = stringResource(Res.string.continue_with_email),
                 onClick = onContinueWithEmail,
                 modifier = modifier.fillMaxWidth(),
                 leadingIcon = {

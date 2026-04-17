@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- Quiz Screen -->
+    <string name="quiz_title">Quiz</string>
+    <string name="quiz_playing_title">Playing quiz</string>
+    <string name="quiz_back">Back</string>
+    <string name="quiz_results_title">Quiz results</string>
+    <string name="quiz_answered_count">%1$s answered</string>
+    <string name="quiz_total_count">%1$s total</string>
+    <string name="quiz_score_format">%1$s%%</string>
+    <string name="quiz_result_summary">You got %1$s out of %2$s correct</string>
+    <string name="quiz_stat_answered">Answered</string>
+    <string name="quiz_stat_correct">Correct</string>
+    <string name="quiz_stat_wrong">Wrong</string>
+    <string name="quiz_retry">Retry quiz</string>
+    <string name="quiz_loading">Loading quiz...</string>
+    <string name="quiz_no_questions">No quiz questions available.</string>
+    <string name="quiz_previous">Previous</string>
+    <string name="quiz_next">Next</string>
+    <string name="quiz_hint">Hint</string>
+    <string name="quiz_hints_left">You have %1$s hints</string>
+    <string name="quiz_no_hints">No hints left</string>
+    <string name="quiz_error_load">Failed to load quiz: %1$s</string>
+    <string name="quiz_error_progress">Failed to load quiz progress: %1$s</string>
+    <string name="quiz_error_save">Failed to save quiz: %1$s</string>
+    <string name="quiz_error_save_progress">Failed to save quiz progress: %1$s</string>
+    <string name="quiz_error_empty">No quiz questions were generated.</string>
+
+    <!-- Study Sets Screen -->
+    <string name="study_sets_title">Study Sets</string>
+    <string name="study_set_detail_title">Study set</string>
+    <string name="study_sets_empty">No study sets yet.</string>
+    <string name="study_sets_empty_hint">Tap + to upload or record your first set.</string>
+    <string name="study_sets_add">Add study set</string>
+    <string name="flashcards">Flashcards</string>
+    <string name="quiz">Quiz</string>
+    <string name="stat_flashcards">Flashcards</string>
+    <string name="stat_quiz">Quiz</string>
+    <string name="stat_swiped">Swiped</string>
+    <string name="stat_completed">Completed</string>
+    <string name="stat_answered">Answered</string>
+    <string name="stat_correct">Correct</string>
+    <string name="stat_wrong">Wrong</string>
+    <string name="generating_flashcards">Generating flashcards</string>
+    <string name="generating_quiz">Generating quiz</string>
+    <string name="generating">Generating</string>
+    <string name="smart_notes">Smart notes</string>
+    <string name="generating_smart_notes">Generating smart notes...</string>
+    <string name="smart_notes_empty">Smart notes will appear here once generated.</string>
+    <string name="generate_smart_notes">Generate smart notes</string>
+
+    <string name="generate_content_title">Generate content</string>
+    <string name="generate_content_count_label">Number of questions/cards</string>
+    <string name="generate_content_multiple_choice">Multiple choice (4 options)</string>
+    <string name="audio_record">Record Audio</string>
+    <string name="audio_upload">Upload Audio</string>
+    <string name="documents_upload">Upload Documents</string>
+    <string name="audio_title">Audio</string>
+    <string name="listening">Listening...</string>
+    <string name="preparing_study_set">Preparing study set...</string>
+    <string name="preparing_study_set_hint">This can take a few seconds.</string>
+    <string name="mic_permission_blocked">Microphone permission is blocked. Enable it in Settings.</string>
+    <string name="mic_permission_needed">Microphone permission is needed to record audio.</string>
+    <string name="mic_permission_requesting">Requesting microphone permission...</string>
+    <string name="flashcard_dont_know">DON'T KNOW</string>
+    <string name="flashcard_know">KNOW</string>
+    <string name="flashcard_question_format">Question %1$d</string>
+    <string name="flashcard_answer_format">Answer %1$d</string>
+    <string name="flashcard_hint">Tap to flip • Swipe to continue</string>
+    <string name="flashcard_reviewed_count">%1$d of %2$d cards reviewed</string>
+    <string name="flashcard_dont_know_button">Don't Know</string>
+    <string name="flashcard_know_button">Know</string>
+    <string name="flashcards_empty">No flashcards yet.</string>
+    <string name="flashcards_empty_hint">Tap + to generate your first deck.</string>
+    <string name="upload_documents">Upload documents</string>
+    <string name="flashcard_item_generated">Generated</string>
+    <string name="flashcard_item_cards">Cards</string>
+    <string name="flashcard_item_swiped">Swiped</string>
+    <string name="flashcard_item_review">REVIEW</string>
+    <string name="quiz_question_index">%1$d/%2$d</string>
+    <string name="quiz_option_correct_answer">Correct answer</string>
+    <string name="quiz_option_your_answer">Your answer</string>
+</resources>

@@ -22,6 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.flashcards
+import brainest.feature.study.presentation.generated.resources.generate_content_count_label
+import brainest.feature.study.presentation.generated.resources.generate_content_multiple_choice
+import brainest.feature.study.presentation.generated.resources.generate_content_title
+import brainest.feature.study.presentation.generated.resources.quiz
+import org.jetbrains.compose.resources.stringResource
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateContentBottomSheet(
@@ -52,14 +60,14 @@ fun GenerateContentBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Generate content",
+                text = stringResource(Res.string.generate_content_title),
                 style = MaterialTheme.typography.titleMedium
             )
 
             OutlinedTextField(
                 value = countText,
                 onValueChange = onCountChange,
-                label = { Text("Number of questions/cards") },
+                label = { Text(stringResource(Res.string.generate_content_count_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -70,7 +78,7 @@ fun GenerateContentBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Multiple choice (4 options)",
+                        text = stringResource(Res.string.generate_content_multiple_choice),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.weight(1f))
@@ -90,7 +98,7 @@ fun GenerateContentBottomSheet(
                         onClick = onGenerateFlashcards,
                         modifier = Modifier.weight(1f).height(48.dp)
                     ) {
-                        Text("Flashcards")
+                        Text(stringResource(Res.string.flashcards))
                     }
                 }
                 if (showQuiz) {
@@ -98,7 +106,7 @@ fun GenerateContentBottomSheet(
                         onClick = onGenerateQuiz,
                         modifier = Modifier.weight(1f).height(48.dp)
                     ) {
-                        Text("Quiz")
+                        Text(stringResource(Res.string.quiz))
                     }
                 }
             }

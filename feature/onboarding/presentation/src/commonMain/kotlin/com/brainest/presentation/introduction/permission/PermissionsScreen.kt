@@ -35,6 +35,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.onboarding.presentation.generated.resources.Res
+import brainest.feature.onboarding.presentation.generated.resources.allow_permissions
+import brainest.feature.onboarding.presentation.generated.resources.best_experience_access
+import brainest.feature.onboarding.presentation.generated.resources.camera
+import brainest.feature.onboarding.presentation.generated.resources.camera_permission_description
+import brainest.feature.onboarding.presentation.generated.resources.enable_permission
+import brainest.feature.onboarding.presentation.generated.resources.microphone
+import brainest.feature.onboarding.presentation.generated.resources.microphone_permission_description
+import brainest.feature.onboarding.presentation.generated.resources.notifications
+import brainest.feature.onboarding.presentation.generated.resources.notifications_permission_description
+import brainest.feature.onboarding.presentation.generated.resources.skip_for_now
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.designsystem.Typography
@@ -43,6 +54,7 @@ import com.scelio.brainest.presentation.permission.Permission
 import com.scelio.brainest.presentation.permission.PermissionState
 import com.scelio.brainest.presentation.permission.rememberPermissionController
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -81,7 +93,7 @@ fun PermissionScreenOnboarding(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Enable Permission",
+                text = stringResource(Res.string.enable_permission),
                 style = TextStyle(
                     fontFamily = BricolageGrotesq,
                     fontSize = 28.sp,
@@ -96,7 +108,7 @@ fun PermissionScreenOnboarding(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "To get the best experience, we'd like access to:",
+                text = stringResource(Res.string.best_experience_access),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal
@@ -115,8 +127,8 @@ fun PermissionScreenOnboarding(
                 PermissionItem(
                     modifier = Modifier.padding(20.dp),
                     icon = Icons.Outlined.Menu,
-                    title = "Camera",
-                    description = "Snap photos of your math problems to solve them instantly.",
+                    title = stringResource(Res.string.camera),
+                    description = stringResource(Res.string.camera_permission_description),
                     state = permissionStates[Permission.CAMERA] ?: PermissionState.NOT_DETERMINED
                 )
             }
@@ -131,8 +143,8 @@ fun PermissionScreenOnboarding(
                 PermissionItem(
                     modifier = Modifier.padding(20.dp),
                     icon = Icons.Outlined.Create,
-                    title = "Microphone",
-                    description = "Use voice commands to ask questions and get help.",
+                    title = stringResource(Res.string.microphone),
+                    description = stringResource(Res.string.microphone_permission_description),
                     state = permissionStates[Permission.MICROPHONE] ?: PermissionState.NOT_DETERMINED
                 )
             }
@@ -147,8 +159,8 @@ fun PermissionScreenOnboarding(
                 PermissionItem(
                     modifier = Modifier.padding(20.dp),
                     icon = Icons.Outlined.Notifications,
-                    title = "Notifications",
-                    description = "Stay updated with reminders and learning alerts.",
+                    title = stringResource(Res.string.notifications),
+                    description = stringResource(Res.string.notifications_permission_description),
                     state = permissionStates[Permission.NOTIFICATIONS] ?: PermissionState.NOT_DETERMINED
                 )
             }
@@ -156,7 +168,7 @@ fun PermissionScreenOnboarding(
             Spacer(modifier = Modifier.height(48.dp))
 
             BrainestButton(
-                text = "Allow Permissions",
+                text = stringResource(Res.string.allow_permissions),
                 onClick = {
                     scope.launch {
                         permissionsToRequest.forEach { permission ->
@@ -197,7 +209,7 @@ fun PermissionScreenOnboarding(
                 )
             ) {
                 Text(
-                    text = "Skip for now",
+                    text = stringResource(Res.string.skip_for_now),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium

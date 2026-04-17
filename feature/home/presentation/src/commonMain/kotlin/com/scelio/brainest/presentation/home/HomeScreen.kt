@@ -25,11 +25,18 @@ import com.scelio.brainest.presentation.home.components.HomeStatsGrid
 import com.scelio.brainest.presentation.home.components.StudyDayUi
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import brainest.feature.home.presentation.generated.resources.Res
+import brainest.feature.home.presentation.generated.resources.home_days_value
+import brainest.feature.home.presentation.generated.resources.home_decks_label
+import brainest.feature.home.presentation.generated.resources.home_earned_label
+import brainest.feature.home.presentation.generated.resources.home_points_value
+import brainest.feature.home.presentation.generated.resources.home_quizzes_label
+import brainest.feature.home.presentation.generated.resources.home_streak_label
 import brainest.feature.home.presentation.generated.resources.ic_bronze
 import brainest.feature.home.presentation.generated.resources.ic_lesson
 import brainest.feature.home.presentation.generated.resources.ic_vocab
 import brainest.feature.home.presentation.generated.resources.ic_yellow_fire
 import com.scelio.brainest.designsystem.components.vip.vipcard.VipUpgradeCard
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -101,23 +108,23 @@ fun HomeScreen(
         HomeStatsGrid(
             stats = listOf(
                 HomeStatCardUi(
-                    value = "$streakDays Days",
-                    label = "Streak",
+                    value = stringResource(Res.string.home_days_value, streakDays),
+                    label = stringResource(Res.string.home_streak_label),
                     icon = Res.drawable.ic_yellow_fire,
                 ),
                 HomeStatCardUi(
                     value = decks.toString(),
-                    label = "Decks",
+                    label = stringResource(Res.string.home_decks_label),
                     icon = Res.drawable.ic_lesson,
                 ),
                 HomeStatCardUi(
                     value = quizzes.toString(),
-                    label = "Quizzes",
+                    label = stringResource(Res.string.home_quizzes_label),
                     icon = Res.drawable.ic_vocab,
                 ),
                 HomeStatCardUi(
-                    value = "$earnedPoints Pts",
-                    label = "Earned",
+                    value = stringResource(Res.string.home_points_value, earnedPoints),
+                    label = stringResource(Res.string.home_earned_label),
                     icon = Res.drawable.ic_bronze,
                 ),
             ),

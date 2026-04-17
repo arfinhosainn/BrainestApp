@@ -35,11 +35,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.add_caption_1_image
+import brainest.feature.chat.presentation.generated.resources.add_caption_x_images
+import brainest.feature.chat.presentation.generated.resources.add_message_about_document
+import brainest.feature.chat.presentation.generated.resources.ask_follow_up
+import brainest.feature.chat.presentation.generated.resources.follow_up_placeholder
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.domain.chat.ImageEncoder
 import com.scelio.brainest.presentation.chat_detail.UploadedDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -147,10 +154,12 @@ fun MessageInputBox(
                             ) {
                                 if (textFieldState.text.isEmpty()) {
                                     Text(
-                                        text = getPlaceholderText(
-                                            selectedImages.size,
-                                            selectedDocument
-                                        ),
+                                        text = when {
+                                            selectedDocument != null -> stringResource(Res.string.add_message_about_document)
+                                            selectedImages.size > 1 -> stringResource(Res.string.add_caption_x_images, selectedImages.size)
+                                            selectedImages.size == 1 -> stringResource(Res.string.add_caption_1_image)
+                                            else -> stringResource(Res.string.ask_follow_up)
+                                        },
                                         style = TextStyle(
                                             fontSize = 16.sp,
                                             lineHeight = 20.sp,
@@ -178,20 +187,11 @@ fun MessageInputBox(
 }
 
 
-private fun getPlaceholderText(imageCount: Int, document: UploadedDocument?): String {
-    return when {
-        document != null -> "Add a message about this document"
-        imageCount > 1 -> "Add a caption ($imageCount images)"
-        imageCount == 1 -> "Add a caption (1 image)"
-        else -> "Ask a Follow-Up"
-    }
-}
-
-
 @Preview(showBackground = true, name = "With Text Typed")
 @Composable
 private fun MessageInputBoxPreview_WithText() {
-    val textState = remember { TextFieldState("Here's my follow-up question...") }
+    val placeholder = stringResource(Res.string.follow_up_placeholder)
+    val textState = remember(placeholder) { TextFieldState(placeholder) }
 
     Column {
 

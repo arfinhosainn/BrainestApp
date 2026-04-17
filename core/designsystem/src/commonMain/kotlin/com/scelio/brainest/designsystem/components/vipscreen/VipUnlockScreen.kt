@@ -43,9 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.arrow_left_icon
+import brainest.core.designsystem.generated.resources.back
+import brainest.core.designsystem.generated.resources.get_premium
+import brainest.core.designsystem.generated.resources.get_vip
 import brainest.core.designsystem.generated.resources.ic_unlock_premium
+import brainest.core.designsystem.generated.resources.unlock_more_exciting_new_lessons
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.Typography
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -54,9 +59,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun VipUnlockScreen(
     modifier: Modifier = Modifier,
-    title: String = "Get VIP",
-    headline: String = "Unlock more exciting\nnew lessons",
-    ctaText: String = "Get VIP",
+    title: String = stringResource(Res.string.get_vip),
+    headline: String = stringResource(Res.string.unlock_more_exciting_new_lessons),
+    ctaText: String = stringResource(Res.string.get_vip),
     onBackClick: () -> Unit = {},
     onCtaClick: () -> Unit = {},
 ) {
@@ -91,7 +96,7 @@ fun VipUnlockScreen(
                     ) {
                         Icon(
                             imageVector = vectorResource(Res.drawable.arrow_left_icon),
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.back),
                             tint = Color.White,
                             modifier = Modifier.size(18.dp),
                         )
@@ -109,7 +114,7 @@ fun VipUnlockScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = {  },
+                    onClick = onCtaClick,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
@@ -117,7 +122,7 @@ fun VipUnlockScreen(
                     )
                 ) {
                     Text(
-                        text = "Get Premium",
+                        text = stringResource(Res.string.get_premium),
                         style = TextStyle(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -189,7 +194,7 @@ private fun VipTopBar(
         ) {
             androidx.compose.material3.Icon(
                 imageVector = vectorResource(Res.drawable.arrow_left_icon),
-                contentDescription = "Back",
+                contentDescription = stringResource(Res.string.back),
                 tint = Color.White,
                 modifier = Modifier.size(18.dp),
             )

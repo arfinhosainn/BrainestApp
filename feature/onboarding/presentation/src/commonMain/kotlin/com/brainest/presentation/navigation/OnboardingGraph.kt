@@ -26,6 +26,7 @@ import brainest.feature.onboarding.presentation.generated.resources.english
 import brainest.feature.onboarding.presentation.generated.resources.french
 import brainest.feature.onboarding.presentation.generated.resources.german
 import brainest.feature.onboarding.presentation.generated.resources.spanish
+import brainest.feature.onboarding.presentation.generated.resources.*
 import com.brainest.presentation.introduction.IntroductionScreen
 import com.brainest.presentation.introduction.UserReviewScreen
 import com.brainest.presentation.introduction.WelcomeScreen
@@ -48,6 +49,7 @@ import com.brainest.presentation.onboarding.OnboardingAction
 import com.brainest.presentation.onboarding.OnboardingFlowSteps
 import com.brainest.presentation.onboarding.OnboardingStepId
 import com.brainest.presentation.onboarding.OnboardingViewModel
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -92,15 +94,15 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             NameInputScreen(
-                title = "What's your name?",
-                subtitle = "This helps us personalize your experience",
-                stepLabel = "About You",
+                title = stringResource(Res.string.what_is_your_name),
+                subtitle = stringResource(Res.string.personalize_experience),
+                stepLabel = stringResource(Res.string.about_you),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Name),
                 totalSteps = OnboardingFlowSteps.totalSteps,
                 inputValue = state.name,
                 onInputValueChange = { viewModel.onAction(OnboardingAction.NameChanged(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Grade) },
-                placeholder = "Your Name"
+                placeholder = stringResource(Res.string.your_name)
             )
         }
 
@@ -109,12 +111,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             GradeScreen(
-                title = "What's your grade level?",
-                subtitle = "We'll tailor your learning path accordingly",
-                stepLabel = "About You",
+                title = stringResource(Res.string.what_is_your_grade),
+                subtitle = stringResource(Res.string.tailor_learning_path),
+                stepLabel = stringResource(Res.string.about_you),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Grade),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = gradeOptions,
+                options = gradeOptions(),
                 selectedOptionId = state.gradeId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.GradeSelected(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Subjects) }
@@ -126,12 +128,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             SelectSubjectScreen(
-                title = "What subjects are you studying?",
-                subtitle = "Select all that apply",
-                stepLabel = "About You",
+                title = stringResource(Res.string.what_subjects_studying),
+                subtitle = stringResource(Res.string.select_all_apply),
+                stepLabel = stringResource(Res.string.about_you),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Subjects),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = subjectOptions,
+                options = subjectOptions(),
                 selectedOptionIds = state.subjectIds,
                 onOptionToggle = { viewModel.onAction(OnboardingAction.SubjectToggled(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Goal) },
@@ -147,12 +149,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             GoalScreen(
-                title = "What's your main goal?",
-                subtitle = "We'll build a plan that gets you there",
-                stepLabel = "Goals",
+                title = stringResource(Res.string.what_is_your_goal),
+                subtitle = stringResource(Res.string.build_plan_goal),
+                stepLabel = stringResource(Res.string.goals_label),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Goal),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = goalOptions,
+                options = goalOptions(),
                 selectedOptionId = state.goalId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.GoalSelected(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Growth) }
@@ -164,12 +166,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             SelectSubjectScreen(
-                title = "What challenges are you facing?",
-                subtitle = "Select all that apply",
-                stepLabel = "Challenges",
+                title = stringResource(Res.string.what_challenges_facing),
+                subtitle = stringResource(Res.string.select_all_apply),
+                stepLabel = stringResource(Res.string.challenges_label),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Challenges),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = challengeOptions,
+                options = challengeOptions(),
                 selectedOptionIds = state.challengeIds,
                 onOptionToggle = { viewModel.onAction(OnboardingAction.ChallengeToggled(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Survey) },
@@ -185,9 +187,9 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             StudyHoursScreen(
-                title = "How many hours do you study daily?",
-                subtitle = "This helps us plan your schedule",
-                stepLabel = "Survey",
+                title = stringResource(Res.string.how_many_hours_study),
+                subtitle = stringResource(Res.string.help_plan_schedule),
+                stepLabel = stringResource(Res.string.survey_label),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Survey),
                 totalSteps = OnboardingFlowSteps.totalSteps,
                 hours = state.studyHours,
@@ -201,12 +203,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             LearningMethodScreen(
-                title = "How do you learn best?",
-                subtitle = "We'll personalize your experience",
-                stepLabel = "Learning Style",
+                title = stringResource(Res.string.how_do_you_learn_best),
+                subtitle = stringResource(Res.string.personalize_experience_short),
+                stepLabel = stringResource(Res.string.learning_style_label),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.LearningMethod),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = learningMethodOptions,
+                options = learningMethodOptions(),
                 selectedOptionId = state.learningMethodId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.LearningMethodSelected(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.StudyTime) }
@@ -218,12 +220,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             StudyTimeScreen(
-                title = "When do you usually study?",
-                subtitle = "We'll schedule your sessions at the right time",
-                stepLabel = "Learning Style",
+                title = stringResource(Res.string.when_do_you_study),
+                subtitle = stringResource(Res.string.schedule_sessions_time),
+                stepLabel = stringResource(Res.string.learning_style_label),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.StudyTime),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = studyTimeOptions,
+                options = studyTimeOptions(),
                 selectedOptionId = state.studyTimeId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.StudyTimeSelected(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Language) }
@@ -235,12 +237,12 @@ fun NavGraphBuilder.onboardingGraph(
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             LanguageSelectionScreen(
-                title = "Select your language",
-                subtitle = "We'll localize the experience for you",
-                stepLabel = "Personalization",
+                title = stringResource(Res.string.select_your_language),
+                subtitle = stringResource(Res.string.localize_experience),
+                stepLabel = stringResource(Res.string.personalization_label),
                 currentStep = OnboardingFlowSteps.indexOf(OnboardingStepId.Language),
                 totalSteps = OnboardingFlowSteps.totalSteps,
-                options = languageOptions,
+                options = languageOptions(),
                 selectedOptionId = state.languageId,
                 onOptionSelected = { viewModel.onAction(OnboardingAction.LanguageSelected(it)) },
                 onContinueClicked = { navController.navigate(OnboardingGraphRoutes.Review) }
@@ -276,64 +278,71 @@ private fun rememberOnboardingViewModel(
     return koinViewModel(viewModelStoreOwner = parentEntry)
 }
 
-private val gradeOptions = listOf(
-    SelectionOptionData(id = "elementary", label = "Elementary (Grade 1-5)"),
-    SelectionOptionData(id = "middle_school", label = "Middle School (Grade 6-8)"),
-    SelectionOptionData(id = "high_school", label = "High School (Grade 9-12)"),
-    SelectionOptionData(id = "undergraduate", label = "Undergraduate"),
-    SelectionOptionData(id = "postgraduate", label = "Postgraduate")
+@Composable
+private fun gradeOptions() = listOf(
+    SelectionOptionData(id = "elementary", label = stringResource(Res.string.elementary)),
+    SelectionOptionData(id = "middle_school", label = stringResource(Res.string.middle_school)),
+    SelectionOptionData(id = "high_school", label = stringResource(Res.string.high_school)),
+    SelectionOptionData(id = "undergraduate", label = stringResource(Res.string.undergraduate)),
+    SelectionOptionData(id = "postgraduate", label = stringResource(Res.string.postgraduate))
 )
 
-private val subjectOptions = listOf(
-    MultiSelectOptionData(id = "math", label = "Mathematics"),
-    MultiSelectOptionData(id = "science", label = "Science"),
-    MultiSelectOptionData(id = "physics", label = "Physics"),
-    MultiSelectOptionData(id = "chemistry", label = "Chemistry"),
-    MultiSelectOptionData(id = "biology", label = "Biology"),
-    MultiSelectOptionData(id = "history", label = "History"),
-    MultiSelectOptionData(id = "geography", label = "Geography"),
-    MultiSelectOptionData(id = "english", label = "English"),
-    MultiSelectOptionData(id = "literature", label = "Literature"),
-    MultiSelectOptionData(id = "computer_science", label = "Computer Science")
+@Composable
+private fun subjectOptions() = listOf(
+    MultiSelectOptionData(id = "math", label = stringResource(Res.string.math)),
+    MultiSelectOptionData(id = "science", label = stringResource(Res.string.science)),
+    MultiSelectOptionData(id = "physics", label = stringResource(Res.string.physics)),
+    MultiSelectOptionData(id = "chemistry", label = stringResource(Res.string.chemistry)),
+    MultiSelectOptionData(id = "biology", label = stringResource(Res.string.biology)),
+    MultiSelectOptionData(id = "history", label = stringResource(Res.string.history)),
+    MultiSelectOptionData(id = "geography", label = stringResource(Res.string.geography)),
+    MultiSelectOptionData(id = "english", label = stringResource(Res.string.english)),
+    MultiSelectOptionData(id = "literature", label = stringResource(Res.string.literature)),
+    MultiSelectOptionData(id = "computer_science", label = stringResource(Res.string.computer_science))
 )
 
-private val goalOptions = listOf(
-    SelectGradeOption(id = "improve_grades", label = "Improve My Grades"),
-    SelectGradeOption(id = "prepare_exams", label = "Prepare for Exams"),
-    SelectGradeOption(id = "learn_new_skills", label = "Learn New Skills"),
-    SelectGradeOption(id = "stay_consistent", label = "Stay Consistent Daily"),
-    SelectGradeOption(id = "get_ahead", label = "Get Ahead of Class")
+@Composable
+private fun goalOptions() = listOf(
+    SelectGradeOption(id = "improve_grades", label = stringResource(Res.string.improve_grades)),
+    SelectGradeOption(id = "prepare_exams", label = stringResource(Res.string.prepare_exams)),
+    SelectGradeOption(id = "learn_new_skills", label = stringResource(Res.string.learn_new_skills)),
+    SelectGradeOption(id = "stay_consistent", label = stringResource(Res.string.stay_consistent)),
+    SelectGradeOption(id = "get_ahead", label = stringResource(Res.string.get_ahead))
 )
 
-private val challengeOptions = listOf(
-    MultiSelectOptionData(id = "focus", label = "Staying focused"),
-    MultiSelectOptionData(id = "time_management", label = "Time management"),
-    MultiSelectOptionData(id = "understanding", label = "Understanding concepts"),
-    MultiSelectOptionData(id = "exam_anxiety", label = "Exam anxiety"),
-    MultiSelectOptionData(id = "motivation", label = "Motivation"),
-    MultiSelectOptionData(id = "note_taking", label = "Note-taking")
+@Composable
+private fun challengeOptions() = listOf(
+    MultiSelectOptionData(id = "focus", label = stringResource(Res.string.staying_focused)),
+    MultiSelectOptionData(id = "time_management", label = stringResource(Res.string.time_management)),
+    MultiSelectOptionData(id = "understanding", label = stringResource(Res.string.understanding_concepts)),
+    MultiSelectOptionData(id = "exam_anxiety", label = stringResource(Res.string.exam_anxiety)),
+    MultiSelectOptionData(id = "motivation", label = stringResource(Res.string.motivation)),
+    MultiSelectOptionData(id = "note_taking", label = stringResource(Res.string.note_taking))
 )
 
-private val learningMethodOptions = listOf(
-    LearningMethodsData(id = "videos", label = "Video Lessons"),
-    LearningMethodsData(id = "quizzes", label = "Quizzes and Practice Tests"),
-    LearningMethodsData(id = "flashcards", label = "Flashcards"),
-    LearningMethodsData(id = "reading", label = "Reading and Summaries"),
-    LearningMethodsData(id = "interactive", label = "Interactive Exercises")
+@Composable
+private fun learningMethodOptions() = listOf(
+    LearningMethodsData(id = "videos", label = stringResource(Res.string.video_lessons)),
+    LearningMethodsData(id = "quizzes", label = stringResource(Res.string.quizzes_practice)),
+    LearningMethodsData(id = "flashcards", label = stringResource(Res.string.flashcards)),
+    LearningMethodsData(id = "reading", label = stringResource(Res.string.reading_summaries)),
+    LearningMethodsData(id = "interactive", label = stringResource(Res.string.interactive_exercises))
 )
 
-private val studyTimeOptions = listOf(
-    StudyTimeData(id = "early_morning", label = "Early Morning (5AM - 8AM)"),
-    StudyTimeData(id = "morning", label = "Morning (8AM - 12PM)"),
-    StudyTimeData(id = "afternoon", label = "Afternoon (12PM - 5PM)"),
-    StudyTimeData(id = "evening", label = "Evening (5PM - 9PM)"),
-    StudyTimeData(id = "night", label = "Night (9PM - 12AM)")
+@Composable
+private fun studyTimeOptions() = listOf(
+    StudyTimeData(id = "early_morning", label = stringResource(Res.string.early_morning)),
+    StudyTimeData(id = "morning", label = stringResource(Res.string.morning)),
+    StudyTimeData(id = "afternoon", label = stringResource(Res.string.afternoon)),
+    StudyTimeData(id = "evening", label = stringResource(Res.string.evening)),
+    StudyTimeData(id = "night", label = stringResource(Res.string.night))
 )
 
-private val languageOptions = listOf(
+@Composable
+private fun languageOptions() = listOf(
     LanguageData(
         id = "english",
-        label = "English",
+        label = stringResource(Res.string.english),
         icon = {
             Box(
                 modifier = Modifier
@@ -349,7 +358,7 @@ private val languageOptions = listOf(
         }),
     LanguageData(
         id = "arabic",
-        label = "Arabic",
+        label = stringResource(Res.string.arabic),
         icon = {
             Box(
                 modifier = Modifier
@@ -365,7 +374,7 @@ private val languageOptions = listOf(
         }),
     LanguageData(
         id = "french",
-        label = "French",
+        label = stringResource(Res.string.french),
         icon = {
             Box(
                 modifier = Modifier
@@ -381,7 +390,7 @@ private val languageOptions = listOf(
         }),
     LanguageData(
         id = "spanish",
-        label = "Spanish",
+        label = stringResource(Res.string.spanish),
         icon = {
             Box(
                 modifier = Modifier
@@ -397,7 +406,7 @@ private val languageOptions = listOf(
         }),
     LanguageData(
         id = "german",
-        label = "German",
+        label = stringResource(Res.string.german),
         icon = {
             Box(
                 modifier = Modifier
@@ -413,7 +422,7 @@ private val languageOptions = listOf(
         }),
     LanguageData(
         id = "chinese",
-        label = "Chinese",
+        label = stringResource(Res.string.chinese),
         icon = {
             Box(
                 modifier = Modifier

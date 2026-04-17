@@ -46,11 +46,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.flashcards
+import brainest.feature.study.presentation.generated.resources.generate_smart_notes
+import brainest.feature.study.presentation.generated.resources.generating
+import brainest.feature.study.presentation.generated.resources.generating_flashcards
+import brainest.feature.study.presentation.generated.resources.generating_quiz
+import brainest.feature.study.presentation.generated.resources.generating_smart_notes
+import brainest.feature.study.presentation.generated.resources.quiz_back
+import brainest.feature.study.presentation.generated.resources.quiz
+import brainest.feature.study.presentation.generated.resources.smart_notes
+import brainest.feature.study.presentation.generated.resources.smart_notes_empty
+import brainest.feature.study.presentation.generated.resources.study_set_detail_title
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.components.StudySetItem
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.Instant as KxInstant
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -105,12 +118,12 @@ fun StudySetDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TopAppBar(
-                        title = { Text(text = "Study set") },
+                        title = { Text(text = stringResource(Res.string.study_set_detail_title)) },
                         navigationIcon = {
                             IconButton(onClick = onBackClick) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
-                                    contentDescription = "Back"
+                                    contentDescription = stringResource(Res.string.quiz_back)
                                 )
                             }
                         },
@@ -136,13 +149,13 @@ fun StudySetDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         StudySetActionItem(
-                            title = "Flashcards",
+                            title = stringResource(Res.string.flashcards),
                             icon = Icons.Outlined.AutoStories,
                             enabled = !state.isGenerating,
                             onClick = { viewModel.generateFlashcards(DefaultGenerationCount) }
                         )
                         StudySetActionItem(
-                            title = "Quiz",
+                            title = stringResource(Res.string.quiz),
                             icon = Icons.Outlined.Quiz,
                             enabled = !state.isGenerating,
                             onClick = { viewModel.generateQuiz(DefaultGenerationCount, DefaultMultipleChoice) }
@@ -172,9 +185,9 @@ fun StudySetDetailScreen(
 
         if (state.isGenerating) {
             val generationLabel = when (state.generationTarget) {
-                GenerationTarget.Flashcards -> "Generating flashcards"
-                GenerationTarget.Quiz -> "Generating quiz"
-                null -> "Generating"
+                GenerationTarget.Flashcards -> stringResource(Res.string.generating_flashcards)
+                GenerationTarget.Quiz -> stringResource(Res.string.generating_quiz)
+                null -> stringResource(Res.string.generating)
             }
             Box(
                 modifier = Modifier
@@ -264,7 +277,7 @@ private fun SmartNotesSection(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Smart notes",
+            text = stringResource(Res.string.smart_notes),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
@@ -273,7 +286,7 @@ private fun SmartNotesSection(
         if (isLoading) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Generating smart notes...",
+                    text = stringResource(Res.string.generating_smart_notes),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -288,7 +301,7 @@ private fun SmartNotesSection(
         }
 
         Text(
-            text = "Smart notes will appear here once generated.",
+            text = stringResource(Res.string.smart_notes_empty),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -302,7 +315,7 @@ private fun SmartNotesSection(
         }
 
         TextButton(onClick = onRetry) {
-            Text(text = "Generate smart notes")
+            Text(text = stringResource(Res.string.generate_smart_notes))
         }
     }
 }

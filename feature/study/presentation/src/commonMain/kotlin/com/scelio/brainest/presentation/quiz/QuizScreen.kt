@@ -33,6 +33,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.quiz_answered_count
+import brainest.feature.study.presentation.generated.resources.quiz_back
+import brainest.feature.study.presentation.generated.resources.quiz_playing_title
+import brainest.feature.study.presentation.generated.resources.quiz_question_index
+import brainest.feature.study.presentation.generated.resources.quiz_result_summary
+import brainest.feature.study.presentation.generated.resources.quiz_results_title
+import brainest.feature.study.presentation.generated.resources.quiz_retry
+import brainest.feature.study.presentation.generated.resources.quiz_score_format
+import brainest.feature.study.presentation.generated.resources.quiz_stat_answered
+import brainest.feature.study.presentation.generated.resources.quiz_stat_correct
+import brainest.feature.study.presentation.generated.resources.quiz_stat_wrong
+import brainest.feature.study.presentation.generated.resources.quiz_total_count
 import brainest.feature.study.presentation.generated.resources.quizbackground
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
@@ -42,6 +54,7 @@ import com.scelio.brainest.presentation.quiz.components.QuizOptionState
 import com.scelio.brainest.presentation.quiz.components.QuizQuestionCard
 import com.scelio.brainest.presentation.quiz.components.QuizTopAppBar
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class QuizOptionUi(
@@ -75,7 +88,6 @@ fun QuizScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
-        // Background Image
         Image(
             painter = painterResource(Res.drawable.quizbackground),
             contentDescription = null,
@@ -90,7 +102,6 @@ fun QuizScreen(
                 .statusBarsPadding()
                 .padding(horizontal = 20.dp)
         ) {
-            // 1. Custom Top Bar (Centered Title + Back Button)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,7 +114,7 @@ fun QuizScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(Res.string.quiz_back),
                         tint = Color.White
                     )
                 }
@@ -145,7 +156,7 @@ fun QuizScreen(
 
             // 3. Question Index
             Text(
-                text = "$questionIndex/$totalQuestions",
+                text = stringResource(Res.string.quiz_question_index, questionIndex, totalQuestions),
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -229,9 +240,9 @@ fun QuizResultsScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             QuizTopAppBar(
-                title = "Quiz results",
-                timeLeftText = "$answeredQuestions answered",
-                totalTimeText = "$totalQuestions total",
+                title = stringResource(Res.string.quiz_results_title),
+                timeLeftText = stringResource(Res.string.quiz_answered_count, answeredQuestions),
+                totalTimeText = stringResource(Res.string.quiz_total_count, totalQuestions),
                 progress = 1f,
                 onBackClick = onBackClick
             )
@@ -241,8 +252,8 @@ fun QuizResultsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 QuizQuestionCard(
-                    title = "$scorePercent%",
-                    subtitle = "You got $correctAnswers out of $totalQuestions correct"
+                    title = stringResource(Res.string.quiz_score_format, scorePercent),
+                    subtitle = stringResource(Res.string.quiz_result_summary, correctAnswers, totalQuestions)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -251,9 +262,9 @@ fun QuizResultsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatSummary(label = "Answered", value = answeredQuestions.toString())
-                    StatSummary(label = "Correct", value = correctAnswers.toString())
-                    StatSummary(label = "Wrong", value = (answeredQuestions - correctAnswers).coerceAtLeast(0).toString())
+                    StatSummary(label = stringResource(Res.string.quiz_stat_answered), value = answeredQuestions.toString())
+                    StatSummary(label = stringResource(Res.string.quiz_stat_correct), value = correctAnswers.toString())
+                    StatSummary(label = stringResource(Res.string.quiz_stat_wrong), value = (answeredQuestions - correctAnswers).coerceAtLeast(0).toString())
                 }
             }
 
@@ -263,7 +274,7 @@ fun QuizResultsScreen(
                     .fillMaxWidth()
                     .height(52.dp)
             ) {
-                Text(text = "Retry quiz")
+                Text(text = stringResource(Res.string.quiz_retry))
             }
         }
     }
@@ -296,7 +307,7 @@ private fun PreviewQuizScreen() {
     BrainestTheme {
         Surface {
             QuizScreen(
-                title = "Playing quiz",
+                title = stringResource(Res.string.quiz_playing_title),
                 questionIndex = 14,
                 totalQuestions = 20,
                 question = "With over 222 million units sold, what is Apple's highest-selling iPhone model?",

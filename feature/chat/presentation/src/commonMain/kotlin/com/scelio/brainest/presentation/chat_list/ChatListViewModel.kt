@@ -9,9 +9,17 @@ import com.scelio.brainest.domain.models.CreateChatRequest
 import com.scelio.brainest.presentation.chat_list.components.ChatSystemPrompt
 import com.scelio.brainest.presentation.mappers.toUi
 import com.scelio.brainest.presentation.util.UiText
+import brainest.feature.chat.presentation.generated.resources.Res
+import brainest.feature.chat.presentation.generated.resources.failed_to_create_chat
+import brainest.feature.chat.presentation.generated.resources.failed_to_delete_chat
+import brainest.feature.chat.presentation.generated.resources.failed_to_load_chat
+import brainest.feature.chat.presentation.generated.resources.failed_to_search_chats
+import brainest.feature.chat.presentation.generated.resources.new_chat
+import brainest.feature.chat.presentation.generated.resources.not_logged_in
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 
 
@@ -71,7 +79,7 @@ class ChatListViewModel(
             } catch (e: Exception) {
                 _events.send(
                     ChatListEvent.ShowError(
-                        UiText.DynamicString(e.message ?: "Failed to search chats")
+                        e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_search_chats)
                     )
                 )
             }
@@ -97,7 +105,7 @@ class ChatListViewModel(
                 loadChats()
                 _events.send(
                     ChatListEvent.ShowError(
-                        UiText.DynamicString(e.message ?: "Failed to delete chat")
+                        e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_delete_chat)
                     )
                 )
             }
@@ -112,7 +120,7 @@ class ChatListViewModel(
             val userId = authService.currentUserId()
             if (userId.isNullOrBlank()) {
                 _state.update { it.copy(isLoading = false) }
-                _events.send(ChatListEvent.ShowError(UiText.DynamicString("Not logged in")))
+                _events.send(ChatListEvent.ShowError(UiText.Resource(Res.string.not_logged_in)))
                 return@launch
             }
 
@@ -125,7 +133,7 @@ class ChatListViewModel(
                 _state.update { it.copy(isLoading = false) }
                 _events.send(
                     ChatListEvent.ShowError(
-                        UiText.DynamicString(e.message ?: "Failed to load chats")
+                        e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_load_chat)
                     )
                 )
             }
@@ -138,7 +146,7 @@ class ChatListViewModel(
 
             val userId = authService.currentUserId()
             if (userId.isNullOrBlank()) {
-                _events.send(ChatListEvent.ShowError(UiText.DynamicString("Not logged in")))
+                _events.send(ChatListEvent.ShowError(UiText.Resource(Res.string.not_logged_in)))
                 return@launch
             }
 
@@ -148,7 +156,7 @@ class ChatListViewModel(
                 val chat = chatRepository.createChat(
                     CreateChatRequest(
                         userId = userId,
-                        title = "New chat",
+                        title = getString(Res.string.new_chat),
                         systemPrompt = ChatSystemPrompt
                     )
                 )
@@ -159,7 +167,7 @@ class ChatListViewModel(
                 _state.update { it.copy(isCreatingChat = false) }
                 _events.send(
                     ChatListEvent.ShowError(
-                        UiText.DynamicString(e.message ?: "Failed to create chat")
+                        e.message?.let { UiText.DynamicString(it) } ?: UiText.Resource(Res.string.failed_to_create_chat)
                     )
                 )
             }

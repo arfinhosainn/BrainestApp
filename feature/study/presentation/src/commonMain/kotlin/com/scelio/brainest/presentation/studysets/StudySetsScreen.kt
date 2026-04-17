@@ -37,6 +37,11 @@ import com.scelio.brainest.presentation.components.UploadDocsBottomSheet
 import com.scelio.brainest.presentation.flashcards.rememberDocumentPicker
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import brainest.feature.study.presentation.generated.resources.Res
+import brainest.feature.study.presentation.generated.resources.study_sets_add
+import brainest.feature.study.presentation.generated.resources.study_sets_empty
+import brainest.feature.study.presentation.generated.resources.study_sets_empty_hint
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
 import kotlinx.datetime.Instant as KxInstant
@@ -107,13 +112,13 @@ fun StudySetsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "No study sets yet.",
+                        text = stringResource(Res.string.study_sets_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Tap + to upload or record your first set.",
+                        text = stringResource(Res.string.study_sets_empty_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -155,7 +160,7 @@ fun StudySetsScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add study set"
+                contentDescription = stringResource(Res.string.study_sets_add)
             )
         }
 

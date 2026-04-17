@@ -33,10 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.core.designsystem.generated.resources.Res
 import brainest.core.designsystem.generated.resources.crown
+import brainest.core.designsystem.generated.resources.diamonds
 import brainest.core.designsystem.generated.resources.ic_diamond
 import brainest.core.designsystem.generated.resources.ic_settings
+import brainest.core.designsystem.generated.resources.profile_badge
+import brainest.core.designsystem.generated.resources.settings
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -46,7 +50,7 @@ fun HomeTopNavBar(
     modifier: Modifier = Modifier,
     notificationCount: Int = 0,
     badgeIcon: Painter = painterResource(Res.drawable.crown),
-    badgeContentDescription: String? = "Profile badge",
+    badgeContentDescription: String? = stringResource(Res.string.profile_badge),
     onSettingsClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
 ) {
@@ -86,7 +90,7 @@ fun HomeTopNavBar(
             )
             TopNavIconButton(
                 imageVector = vectorResource(Res.drawable.ic_settings),
-                contentDescription = "Settings",
+                contentDescription = stringResource(Res.string.settings),
                 onClick = onSettingsClick,
             )
         }
@@ -131,7 +135,7 @@ private fun DiamondCountChip(
 
         Icon(
             imageVector = vectorResource(Res.drawable.ic_diamond),
-            contentDescription = "Diamonds",
+            contentDescription = stringResource(Res.string.diamonds),
             modifier = Modifier
                 .size(34.dp)
                 .offset(x = (4).dp),

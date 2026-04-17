@@ -15,7 +15,10 @@ import androidx.compose.ui.unit.dp
 import brainest.feature.chat.presentation.generated.resources.Res
 import brainest.feature.chat.presentation.generated.resources.ic_arrow_up
 import brainest.feature.chat.presentation.generated.resources.ic_mic
+import brainest.feature.chat.presentation.generated.resources.record_voice
+import brainest.feature.chat.presentation.generated.resources.send_message
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TrailingButton(
@@ -38,7 +41,7 @@ fun TrailingButton(
                 modifier = Modifier.size(15.dp),
 
                 painter = painterResource(Res.drawable.ic_arrow_up),
-                contentDescription = "Send message"
+                contentDescription = stringResource(Res.string.send_message)
             )
         }
     } else {
@@ -53,7 +56,7 @@ fun TrailingButton(
             Icon(
 
                 painter = painterResource(Res.drawable.ic_mic),
-                contentDescription = "Record voice",
+                contentDescription = stringResource(Res.string.record_voice),
                 modifier = Modifier.size(15.dp)
             )
         }

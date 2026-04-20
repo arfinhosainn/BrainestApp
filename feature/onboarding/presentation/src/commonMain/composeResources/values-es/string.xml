@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- Onboarding Steps -->
+    <string name="onboarding_step1_title">Chatea con tu tutor de IA.</string>
+    <string name="onboarding_step1_desc">Haz preguntas y obtén ayuda personalizada con matemáticas, ciencias y mucho más.</string>
+    <string name="onboarding_step2_title">Captura y resuelve preguntas</string>
+    <string name="onboarding_step2_desc">Toma una foto de cualquier pregunta y obtén explicaciones instantáneas paso a paso gracias a la inteligencia artificial.</string>
+    <string name="onboarding_step3_title">Crea tarjetas didácticas y cuestionarios.</string>
+    <string name="onboarding_step3_desc">Convierte las lecciones en tarjetas de memoria y cuestionarios rápidos para poner a prueba tus conocimientos.</string>
+
+    <!-- User Review Screen -->
+    <string name="continue_label">Continuar</string>
+    <string name="join_others">Únete a más de 50.000 personas que están alcanzando sus metas.</string>
+    <string name="trusted_by_thousands">Con la confianza de miles de personas.</string>
+    <string name="rating_score">4.8</string>
+    <string name="app_store_rating">Calificación promedio en la App Store</string>
+    
+    <string name="review1_title">¡Justo lo que necesitaba!</string>
+    <string name="review1_name">Felicia2</string>
+    <string name="review1_content">¡Sencilla, rápida y eficaz! Había alcanzado mi peso máximo y me sentía bastante desesperanzada. Esta aplicación es sencilla, apta para personas con TDAH y me ayuda a ser realmente consciente de los alimentos que consumo.</string>
+    
+    <string name="review2_title">¡Un cambio radical!</string>
+    <string name="review2_name">Alex_Dev</string>
+    <string name="review2_content">Por fin una aplicación que no se siente como una tarea pesada. Registrar los alimentos es realmente divertido y la interfaz de usuario es increíblemente fluida.</string>
+    
+    <string name="review3_title">Muy recomendable</string>
+    <string name="review3_name">SarahM</string>
+    <string name="review3_content">He probado todos los rastreadores que existen, pero Brainest es el único que me ha convencido. Su sencillez es su mayor virtud.</string>
+
+    <!-- Onboarding Questions -->
+    <string name="what_is_your_name">¿Cómo te llamas?</string>
+    <string name="personalize_experience">Esto nos ayuda a personalizar su experiencia.</string>
+    <string name="about_you">Acerca de ti</string>
+    <string name="your_name">Su nombre</string>
+    
+    <string name="what_is_your_grade">¿Cuál es tu nivel de grado?</string>
+    <string name="tailor_learning_path">Adaptaremos tu ruta de aprendizaje en consecuencia.</string>
+    
+    <string name="what_subjects_studying">¿Qué asignaturas estás estudiando?</string>
+    <string name="select_all_apply">Seleccione todas las opciones que correspondan.</string>
+    <string name="personalize_learning_experience">Selecciona todas las opciones que correspondan y personalizaremos tu experiencia de aprendizaje.</string>
+    
+    <string name="what_is_your_goal">¿Cuál es tu objetivo principal?</string>
+    <string name="build_plan_goal">Elaboraremos un plan que te lleve allí.</string>
+    <string name="goals_label">Objetivos</string>
+    
+    <string name="what_challenges_facing">¿Qué retos estás afrontando?</string>
+    <string name="challenges_label">Desafíos</string>
+    
+    <string name="how_many_hours_study">¿Cuántas horas estudias al día?</string>
+    <string name="help_plan_schedule">Esto nos ayuda a planificar su horario.</string>
+    <string name="survey_label">Encuesta</string>
+    
+    <string name="how_do_you_learn_best">¿Cuál es la mejor manera de aprender?</string>
+    <string name="personalize_experience_short">Personalizaremos tu experiencia.</string>
+    <string name="learning_style_label">Estilo de aprendizaje</string>
+    
+    <string name="when_do_you_study">¿Cuándo sueles estudiar?</string>
+    <string name="schedule_sessions_time">Programaremos tus sesiones en el momento adecuado.</string>
+    
+    <string name="select_your_language">Selecciona tu idioma</string>
+    <string name="localize_experience">Nosotros adaptaremos la experiencia a tus necesidades.</string>
+    <string name="personalization_label">Personalización</string>
+    <string name="welcome_title">Juguemos con muchos temas de concursos.</string>
+    <string name="get_started">Comience</string>
+    <string name="already_have_account">Ya tengo una cuenta</string>
+    <string name="finish">Finalizar</string>
+
+    <!-- Options -->
+    <string name="elementary">Primaria (1.º a 5.º grado)</string>
+    <string name="middle_school">Escuela intermedia (6.º a 8.º grado)</string>
+    <string name="high_school">Educación secundaria (de 9.º a 12.º grado)</string>
+    <string name="undergraduate">De licenciatura</string>
+    <string name="postgraduate">Graduado</string>
+    
+    <string name="math">Matemáticas</string>
+    <string name="science">Ciencia</string>
+    <string name="physics">Física</string>
+    <string name="chemistry">Química</string>
+    <string name="biology">Biología</string>
+    <string name="history">Historia</string>
+    <string name="geography">Geografía</string>
+    <string name="english">Inglés</string>
+    <string name="literature">Literatura</string>
+    <string name="computer_science">Ciencias de la Computación</string>
+    <string name="economics">Ciencias económicas</string>
+    <string name="psychology">Psicología</string>
+    
+    <string name="improve_grades">Mejorar mis calificaciones</string>
+    <string name="prepare_exams">Prepárate para los exámenes</string>
+    <string name="learn_new_skills">Aprende nuevas habilidades</string>
+    <string name="stay_consistent">Mantén la constancia a diario.</string>
+    <string name="get_ahead">Adelántate a la clase</string>
+    
+    <string name="staying_focused">Mantenerse concentrado</string>
+    <string name="time_management">Gestión del tiempo</string>
+    <string name="understanding_concepts">Comprender conceptos</string>
+    <string name="exam_anxiety">Ansiedad ante los exámenes</string>
+    <string name="motivation">Motivación</string>
+    <string name="note_taking">Toma de notas</string>
+    
+    <string name="video_lessons">Lecciones en vídeo</string>
+    <string name="quizzes_practice">Cuestionarios y pruebas de práctica</string>
+    <string name="flashcards">Tarjetas didácticas</string>
+    <string name="reading_summaries">Lectura y resúmenes</string>
+    <string name="interactive_exercises">Ejercicios interactivos</string>
+    
+    <string name="early_morning">Madrugada (5:00 - 8:00)</string>
+    <string name="morning">Mañana (8:00 - 12:00)</string>
+    <string name="afternoon">Tarde (12:00 - 17:00)</string>
+    <string name="evening">Tarde (17:00 - 21:00)</string>
+    <string name="night">Noche (21:00 - 24:00)</string>
+    
+    <string name="arabic">árabe</string>
+    <string name="chinese">Chino</string>
+    <string name="french">Francés</string>
+    <string name="spanish">Español</string>
+    <string name="german">Alemán</string>
+    <string name="ukrainian">ucranio</string>
+    <string name="none_of_the_above">Ninguna de las anteriores</string>
+    <string name="your_profile_label">Tu perfil</string>
+    <string name="your_goals_label">Tus metas</string>
+    <string name="daily_study_hours">Horas de estudio diarias</string>
+    <string name="select_average_study_time">Seleccione su tiempo de estudio promedio</string>
+    <string name="preferred_language_title">¿Cuál es tu idioma preferido?</string>
+    <string name="preferred_language_subtitle">Le entregaremos su contenido en el idioma con el que se sienta más cómodo.</string>
+
+    <!-- Permissions -->
+    <string name="enable_permission">Habilitar permisos</string>
+    <string name="best_experience_access">Para obtener la mejor experiencia, nos gustaría tener acceso a:</string>
+    <string name="camera">Cámara</string>
+    <string name="microphone">Micrófono</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="camera_permission_description">Toma fotos de tus problemas de matemáticas para resolverlos al instante.</string>
+    <string name="microphone_permission_description">Utilice comandos de voz para hacer preguntas y obtener ayuda.</string>
+    <string name="notifications_permission_description">Mantente al día con recordatorios y alertas de aprendizaje.</string>
+    <string name="allow_permissions">Otorgar permisos</string>
+    <string name="skip_for_now">Saltar por ahora</string>
+    <string name="permission_granted">Permiso concedido</string>
+    <string name="permission_denied">Permiso denegado</string>
+    <string name="permission_permanently_denied">Denegado permanentemente: abre Configuración para habilitarlo.</string>
+    <string name="permission_state_granted">Otorgada</string>
+    <string name="permission_state_denied">Denegado</string>
+
+    <!-- Login Bottom Sheet -->
+    <string name="continue_with_apple">Continuar con Apple</string>
+    <string name="continue_with_google">Continuar con Google</string>
+    <string name="continue_with_email">Continuar con el correo electrónico</string>
+</resources>

@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.scelio.brainest.domain.onboarding.OnboardingData
+import com.scelio.brainest.domain.onboarding.OnboardingStore
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.brainest.presentation.navigation.OnboardingGraphRoutes
@@ -23,7 +25,11 @@ import com.scelio.brainest.presentation.util.ObserveAsEvents
 import com.scellio.brainest.navigation.BrainestBottomNavigationBar
 import com.scellio.brainest.navigation.DeepLinkListener
 import com.scellio.brainest.navigation.NavigationRoot
+import com.scellio.brainest.localization.AppLanguageState
+import com.scellio.brainest.localization.applyAppLanguage
+import com.scellio.brainest.localization.languageIdToTag
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -33,9 +39,19 @@ fun App(
     viewModel: MainViewModel = koinViewModel()
 ) {
     val navController = rememberNavController()
+    val onboardingStore = koinInject<OnboardingStore>()
     DeepLinkListener(navController)
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val onboardingData by onboardingStore.data.collectAsStateWithLifecycle(initialValue = null)
+    val appLanguageTag by AppLanguageState.languageTag.collectAsStateWithLifecycle()
+
+    LaunchedEffect(onboardingData?.languageId) {
+        val persistedLanguageId = onboardingData?.languageId ?: return@LaunchedEffect
+        val languageTag = languageIdToTag(persistedLanguageId)
+        AppLanguageState.update(languageTag)
+        applyAppLanguage(languageTag)
+    }
 
     LaunchedEffect(state.isCheckingAuth) {
         if (!state.isCheckingAuth) {
@@ -56,6 +72,8 @@ fun App(
     }
 
     BrainestTheme {
+        // Consume the app language state so locale updates trigger recomposition.
+        appLanguageTag
         if (!state.isCheckingAuth) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route

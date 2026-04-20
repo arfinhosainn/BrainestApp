@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- Quiz Screen -->
+    <string name="quiz_title">Prueba</string>
+    <string name="quiz_playing_title">Jugando a un concurso</string>
+    <string name="quiz_back">Atrás</string>
+    <string name="quiz_results_title">Resultados del cuestionario</string>
+    <string name="quiz_answered_count">%1$s respondió</string>
+    <string name="quiz_total_count">%1$s total</string>
+    <string name="quiz_score_format">%1$s%%</string>
+    <string name="quiz_result_summary">Obtuviste %1$s de %2$s correctos</string>
+    <string name="quiz_stat_answered">Respondido</string>
+    <string name="quiz_stat_correct">Correcto</string>
+    <string name="quiz_stat_wrong">Equivocado</string>
+    <string name="quiz_retry">Reintentar el cuestionario</string>
+    <string name="quiz_loading">Cargando cuestionario...</string>
+    <string name="quiz_no_questions">No hay preguntas de cuestionario disponibles.</string>
+    <string name="quiz_previous">Anterior</string>
+    <string name="quiz_next">Próximo</string>
+    <string name="quiz_hint">Pista</string>
+    <string name="quiz_hints_left">Tienes %1$s pistas</string>
+    <string name="quiz_no_hints">No quedan pistas</string>
+    <string name="quiz_error_load">No se pudo cargar el cuestionario: %1$s</string>
+    <string name="quiz_error_progress">No se pudo cargar el progreso del cuestionario: %1$s</string>
+    <string name="quiz_error_save">No se pudo guardar el cuestionario: %1$s</string>
+    <string name="quiz_error_save_progress">No se pudo guardar el progreso del cuestionario: %1$s</string>
+    <string name="quiz_error_empty">No se generaron preguntas de cuestionario.</string>
+
+    <!-- Study Sets Screen -->
+    <string name="study_sets_title">Conjuntos de estudio</string>
+    <string name="study_set_detail_title">Conjunto de estudio</string>
+    <string name="study_sets_empty">Aún no hay conjuntos de estudio.</string>
+    <string name="study_sets_empty_hint">Pulsa + para subir o grabar tu primer set.</string>
+    <string name="study_sets_add">Agregar conjunto de estudio</string>
+    <string name="flashcards">Tarjetas didácticas</string>
+    <string name="quiz">Prueba</string>
+    <string name="stat_flashcards">Tarjetas didácticas</string>
+    <string name="stat_quiz">Prueba</string>
+    <string name="stat_swiped">Deslizado</string>
+    <string name="stat_completed">Terminado</string>
+    <string name="stat_answered">Respondido</string>
+    <string name="stat_correct">Correcto</string>
+    <string name="stat_wrong">Equivocado</string>
+    <string name="generating_flashcards">Generación de tarjetas didácticas</string>
+    <string name="generating_quiz">Generando cuestionario</string>
+    <string name="generating">Generando</string>
+    <string name="smart_notes">Notas inteligentes</string>
+    <string name="generating_smart_notes">Generando notas inteligentes...</string>
+    <string name="smart_notes_empty">Las notas inteligentes aparecerán aquí una vez generadas.</string>
+    <string name="generate_smart_notes">Generar notas inteligentes</string>
+
+    <string name="generate_content_title">Generar contenido</string>
+    <string name="generate_content_count_label">Número de preguntas/tarjetas</string>
+    <string name="generate_content_multiple_choice">Opción múltiple (4 opciones)</string>
+    <string name="audio_record">Grabar audio</string>
+    <string name="audio_upload">Subir audio</string>
+    <string name="documents_upload">Subir documentos</string>
+    <string name="audio_title">Audio</string>
+    <string name="listening">Escuchando...</string>
+    <string name="preparing_study_set">Preparando el material de estudio...</string>
+    <string name="preparing_study_set_hint">Esto puede tardar unos segundos.</string>
+    <string name="mic_permission_blocked">El permiso para usar el micrófono está bloqueado. Actívalo en Ajustes.</string>
+    <string name="mic_permission_needed">Se necesita permiso para usar el micrófono para grabar audio.</string>
+    <string name="mic_permission_requesting">Solicitando permiso para usar el micrófono...</string>
+    <string name="flashcard_dont_know">NO LO SÉ</string>
+    <string name="flashcard_know">SABER</string>
+    <string name="flashcard_question_format">Pregunta %1$d</string>
+    <string name="flashcard_answer_format">Respuesta %1$d</string>
+    <string name="flashcard_hint">Toca para voltear • Desliza para continuar</string>
+    <string name="flashcard_reviewed_count">%1$d de %2$d tarjetas revisadas</string>
+    <string name="flashcard_dont_know_button">No lo sé</string>
+    <string name="flashcard_know_button">Saber</string>
+    <string name="flashcards_empty">Todavía no hay tarjetas de memoria.</string>
+    <string name="flashcards_empty_hint">Pulsa + para generar tu primer mazo.</string>
+    <string name="upload_documents">Subir documentos</string>
+    <string name="flashcard_item_generated">Generado</string>
+    <string name="flashcard_item_cards">Tarjetas</string>
+    <string name="flashcard_item_swiped">Deslizado</string>
+    <string name="flashcard_item_review">REVISAR</string>
+    <string name="quiz_question_index">%1$d/%2$d</string>
+    <string name="quiz_option_correct_answer">Respuesta correcta</string>
+    <string name="quiz_option_your_answer">Tu respuesta</string>
+</resources>

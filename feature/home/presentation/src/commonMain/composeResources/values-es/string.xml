@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="home_streak_label">Racha</string>
+    <string name="home_decks_label">Mazos</string>
+    <string name="home_quizzes_label">Cuestionarios</string>
+    <string name="home_earned_label">Ganado</string>
+    <string name="home_days_value">%1$d días</string>
+    <string name="home_points_value">%1$d Puntos</string>
+    <string name="home_consecutive_study_days">Días de estudio consecutivos</string>
+    <string name="home_completed">Terminado</string>
+    <string name="home_missed">Omitido</string>
+    <string name="home_points">%1$d puntos</string>
+    <string name="home_student">Alumno</string>
+    <string name="home_error_no_authenticated_user">No se encontró ningún usuario autenticado.</string>
+    <string name="home_error_failed_to_load_decks">Error al cargar los mazos: %1$s</string>
+    <string name="home_day_mon">Lun</string>
+    <string name="home_day_tue">Mar</string>
+    <string name="home_day_wed">Mié</string>
+    <string name="home_day_thu">Jue</string>
+    <string name="home_day_fri">Vie</string>
+    <string name="home_day_sat">Sáb</string>
+    <string name="home_day_sun">Dom</string>
+    <string name="home_lessons_label">Lecciones</string>
+    <string name="home_vocabulary_label">Vocabulario</string>
+    <string name="home_bronze_class_label">Clase Bronce</string>
+</resources>

@@ -4,6 +4,11 @@ plugins {
 }
 
 kotlin {
+    sourceSets {
+        androidMain.dependencies {
+            implementation(libs.androidx.appcompat)
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="welcome_to_brainest">¡Bienvenido a Brainest!</string>
+    <string name="welcome_back">¡Bienvenido de nuevo!</string>
+    <string name="forgot_password">¿Has olvidado tu contraseña?</string>
+    <string name="set_new_password">Establecer una nueva contraseña</string>
+    <string name="new_password">Nueva contraseña</string>
+    <string name="account_successfully_created">¡Cuenta de Brainest creada con éxito!</string>
+    <string name="verification_email_sent_to_x">Hemos enviado un correo electrónico de verificación a %1$s</string>
+    <string name="resend_verification_email">Reenviar correo electrónico de verificación</string>
+    <string name="resent_verification_email">Correo electrónico de verificación reenviado correctamente</string>
+    <string name="verifying_account">Verificando cuenta...</string>
+    <string name="email_verified_successfully">¡Correo electrónico verificado correctamente!</string>
+    <string name="email_verified_failed">No se pudo verificar su correo electrónico.</string>
+    <string name="email_verified_successfully_desc">Tu correo electrónico ha sido verificado. Ahora puedes iniciar sesión con tus credenciales.</string>
+    <string name="email_verified_failed_desc">No se pudo verificar tu correo electrónico. Es posible que el enlace no sea válido o haya caducado.</string>
+    <string name="close">Cerca</string>
+    <string name="username">Nombre de usuario</string>
+    <string name="submit">Entregar</string>
+    <string name="create_account">Crear una cuenta</string>
+    <string name="password">Contraseña</string>
+    <string name="email">Correo electrónico</string>
+    <string name="register">Registro</string>
+    <string name="username_placeholder">Brainest</string>
+    <string name="email_placeholder">hello@brainest.com</string>
+    <string name="login">Acceso</string>
+    <string name="username_hint">Utilice entre 3 y 20 caracteres para su nombre de usuario.</string>
+    <string name="password_hint">Utilice 9 o más caracteres, al menos un dígito y una letra mayúscula.</string>
+    <string name="error_account_exists">Ya existe una cuenta con ese correo electrónico o nombre de usuario.</string>
+    <string name="error_same_password">La nueva contraseña no puede ser igual a la anterior.</string>
+    <string name="error_invalid_password">La contraseña debe tener al menos 9 caracteres e incluir un dígito y una letra mayúscula.</string>
+    <string name="error_invalid_email">Este no es un correo electrónico válido.</string>
+    <string name="error_invalid_username">El nombre de usuario debe tener entre 3 y 20 caracteres.</string>
+    <string name="error_invalid_credentials">El correo electrónico o la contraseña son incorrectos.</string>
+    <string name="error_email_not_verified">No puedes iniciar sesión porque tu correo electrónico no está verificado.</string>
+    <string name="error_reset_password_token_invalid">Parece que el enlace para restablecer la contraseña no es válido o ha caducado. Por favor, solicite un nuevo correo electrónico.</string>
+    <string name="reset_password_successfully">Tu contraseña se ha cambiado correctamente. Ahora puedes iniciar sesión con tu nueva contraseña.</string>
+    <string name="forgot_password_email_sent_successfully">Le hemos enviado correctamente un correo electrónico con un enlace para restablecer su contraseña.</string>
+
+</resources>

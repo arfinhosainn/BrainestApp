@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="create_chat">Crear chat</string>
+    <string name="add">Agregar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="email_or_username">Correo electrónico o nombre de usuario</string>
+    <string name="no_messages">No hay mensajes</string>
+    <string name="no_messages_subtitle">Crea un nuevo chat para empezar a enviar mensajes.</string>
+    <string name="do_you_want_to_logout">¿Deseas cerrar sesión?</string>
+    <string name="do_you_want_to_logout_desc">Tendrás que iniciar sesión de nuevo para usar la aplicación.</string>
+    <string name="today">Hoy</string>
+    <string name="yesterday">Ayer</string>
+    <string name="only_you">Sólo tu</string>
+    <string name="today_x">Hoy, %1$s</string>
+    <string name="yesterday_x">Ayer, %1$s</string>
+
+    <!-- Search -->
+    <string name="search">Buscar</string>
+    <string name="search_conversations">Buscar conversaciones...</string>
+    <string name="no_conversations_found">No se encontraron conversaciones para &quot;%1$s&quot;</string>
+
+    <!-- Chat Detail -->
+    <string name="ask_anything">Pregunta lo que quieras</string>
+    <string name="open_recent_chats">Abrir chats recientes</string>
+    <string name="close_chat">Cerrar chat</string>
+    <string name="send_message">Enviar mensaje</string>
+    <string name="record_voice">Grabar voz</string>
+    <string name="new_chat">Nuevo chat</string>
+    <string name="chats">Chats</string>
+    <string name="recents">Recientes</string>
+    <string name="no_recent_chats">Aún no hay chats recientes.</string>
+    <string name="history">Historia</string>
+    <string name="close_history">Historia cercana</string>
+
+    <!-- Attachments -->
+    <string name="open_attachment_menu">Abrir menú adjunto</string>
+    <string name="take_photo">Tomar foto</string>
+    <string name="upload_photo">Subir foto</string>
+    <string name="upload_file">Subir archivo</string>
+    <string name="remove_image">Eliminar imagen</string>
+    <string name="remove_document">Eliminar documento</string>
+    <string name="image_x">Imagen %1$d</string>
+
+    <!-- Input Box -->
+    <string name="add_message_about_document">Agregue un mensaje sobre este documento.</string>
+    <string name="add_caption_x_images">Agregar un pie de foto (%1$d imágenes)</string>
+    <string name="add_caption_1_image">Agregar un pie de foto (1 imagen)</string>
+    <string name="ask_follow_up">Haz una pregunta de seguimiento</string>
+    <string name="follow_up_placeholder">Aquí va mi pregunta de seguimiento...</string>
+
+    <!-- Errors and Info -->
+    <string name="chat_not_found">No se encontró el chat.</string>
+    <string name="failed_to_load_chat">No se pudo cargar el chat</string>
+    <string name="just_now">En este momento</string>
+    <string name="failed_to_send">No se pudo enviar</string>
+    <string name="not_logged_in">No has iniciado sesión</string>
+    <string name="failed_to_create_chat">No se pudo crear el chat</string>
+    <string name="failed_to_load_more_messages">No se pudieron cargar más mensajes.</string>
+    <string name="failed_to_search_chats">No se pudo buscar en los chats.</string>
+    <string name="failed_to_delete_chat">No se pudo eliminar el chat</string>
+    <string name="delete">Borrar</string>
+    <string name="navigate">Navegar por</string>
+    <string name="brainest">Brainest</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="hide_password">Ocultar contraseña</string>
+    <string name="show_password">Mostrar contraseña</string>
+    <string name="dismiss_dialog">Cerrar diálogo</string>
+    <string name="back">Atrás</string>
+    <string name="get_vip">Obtener VIP</string>
+    <string name="unlock_more_exciting_new_lessons">Desbloquea más\nlecciones nuevas y emocionantes</string>
+    <string name="get_premium">Obtener Premium</string>
+    <string name="upgrade_to">Actualizar a</string>
+    <string name="vip_account">cuenta VIP</string>
+    <string name="play">Reproducir</string>
+    <string name="paused">En pausa</string>
+    <string name="stopped">Detenido</string>
+    <string name="finish_recording">Finalizar grabación</string>
+    <string name="cancel_recording">Cancelar grabación</string>
+    <string name="profile_badge">Insignia de perfil</string>
+    <string name="settings">Ajustes</string>
+    <string name="diamonds">Diamantes</string>
+    <string name="profile_picture">Foto de perfil</string>
+    <string name="stats_decks">Mazos</string>
+    <string name="stats_quizzes">Cuestionarios</string>
+    <string name="stats_others">Otros</string>
+    <string name="delete_profile_picture_title">¿Eliminar la foto de perfil?</string>
+    <string name="delete_profile_picture_description">Esto eliminará permanentemente tu foto de perfil. Esta acción no se puede deshacer.</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+</resources>

@@ -378,7 +378,7 @@ private fun isInCurrentWeek(
 }
 
 private fun Instant.toLocalDate(): LocalDate {
-    return kotlinx.datetime.Instant.fromEpochMilliseconds(toEpochMilliseconds())
+    return Instant.fromEpochMilliseconds(toEpochMilliseconds())
         .toLocalDateTime(TimeZone.currentSystemDefault())
         .date
 }

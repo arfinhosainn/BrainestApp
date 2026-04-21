@@ -150,7 +150,7 @@ class AudioRecordingViewModel(
             when (val deckResult = repository.createDeck(
                 userId = userId,
                 title = title,
-                sourceFilename = "audio-recording"
+                sourceFilename = "audio-recording.m4a"
             )) {
                 is Result.Success -> {
                     val deck = deckResult.data
@@ -278,13 +278,13 @@ class AudioRecordingViewModel(
         deckId: String,
         transcript: String
     ): StudySource {
-        return StudySource(
+            return StudySource(
             id = Uuid.random().toString(),
             deckId = deckId,
             sourceType = StudySourceType.AUDIO,
             sourceText = transcript,
-            sourceFileId = null,
-            sourceFilename = "audio-recording",
+                sourceFileId = null,
+                sourceFilename = "audio-recording.m4a",
             createdAt = Clock.System.now()
         )
     }

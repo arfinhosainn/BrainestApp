@@ -8,4 +8,6 @@ data class StudySetSummary(
     val createdAt: Instant,
     val flashcardsCount: Int,
     val quizCount: Int
+    ,
+    val sourceFilename: String? = null
 )

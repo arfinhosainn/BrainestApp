@@ -2,19 +2,20 @@ package com.scelio.brainest.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MicNone
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -29,23 +30,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import brainest.feature.study.presentation.generated.resources.Res
-import brainest.feature.study.presentation.generated.resources.ic_flashcard
-import brainest.feature.study.presentation.generated.resources.stat_completed
-import brainest.feature.study.presentation.generated.resources.stat_flashcards
-import brainest.feature.study.presentation.generated.resources.stat_quiz
-import brainest.feature.study.presentation.generated.resources.stat_swiped
 import com.scelio.brainest.designsystem.BrainestTheme
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private val ColorAccentBar = Color(0xFF19C472)
 private val ColorTextDark = Color(0xFF1A1A1A)
 private val ColorTextMuted = Color(0xFF6D6A66)
-private val ColorCardBg = Color(0xFFFBF8F5)
-private val ColorDivider = Color(0xFFEDE3D8)
+// ...existing code...
 private val ColorIconBg = Color(0xFFD8F5E2)
+private val ColorAudioIconBg = Color(0xFFFFE6D6)
+private val ColorAudioAccent = Color(0xFFFF8A00)
+
+enum class DocType { DOCUMENT, AUDIO, OTHER }
 
 @Composable
 fun StudySetItem(
@@ -56,6 +52,8 @@ fun StudySetItem(
     quizCount: Int,
     flashcardsSwiped: Int = 0,
     quizzesCompleted: Int = 0,
+    masteryPercent: Int = 0,
+    docType: DocType = DocType.DOCUMENT,
     onSetClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -63,111 +61,116 @@ fun StudySetItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = { onSetClick(id) }),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = ColorCardBg),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(6.dp)
-                    .fillMaxHeight()
-                    .background(ColorAccentBar)
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                // Left icon - change icon and background depending on document type
+                val (iconVector, iconBg, iconTint) = when (docType) {
+                    DocType.AUDIO -> Triple(Icons.Outlined.MicNone, ColorAudioIconBg, ColorAudioAccent)
+                    DocType.DOCUMENT -> Triple(Icons.Outlined.Description, ColorIconBg, ColorAccentBar)
+                    else -> Triple(Icons.Outlined.Description, ColorIconBg, ColorAccentBar)
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(iconBg),
+                    contentAlignment = Alignment.Center
                 ) {
+                    Icon(
+                        imageVector = iconVector,
+                        contentDescription = null,
+                        tint = iconTint,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Title and subtitle
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = title,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Black,
                         color = ColorTextDark,
-                        lineHeight = 28.sp
+                        lineHeight = 28.sp,
+                        maxLines = 2
                     )
 
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(ColorIconBg),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = vectorResource(Res.drawable.ic_flashcard),
-                            contentDescription = null,
-                            tint = Color.Black,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "$flashcardsCount flashcards · $createdAt",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = ColorTextMuted
+                    )
                 }
 
-                Spacer(Modifier.height(12.dp))
-
+                // Menu (three dots) - align a bit higher to match title baseline
                 Text(
-                    text = createdAt,
-                    fontSize = 12.sp,
+                    text = "⋮",
+                    fontSize = 20.sp,
+                    color = ColorTextMuted,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .offset(y = (-6).dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Mastery row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Mastery",
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = ColorTextMuted
                 )
 
-                Spacer(Modifier.height(14.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
+                Text(
+                    text = "${masteryPercent.coerceIn(0, 100)}%",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = ColorAccentBar
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Progress bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFFEBEFEA))
+            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(ColorDivider)
+                        .fillMaxWidth(fraction = (masteryPercent.coerceIn(0, 100) / 100f))
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(ColorAccentBar)
                 )
-
-                Spacer(Modifier.height(14.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    StatBlock(label = stringResource(Res.string.stat_flashcards), value = flashcardsCount.toString())
-                    StatBlock(label = stringResource(Res.string.stat_quiz), value = quizCount.toString())
-                    StatBlock(label = stringResource(Res.string.stat_swiped), value = flashcardsSwiped.toString())
-                    StatBlock(label = stringResource(Res.string.stat_completed), value = quizzesCompleted.toString())
-                }
             }
         }
     }
 }
-
-@Composable
-private fun StatBlock(
-    label: String,
-    value: String
-) {
-    Column {
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Medium,
-            color = ColorTextMuted
-        )
-        Text(
-            text = value,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = ColorTextDark
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewStudySetItem() {
@@ -182,6 +185,7 @@ private fun PreviewStudySetItem() {
                     quizCount = 10,
                     flashcardsSwiped = 42,
                     quizzesCompleted = 3,
+                    masteryPercent = 85,
                     onSetClick = {}
                 )
             }

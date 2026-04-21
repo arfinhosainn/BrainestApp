@@ -37,6 +37,8 @@ data class StudySetItemUi(
     val quizCount: Int,
     val flashcardsSwiped: Int,
     val quizzesCompleted: Int
+    ,
+    val sourceFilename: String? = null
 )
 
 data class StudySetsState(
@@ -241,6 +243,8 @@ class StudySetsViewModel(
                         quizCount = set.quizCount,
                         flashcardsSwiped = progress?.flashcardsSwiped ?: 0,
                         quizzesCompleted = progress?.quizzesCompleted ?: 0
+                        ,
+                        sourceFilename = set.sourceFilename
                     )
                 }
             }

@@ -55,7 +55,7 @@ fun SearchBar(
         elevation = CardDefaults.cardElevation(defaultElevation = if (isFocused) 4.dp else 0.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp) // Removed vertical padding
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),

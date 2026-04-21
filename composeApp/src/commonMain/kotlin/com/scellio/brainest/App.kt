@@ -132,7 +132,8 @@ fun App(
                 }
             ) { innerPadding ->
                 val layoutDirection = LocalLayoutDirection.current
-                val navHostPadding = if (isChatDetailRoute || isQuizRoute) {
+                // Remove the top inset for routes that provide their own TopAppBar
+                val navHostPadding = if (isChatDetailRoute || isQuizRoute || isChatListRoute) {
                     PaddingValues(
                         start = innerPadding.calculateStartPadding(layoutDirection),
                         end = innerPadding.calculateEndPadding(layoutDirection),

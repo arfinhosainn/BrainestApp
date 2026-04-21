@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -69,19 +70,18 @@ fun QuizBottomBar(
         OutlinedButton(
             onClick = onPreviousClick,
             modifier = Modifier.height(48.dp),
-            border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(contentColor.copy(alpha = 0.2f)))
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                 contentDescription = null,
-                tint = contentColor,
+                tint = Color.White,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = stringResource(Res.string.quiz_previous),
                 fontWeight = FontWeight.SemiBold,
-                color = contentColor
+                color = Color.White
             )
         }
 
@@ -98,8 +98,8 @@ fun QuizBottomBar(
             onClick = onNextClick,
             modifier = Modifier.height(48.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = accentGreen,
-                contentColor = Color.White
+                containerColor = Color.White,
+                contentColor = Color.Black
             )
         ) {
             Text(

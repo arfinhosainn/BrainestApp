@@ -128,7 +128,7 @@ fun ChatListScreen(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
                 if (state.chats.isEmpty() && state.searchText.isNotEmpty()) {
                     item {

@@ -146,7 +146,8 @@ fun StudySetSummaryRow.toDomain(): StudySetSummary {
         title = deck.title,
         createdAt = Instant.fromEpochMilliseconds(deck.createdAt),
         flashcardsCount = deck.totalCards,
-        quizCount = quizCount
+        quizCount = quizCount,
+        sourceFilename = deck.sourceFilename
     )
 }
 

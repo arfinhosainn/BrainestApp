@@ -14,23 +14,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
-import androidx.compose.material.icons.outlined.AutoStories
-import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,19 +53,20 @@ import brainest.feature.study.presentation.generated.resources.generating
 import brainest.feature.study.presentation.generated.resources.generating_flashcards
 import brainest.feature.study.presentation.generated.resources.generating_quiz
 import brainest.feature.study.presentation.generated.resources.generating_smart_notes
-import brainest.feature.study.presentation.generated.resources.quiz_back
 import brainest.feature.study.presentation.generated.resources.quiz
+import brainest.feature.study.presentation.generated.resources.quiz_back
 import brainest.feature.study.presentation.generated.resources.smart_notes
 import brainest.feature.study.presentation.generated.resources.smart_notes_empty
 import brainest.feature.study.presentation.generated.resources.study_set_detail_title
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.components.StudySetItem
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.Instant as KxInstant
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Instant
 
 private const val DefaultGenerationCount = 10
 private const val DefaultMultipleChoice = true
@@ -129,7 +130,7 @@ fun StudySetDetailScreen(
                         },
                         windowInsets = WindowInsets(0, 0, 0, 0)
                     )
-                    
+
 
                     StudySetItem(
                         id = deck.id,
@@ -158,7 +159,12 @@ fun StudySetDetailScreen(
                             title = stringResource(Res.string.quiz),
                             icon = Icons.Outlined.Quiz,
                             enabled = !state.isGenerating,
-                            onClick = { viewModel.generateQuiz(DefaultGenerationCount, DefaultMultipleChoice) }
+                            onClick = {
+                                viewModel.generateQuiz(
+                                    DefaultGenerationCount,
+                                    DefaultMultipleChoice
+                                )
+                            }
                         )
                     }
 
@@ -385,9 +391,11 @@ private fun parseSmartNotesSections(raw: String): List<SmartNotesSectionData> {
     }
     flush()
 
-    return if (sections.isNotEmpty()) sections else listOf(
-        SmartNotesSectionData(heading = null, body = raw.lines())
-    )
+    return sections.ifEmpty {
+        listOf(
+            SmartNotesSectionData(heading = null, body = raw.lines())
+        )
+    }
 }
 
 private fun normalizeSmartNotesLine(line: String): String {
@@ -416,15 +424,15 @@ private fun PreviewStudySetDetailScreen() {
 }
 
 private fun formatDate(
-    instant: kotlin.time.Instant,
-    timeZone: TimeZone = TimeZone.currentSystemDefault()
+    instant: Instant,
+    timeZone: TimeZone = TimeZone.UTC
 ): String {
-    val localDate = KxInstant
+    val localDate = Instant
         .fromEpochMilliseconds(instant.toEpochMilliseconds())
         .toLocalDateTime(timeZone)
         .date
-    val month = monthNames[localDate.monthNumber - 1]
-    return "$month ${localDate.dayOfMonth}, ${localDate.year}"
+    val month = monthNames[localDate.month.number - 1]
+    return "$month ${localDate.day}, ${localDate.year}"
 }
 
 private val monthNames = listOf(

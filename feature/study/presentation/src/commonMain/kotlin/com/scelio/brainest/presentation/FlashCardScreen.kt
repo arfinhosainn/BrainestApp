@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +40,6 @@ import brainest.feature.study.presentation.generated.resources.flashcard_know
 import brainest.feature.study.presentation.generated.resources.flashcard_know_button
 import brainest.feature.study.presentation.generated.resources.flashcard_reviewed_count
 import com.scelio.brainest.designsystem.BrainestTheme
-import com.scelio.brainest.designsystem.Typography
 import com.scelio.brainest.designsystem.components.buttons.BrainestButton
 import com.scelio.brainest.flashcards.domain.Flashcard
 import com.scelio.brainest.presentation.components.FlashCardContent
@@ -49,7 +47,6 @@ import com.scelio.brainest.presentation.components.FlashCardCounters
 import com.scelio.brainest.presentation.components.SwipeCard
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
 
 private val ColorKnowBackground = Color(0xFF33CA67)
 private val ColorKnowAccent = Color(0xFFFFFFFF)
@@ -126,15 +123,12 @@ fun FlashCardScreen(
 
         when {
             error != null -> {
-                // TODO: show your error UI
             }
 
             cards.isEmpty() -> {
-                // TODO: show your empty state UI
             }
 
             currentIndex >= cards.size -> {
-                // TODO: show your "all done" UI + restart button
             }
 
             else -> {
@@ -224,7 +218,7 @@ fun FlashCardScreen(
                         textStyles = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            fontFamily = Typography.bodyMedium.fontFamily,
+                            fontFamily = MaterialTheme.typography.bodyMedium.fontFamily,
                         )
                     )
 
@@ -250,7 +244,7 @@ fun FlashCardScreen(
                         textStyles = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            fontFamily = Typography.bodyMedium.fontFamily,
+                            fontFamily = MaterialTheme.typography.bodyMedium.fontFamily,
                         )
                     )
 
@@ -269,7 +263,7 @@ fun FlashCardScreen(
                         textStyles = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            fontFamily = Typography.bodyMedium.fontFamily,
+                            fontFamily = MaterialTheme.typography.bodyMedium.fontFamily,
                         )
                     )
                 }

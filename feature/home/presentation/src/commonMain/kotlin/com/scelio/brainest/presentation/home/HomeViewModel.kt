@@ -379,12 +379,12 @@ private fun isInCurrentWeek(
 
 private fun Instant.toLocalDate(): LocalDate {
     return Instant.fromEpochMilliseconds(toEpochMilliseconds())
-        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .toLocalDateTime(TimeZone.UTC)
         .date
 }
 
 private fun today(): LocalDate {
-    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return Clock.System.now().toLocalDateTime(TimeZone.UTC).date
 }
 
 private fun LocalDate.plusDays(days: Int): LocalDate = plus(days, DateTimeUnit.DAY)
@@ -392,7 +392,7 @@ private fun LocalDate.plusDays(days: Int): LocalDate = plus(days, DateTimeUnit.D
 private fun String.toLocalDateOrNull(): LocalDate? {
     return try {
         kotlin.time.Instant.parse(this)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .toLocalDateTime(TimeZone.UTC)
             .date
     } catch (_: Exception) {
         null

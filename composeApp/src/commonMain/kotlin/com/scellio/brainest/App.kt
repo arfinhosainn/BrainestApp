@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.scelio.brainest.domain.onboarding.OnboardingData
 import com.scelio.brainest.domain.onboarding.OnboardingStore
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -132,7 +131,6 @@ fun App(
                 }
             ) { innerPadding ->
                 val layoutDirection = LocalLayoutDirection.current
-                // Remove the top inset for routes that provide their own TopAppBar
                 val navHostPadding = if (isChatDetailRoute || isQuizRoute || isChatListRoute) {
                     PaddingValues(
                         start = innerPadding.calculateStartPadding(layoutDirection),

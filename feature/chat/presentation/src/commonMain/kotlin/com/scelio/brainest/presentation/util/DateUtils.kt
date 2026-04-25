@@ -14,7 +14,7 @@ import kotlin.time.Instant
 object DateTimeFormatter {
 
     fun formatDateTime(instant: Instant): String {
-        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val dateTime = instant.toLocalDateTime(TimeZone.UTC)
 
         val day = dateTime.day.toString().padStart(2, '0')
         val month = dateTime.month.number.toString().padStart(2, '0')
@@ -27,7 +27,7 @@ object DateTimeFormatter {
     }
 
     fun formatTime(instant: Instant): String {
-        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val dateTime = instant.toLocalDateTime(TimeZone.UTC)
 
         val hour = dateTime.hour.toString().padStart(2, '0')
         val minute = dateTime.minute.toString().padStart(2, '0')
@@ -36,7 +36,7 @@ object DateTimeFormatter {
     }
 
     fun formatDate(instant: Instant): String {
-        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val dateTime = instant.toLocalDateTime(TimeZone.UTC)
 
         val day = dateTime.day.toString().padStart(2, '0')
         val month = dateTime.month.number.toString().padStart(2, '0')
@@ -46,7 +46,7 @@ object DateTimeFormatter {
     }
 
     suspend fun formatRelativeDateTime(instant: Instant): String {
-        val timeZone = TimeZone.currentSystemDefault()
+        val timeZone = TimeZone.UTC
         val messageDate = instant.toLocalDateTime(timeZone).date
         val today = Clock.System.now().toLocalDateTime(timeZone).date
 

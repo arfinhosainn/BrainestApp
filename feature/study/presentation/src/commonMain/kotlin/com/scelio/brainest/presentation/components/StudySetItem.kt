@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MicNone
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.MicNone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,13 +33,13 @@ import androidx.compose.ui.unit.sp
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-private val ColorAccentBar = Color(0xFF19C472)
+private val ColorAccentBar = Color(0xFF006D3C)
 private val ColorTextDark = Color(0xFF1A1A1A)
 private val ColorTextMuted = Color(0xFF6D6A66)
-// ...existing code...
-private val ColorIconBg = Color(0xFFD8F5E2)
-private val ColorAudioIconBg = Color(0xFFFFE6D6)
-private val ColorAudioAccent = Color(0xFFFF8A00)
+
+private val ColorIconBg = Color(0xFFE2EAE0)
+private val ColorAudioIconBg = Color(0xFFFFB786)
+private val ColorAudioAccent = Color(0xFF964900)
 
 enum class DocType { DOCUMENT, AUDIO, OTHER }
 
@@ -63,7 +63,7 @@ fun StudySetItem(
             .clickable(onClick = { onSetClick(id) }),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
@@ -72,8 +72,18 @@ fun StudySetItem(
             ) {
                 // Left icon - change icon and background depending on document type
                 val (iconVector, iconBg, iconTint) = when (docType) {
-                    DocType.AUDIO -> Triple(Icons.Outlined.MicNone, ColorAudioIconBg, ColorAudioAccent)
-                    DocType.DOCUMENT -> Triple(Icons.Outlined.Description, ColorIconBg, ColorAccentBar)
+                    DocType.AUDIO -> Triple(
+                        Icons.Outlined.MicNone,
+                        ColorAudioIconBg,
+                        ColorAudioAccent
+                    )
+
+                    DocType.DOCUMENT -> Triple(
+                        Icons.Outlined.Description,
+                        ColorIconBg,
+                        ColorAccentBar
+                    )
+
                     else -> Triple(Icons.Outlined.Description, ColorIconBg, ColorAccentBar)
                 }
 
@@ -94,12 +104,11 @@ fun StudySetItem(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // Title and subtitle
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = title,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = ColorTextDark,
                         lineHeight = 28.sp,
                         maxLines = 2
@@ -109,13 +118,12 @@ fun StudySetItem(
 
                     Text(
                         text = "$flashcardsCount flashcards · $createdAt",
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = ColorTextMuted
                     )
                 }
 
-                // Menu (three dots) - align a bit higher to match title baseline
                 Text(
                     text = "⋮",
                     fontSize = 20.sp,
@@ -171,6 +179,7 @@ fun StudySetItem(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewStudySetItem() {

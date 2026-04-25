@@ -28,6 +28,7 @@
 
     <!-- Study Sets Screen -->
     <string name="study_sets_title">Study Sets</string>
+    <string name="study_sets_subtitle">Organize, Practice, Master</string>
     <string name="study_set_detail_title">Study set</string>
     <string name="study_sets_empty">No study sets yet.</string>
     <string name="study_sets_empty_hint">Tap + to upload or record your first set.</string>

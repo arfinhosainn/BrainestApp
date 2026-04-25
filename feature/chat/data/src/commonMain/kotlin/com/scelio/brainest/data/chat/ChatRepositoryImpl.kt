@@ -61,7 +61,6 @@ class ChatRepositoryImpl(
         coroutineScope.launch(Dispatchers.IO) {
             when (val result = supabaseService.syncChat(chat)) {
                 is Result.Success -> {
-                    // Successfully synced
                 }
 
                 is Result.Failure -> {

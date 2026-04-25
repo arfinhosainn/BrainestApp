@@ -8,10 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.format
 
 data class SettingsState(
     val username: String = "",
@@ -49,13 +48,13 @@ class SettingsViewModel(
                     val joinedText = user.createdAt?.let { dateStr ->
                         try {
                             // Parse ISO date string from Supabase (e.g., "2024-01-15T10:30:00Z")
-                            val instant = Instant.parse(dateStr)
-                            val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+                            val instant = kotlin.time.Instant.parse(dateStr)
+                            val localDate = instant.toLocalDateTime(TimeZone.UTC)
                             val monthNames = listOf(
                                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
                             )
-                            val monthName = monthNames[localDate.monthNumber - 1]
+                            val monthName = monthNames[localDate.month.number - 1]
                             "$monthName ${localDate.year}"
                         } catch (e: Exception) {
                             logger.error("[SettingsViewModel] Failed to parse date: $dateStr")

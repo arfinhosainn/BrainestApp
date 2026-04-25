@@ -35,12 +35,13 @@ import brainest.feature.study.presentation.generated.resources.generating_flashc
 import brainest.feature.study.presentation.generated.resources.upload_documents
 import com.scelio.brainest.presentation.components.FlashcardItem
 import com.scelio.brainest.presentation.components.UploadDocsBottomSheet
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
-import kotlinx.datetime.Instant as KxInstant
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
@@ -190,14 +191,14 @@ fun FlashcardsGenerateScreen(
 
 private fun formatDate(
     instant: Instant,
-    timeZone: TimeZone = TimeZone.currentSystemDefault()
+    timeZone: TimeZone = TimeZone.UTC
 ): String {
-    val localDate = KxInstant
+    val localDate = Instant
         .fromEpochMilliseconds(instant.toEpochMilliseconds())
         .toLocalDateTime(timeZone)
         .date
-    val month = monthNames[localDate.monthNumber - 1]
-    return "$month ${localDate.dayOfMonth}, ${localDate.year}"
+    val month = monthNames[localDate.month.number - 1]
+    return "$month ${localDate.day}, ${localDate.year}"
 }
 
 private val monthNames = listOf(

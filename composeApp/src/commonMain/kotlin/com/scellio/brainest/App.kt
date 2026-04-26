@@ -20,6 +20,7 @@ import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
 import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
 import com.scelio.brainest.presentation.navigation.FlashcardsGraphRoutes
 import com.scelio.brainest.presentation.navigation.HomeGraphRoutes
+import com.scelio.brainest.presentation.navigation.ScanGraphRoutes
 import com.scelio.brainest.presentation.util.ObserveAsEvents
 import com.scellio.brainest.navigation.BrainestBottomNavigationBar
 import com.scellio.brainest.navigation.DeepLinkListener
@@ -92,13 +93,16 @@ fun App(
             val settingsRoute = HomeGraphRoutes.Settings::class.qualifiedName
             val isSettingsRoute = currentRoute == settingsRoute ||
                 currentRoute?.endsWith(".Settings") == true
+            val scanRoutePrefix = ScanGraphRoutes.Scan::class.qualifiedName
+            val isScanRoute = scanRoutePrefix != null && currentRoute?.startsWith(scanRoutePrefix) == true
             val hideBottomBar = currentRoute == FlashcardsGraphRoutes.AudioRecording::class.qualifiedName ||
                 currentRoute?.endsWith(".AudioRecording") == true ||
                 isChatDetailRoute ||
                 isChatListRoute ||
                 isQuizRoute ||
                 isFlashcardsSessionRoute ||
-                isSettingsRoute
+                isSettingsRoute ||
+                isScanRoute
             val mainGraphPrefixes = listOfNotNull(
                 HomeGraphRoutes::class.qualifiedName,
                 ChatGraphRoutes::class.qualifiedName,
@@ -115,6 +119,9 @@ fun App(
                             onItemSelected = { index ->
                                 when (index) {
                                     0 -> navController.navigate(HomeGraphRoutes.Graph) {
+                                        launchSingleTop = true
+                                    }
+                                    1 -> navController.navigate(ScanGraphRoutes.Scan) {
                                         launchSingleTop = true
                                     }
                                     2 -> navController.navigate(ChatGraphRoutes.ChatDetailRoute()) {

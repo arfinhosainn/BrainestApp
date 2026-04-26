@@ -10,10 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
@@ -44,12 +42,8 @@ fun TopAppBarStudySets(
             }
         },
         modifier = modifier.fillMaxWidth(),
-        // remove automatic status bar top inset so the bar sits flush with the top of the layout
-        windowInsets = WindowInsets(0, 0, 0, 0),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            titleContentColor = MaterialTheme.colorScheme.onSurface
-        )
+        // Avoid the newer topAppBarColors overload here because Live Edit can resolve
+        // against an older Material3 runtime and crash on signature mismatch.
+        windowInsets = WindowInsets(0, 0, 0, 0)
     )
 }
-

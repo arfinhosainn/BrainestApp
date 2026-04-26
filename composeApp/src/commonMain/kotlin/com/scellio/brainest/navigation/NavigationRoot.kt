@@ -12,6 +12,7 @@ import com.scelio.brainest.presentation.navigation.authGraph
 import com.scelio.brainest.presentation.navigation.chatGraph
 import com.scelio.brainest.presentation.navigation.flashcardsGraph
 import com.scelio.brainest.presentation.navigation.homeGraph
+import com.scelio.brainest.presentation.navigation.scanGraph
 
 @Suppress("ParamsComparedByRef")
 @Composable
@@ -54,5 +55,6 @@ fun NavigationRoot(
                 }
             }
         )
+        scanGraph()
     }
 }

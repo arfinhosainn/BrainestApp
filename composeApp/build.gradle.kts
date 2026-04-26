@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.convention.cmp.library)
 }
@@ -34,6 +33,7 @@ kotlin {
             implementation(projects.feature.home.presentation)
             implementation(projects.feature.home.data)
             implementation(projects.feature.settings.presentation)
+            implementation(projects.feature.scan.presentation)
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.bundles.koin.common)
             implementation(libs.supabase.postgrest.kt)

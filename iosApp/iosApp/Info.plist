@@ -19,6 +19,8 @@
 	<string>We need microphone access to record audio.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need camera access to capture study images.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need photo library access so you can pick study images.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 </dict>

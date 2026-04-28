@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCapturePhoto
@@ -37,12 +37,22 @@ import platform.AVFoundation.AVCaptureVideoPreviewLayer
 import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
 import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.fileDataRepresentation
+import platform.AVFoundation.hasTorch
+import platform.AVFoundation.torchMode
+import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
-import platform.Foundation.NSData
+import platform.UIKit.UIApplication
+import platform.UIKit.UIImagePickerController
+import platform.UIKit.UIImagePickerControllerDelegateProtocol
+import platform.UIKit.UIImagePickerControllerImageURL
+import platform.UIKit.UIImagePickerControllerSourceType
+import platform.UIKit.UINavigationControllerDelegateProtocol
 import platform.UIKit.UIView
+import platform.UIKit.UIWindow
 import platform.darwin.NSObject
 
 @Composable
@@ -59,6 +69,17 @@ actual fun CameraScreen(
     var statusMessage by remember { mutableStateOf<String?>(null) }
     var isFlashOn by remember { mutableStateOf(false) }
     var isFlashAvailable by remember { mutableStateOf(false) }
+    val galleryPicker = remember {
+        IOSGalleryImagePicker(
+            onImagePicked = { path ->
+                statusMessage = "Image selected."
+                currentOnImageCaptured(path)
+            },
+            onError = { message ->
+                statusMessage = message
+            }
+        )
+    }
 
     val cameraController = remember {
         IOSCameraController(
@@ -104,7 +125,7 @@ actual fun CameraScreen(
         CameraBottomControls(
             modifier = Modifier.align(Alignment.BottomCenter),
             onGalleryClick = {
-                statusMessage = "Gallery will be added next."
+                galleryPicker.launch()
             },
             onCaptureClick = {
                 cameraController.capture()
@@ -159,6 +180,98 @@ actual fun CameraScreen(
         )
     }
 }
+
+private class IOSGalleryImagePicker(
+    private val onImagePicked: (String) -> Unit,
+    private val onError: (String) -> Unit
+) {
+    private val delegate = GalleryImagePickerDelegate(
+        onImagePicked = onImagePicked,
+        onError = onError
+    )
+
+    fun launch() {
+        val rootViewController = findRootViewController()
+        if (rootViewController == null) {
+            onError("Unable to open image gallery.")
+            return
+        }
+
+        val picker = UIImagePickerController().apply {
+            sourceType =
+                UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
+            allowsEditing = false
+            delegate = this@IOSGalleryImagePicker.delegate
+        }
+
+        rootViewController.presentViewController(
+            picker,
+            animated = true,
+            completion = null
+        )
+    }
+}
+
+private class GalleryImagePickerDelegate(
+    private val onImagePicked: (String) -> Unit,
+    private val onError: (String) -> Unit
+) : NSObject(), UIImagePickerControllerDelegateProtocol, UINavigationControllerDelegateProtocol {
+
+    override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        picker.dismissViewControllerAnimated(true, completion = null)
+    }
+
+    override fun imagePickerController(
+        picker: UIImagePickerController,
+        didFinishPickingMediaWithInfo: Map<Any?, *>
+    ) {
+        val imageUrl = didFinishPickingMediaWithInfo[UIImagePickerControllerImageURL] as? NSURL
+        if (imageUrl == null) {
+            onError("Unable to read selected image.")
+            picker.dismissViewControllerAnimated(true, completion = null)
+            return
+        }
+
+        val sourcePath = imageUrl.path
+        if (sourcePath == null) {
+            onError("Unable to read selected image path.")
+            picker.dismissViewControllerAnimated(true, completion = null)
+            return
+        }
+
+        val data = NSFileManager.defaultManager.contentsAtPath(sourcePath)
+        if (data == null) {
+            onError("Unable to read selected image.")
+            picker.dismissViewControllerAnimated(true, completion = null)
+            return
+        }
+
+        val filePath = "${NSTemporaryDirectory()}scan_gallery_${NSUUID().UUIDString}.jpg"
+        val didWrite = NSFileManager.defaultManager.createFileAtPath(
+            path = filePath,
+            contents = data,
+            attributes = null
+        )
+
+        if (didWrite) {
+            onImagePicked(filePath)
+        } else {
+            onError("Unable to save selected image.")
+        }
+
+        picker.dismissViewControllerAnimated(true, completion = null)
+    }
+}
+
+private fun findRootViewController() = UIApplication.sharedApplication.keyWindow?.rootViewController
+    ?: UIApplication.sharedApplication.windows
+        .filterIsInstance<UIWindow>()
+        .firstOrNull { it.isKeyWindow() }
+        ?.rootViewController
+    ?: UIApplication.sharedApplication.windows
+        .filterIsInstance<UIWindow>()
+        .firstOrNull()
+        ?.rootViewController
 
 private class IOSCameraController(
     private val onImageCaptured: (String) -> Unit,

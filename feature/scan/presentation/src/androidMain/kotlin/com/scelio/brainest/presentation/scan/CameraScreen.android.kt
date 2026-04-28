@@ -1,8 +1,11 @@
 package com.scelio.brainest.presentation.scan
 
 import android.Manifest
+import android.content.ContentResolver
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.Camera
@@ -42,6 +45,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.foundation.shape.RoundedCornerShape
 import java.io.File
+import java.io.IOException
 
 @Composable
 actual fun CameraScreen(
@@ -79,6 +83,23 @@ actual fun CameraScreen(
         hasPermission = granted
         currentOnCameraReady(granted)
         statusMessage = if (granted) null else "Camera permission denied."
+    }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+
+        val imagePath = runCatching {
+            context.contentResolver.copyImageToCache(uri, context.cacheDir)
+        }.getOrNull()
+
+        if (imagePath == null) {
+            statusMessage = "Unable to read selected image."
+            return@rememberLauncherForActivityResult
+        }
+
+        statusMessage = "Image selected."
+        currentOnImageCaptured(imagePath)
     }
 
     fun capturePhoto() {
@@ -216,7 +237,7 @@ actual fun CameraScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
             isCaptureEnabled = hasPermission,
             onGalleryClick = {
-                statusMessage = "Gallery will be added next."
+                galleryLauncher.launch("image/*")
             },
             onCaptureClick = {
                 if (hasPermission) {
@@ -294,4 +315,21 @@ actual fun CameraScreen(
             onFlashClick = { toggleFlashlight() }
         )
     }
+}
+
+private fun ContentResolver.copyImageToCache(uri: Uri, cacheDir: File): String {
+    val extension = getType(uri)
+        ?.let { MimeTypeMap.getSingleton().getExtensionFromMimeType(it) }
+        ?.takeIf { it.isNotBlank() }
+        ?: "jpg"
+    val outputFile = File.createTempFile("scan_gallery_", ".$extension", cacheDir)
+
+    openInputStream(uri)?.use { input ->
+        outputFile.outputStream().use { output ->
+            input.copyTo(output)
+        }
+        return outputFile.absolutePath
+    }
+
+    throw IOException("Unable to open selected image stream.")
 }

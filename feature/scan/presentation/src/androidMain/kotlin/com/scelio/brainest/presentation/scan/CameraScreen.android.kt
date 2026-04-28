@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.foundation.shape.RoundedCornerShape
+import kotlinx.coroutines.delay
 import java.io.File
 import java.io.IOException
 
@@ -76,6 +79,8 @@ actual fun CameraScreen(
     var camera by remember { mutableStateOf<Camera?>(null) }
     var isTorchOn by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf<String?>(null) }
+    var galleryPreviewPath by remember { mutableStateOf<String?>(null) }
+    var isGalleryScanning by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -98,8 +103,9 @@ actual fun CameraScreen(
             return@rememberLauncherForActivityResult
         }
 
-        statusMessage = "Image selected."
-        currentOnImageCaptured(imagePath)
+        statusMessage = null
+        galleryPreviewPath = imagePath
+        isGalleryScanning = true
     }
 
     fun capturePhoto() {
@@ -116,8 +122,9 @@ actual fun CameraScreen(
             object : ImageCapture.OnImageSavedCallback {
                 @Suppress("UNUSED_PARAMETER")
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    statusMessage = "Image captured."
-                    currentOnImageCaptured(outputFile.absolutePath)
+                    statusMessage = null
+                    galleryPreviewPath = outputFile.absolutePath
+                    isGalleryScanning = true
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -226,6 +233,16 @@ actual fun CameraScreen(
         }
     }
 
+    LaunchedEffect(isGalleryScanning, galleryPreviewPath) {
+        val selectedPath = galleryPreviewPath
+        if (isGalleryScanning && selectedPath != null) {
+            delay(1700)
+            currentOnImageCaptured(selectedPath)
+            isGalleryScanning = false
+            galleryPreviewPath = null
+        }
+    }
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
@@ -251,7 +268,29 @@ actual fun CameraScreen(
             }
         )
 
-        if (hasPermission) {
+        if (galleryPreviewPath != null) {
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = previewBottomPadding)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomStart = CameraPreviewBottomCornerRadius,
+                            bottomEnd = CameraPreviewBottomCornerRadius
+                        )
+                    )
+            ) {
+                val circleSize = minOf(maxWidth, maxHeight) * CameraPreviewCutoutRatio
+                LocalImagePreview(
+                    imagePath = galleryPreviewPath.orEmpty(),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(circleSize)
+                        .clip(CircleShape)
+                )
+                CameraPreviewOverlay(modifier = Modifier.fillMaxSize())
+            }
+        } else if (hasPermission) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -267,7 +306,7 @@ actual fun CameraScreen(
                     modifier = Modifier.fillMaxSize(),
                     factory = { previewView }
                 )
-                CameraSquareOverlay(modifier = Modifier.fillMaxSize())
+                CameraPreviewOverlay(modifier = Modifier.fillMaxSize())
             }
         } else {
             Column(
@@ -314,6 +353,19 @@ actual fun CameraScreen(
             onCloseClick = { currentOnCloseRequested() },
             onFlashClick = { toggleFlashlight() }
         )
+
+        CameraFullscreenScanOverlay(
+            modifier = Modifier.fillMaxSize(),
+            isVisible = isGalleryScanning,
+            previewBottomInset = previewBottomPadding
+        )
+        if (isGalleryScanning) {
+            CameraScanningIndicator(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = CameraControlsPanelHeight + 24.dp)
+            )
+        }
     }
 }
 

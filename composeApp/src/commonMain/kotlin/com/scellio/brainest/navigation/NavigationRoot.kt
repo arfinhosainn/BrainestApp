@@ -55,6 +55,8 @@ fun NavigationRoot(
                 }
             }
         )
-        scanGraph()
+        scanGraph(
+            navController = navController
+        )
     }
 }

@@ -17,11 +17,16 @@ kotlin {
                 implementation(projects.core.designsystem)
                 implementation(projects.core.presentation)
                 implementation(projects.feature.chat.domain)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+
+
 
                 // Compose
                 implementation(libs.jetbrains.compose.ui)
                 implementation(libs.jetbrains.compose.foundation)
                 implementation(libs.jetbrains.compose.material3)
+                implementation(libs.jetbrains.compose.material.icons.extended)
                 implementation(libs.jetbrains.compose.navigation)
             }
         }

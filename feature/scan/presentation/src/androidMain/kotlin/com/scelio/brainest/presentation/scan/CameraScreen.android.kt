@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -13,6 +14,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,8 +37,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.draw.clip
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.foundation.shape.RoundedCornerShape
 import java.io.File
 
 @Composable
@@ -44,13 +48,15 @@ actual fun CameraScreen(
     modifier: Modifier,
     captureTrigger: Int,
     onImageCaptured: (String) -> Unit,
-    onCameraReady: (Boolean) -> Unit
+    onCameraReady: (Boolean) -> Unit,
+    onCloseRequested: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraExecutor = remember(context) { ContextCompat.getMainExecutor(context) }
     val currentOnImageCaptured by rememberUpdatedState(onImageCaptured)
     val currentOnCameraReady by rememberUpdatedState(onCameraReady)
+    val currentOnCloseRequested by rememberUpdatedState(onCloseRequested)
     val previewView = remember {
         PreviewView(context).apply {
             scaleType = PreviewView.ScaleType.FILL_CENTER
@@ -63,6 +69,8 @@ actual fun CameraScreen(
         )
     }
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
+    var camera by remember { mutableStateOf<Camera?>(null) }
+    var isTorchOn by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf<String?>(null) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -99,9 +107,26 @@ actual fun CameraScreen(
         )
     }
 
+    fun toggleFlashlight() {
+        val boundCamera = camera
+        if (boundCamera == null) {
+            statusMessage = "Camera not ready."
+            return
+        }
+        if (!boundCamera.cameraInfo.hasFlashUnit()) {
+            statusMessage = "Flash is not available."
+            return
+        }
+        val targetTorchState = !isTorchOn
+        boundCamera.cameraControl.enableTorch(targetTorchState)
+        isTorchOn = targetTorchState
+    }
+
     DisposableEffect(hasPermission, lifecycleOwner) {
         if (!hasPermission) {
             imageCapture = null
+            camera = null
+            isTorchOn = false
             currentOnCameraReady(false)
             onDispose { }
         } else {
@@ -123,17 +148,21 @@ actual fun CameraScreen(
                     .build()
                 try {
                     provider.unbindAll()
-                    provider.bindToLifecycle(
+                    val boundCamera = provider.bindToLifecycle(
                         lifecycleOwner,
                         CameraSelector.DEFAULT_BACK_CAMERA,
                         preview,
                         captureUseCase
                     )
+                    camera = boundCamera
                     imageCapture = captureUseCase
+                    isTorchOn = false
                     statusMessage = null
                     currentOnCameraReady(true)
                 } catch (t: Throwable) {
                     imageCapture = null
+                    camera = null
+                    isTorchOn = false
                     currentOnCameraReady(false)
                     statusMessage = "Unable to start camera preview."
                     Log.e("CameraScreen", "Camera bind failed", t)
@@ -143,9 +172,14 @@ actual fun CameraScreen(
 
             onDispose {
                 runCatching {
+                    camera?.cameraControl?.enableTorch(false)
+                }
+                runCatching {
                     providerFuture.get().unbindAll()
                 }
                 imageCapture = null
+                camera = null
+                isTorchOn = false
                 currentOnCameraReady(false)
             }
         }
@@ -171,20 +205,60 @@ actual fun CameraScreen(
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
+        val previewBottomPadding = CameraPreviewBottomPadding + (maxHeight * CameraPreviewBottomShrinkRatio)
+
+        CameraBottomControls(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            isCaptureEnabled = hasPermission,
+            onGalleryClick = {
+                statusMessage = "Gallery will be added next."
+            },
+            onCaptureClick = {
+                if (hasPermission) {
+                    capturePhoto()
+                } else {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            onTypeClick = {
+                statusMessage = "Type mode will be added next."
+            }
+        )
+
         if (hasPermission) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = { previewView }
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = previewBottomPadding)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomStart = CameraPreviewBottomCornerRadius,
+                            bottomEnd = CameraPreviewBottomCornerRadius
+                        )
+                    )
+            ) {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { previewView }
+                )
+                CameraSquareOverlay(modifier = Modifier.fillMaxSize())
+            }
         } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(bottom = previewBottomPadding)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomStart = CameraPreviewBottomCornerRadius,
+                            bottomEnd = CameraPreviewBottomCornerRadius
+                        )
+                    )
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -212,17 +286,12 @@ actual fun CameraScreen(
             )
         }
 
-        CameraCaptureButton(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp),
-            enabled = hasPermission
-        ) {
-            if (hasPermission) {
-                capturePhoto()
-            } else {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }
+        CameraTopControls(
+            modifier = Modifier.align(Alignment.TopCenter),
+            isFlashOn = isTorchOn,
+            isFlashAvailable = hasPermission && (camera?.cameraInfo?.hasFlashUnit() == true),
+            onCloseClick = { currentOnCloseRequested() },
+            onFlashClick = { toggleFlashlight() }
+        )
     }
 }

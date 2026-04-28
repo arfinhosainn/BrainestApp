@@ -8,5 +8,6 @@ expect fun CameraScreen(
     modifier: Modifier = Modifier,
     captureTrigger: Int = 0,
     onImageCaptured: (String) -> Unit = {},
-    onCameraReady: (Boolean) -> Unit = {}
+    onCameraReady: (Boolean) -> Unit = {},
+    onCloseRequested: () -> Unit = {}
 )

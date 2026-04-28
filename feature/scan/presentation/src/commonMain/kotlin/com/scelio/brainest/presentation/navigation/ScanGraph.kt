@@ -1,6 +1,7 @@
 package com.scelio.brainest.presentation.navigation
 
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.scelio.brainest.presentation.scan.CameraScreen
 import kotlinx.serialization.Serializable
@@ -16,11 +17,16 @@ sealed interface ScanGraphRoutes {
     }
 }
 
-fun NavGraphBuilder.scanGraph() {
+fun NavGraphBuilder.scanGraph(
+    navController: NavHostController
+) {
     composable<ScanGraphRoutes.Scan> { _ ->
         CameraScreen(
             onImageCaptured = { /* Handle captured image */ },
-            onCameraReady = { /* Handle camera ready */ }
+            onCameraReady = { /* Handle camera ready */ },
+            onCloseRequested = {
+                navController.popBackStack()
+            }
         )
     }
 }

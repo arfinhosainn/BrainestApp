@@ -3,15 +3,27 @@ package com.scellio.brainest
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scelio.brainest.domain.onboarding.OnboardingData
 import com.scelio.brainest.domain.onboarding.OnboardingStore
@@ -70,6 +82,7 @@ fun App(
         hasCompletedOnboarding -> isOnAuthGraph
         else -> isOnOnboardingGraph
     }
+    val fabOffsetY = if (isIosPlatform()) (-15).dp else (-6).dp
     val canDismissSplash = isStartupReady
     val hasDismissedSplash = remember { mutableStateOf(false) }
 
@@ -184,27 +197,55 @@ fun App(
             }
             val showBottomBar = (state.isLoggedIn || isMainGraphRoute) && !hideBottomBar
             Scaffold(
+                containerColor = Color.Transparent,
                 bottomBar = {
                     if (showBottomBar) {
-                        BrainestBottomNavigationBar(
-                            onItemSelected = { index ->
-                                when (index) {
-                                    0 -> navController.navigate(HomeGraphRoutes.Graph) {
-                                        launchSingleTop = true
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            BrainestBottomNavigationBar(
+                                modifier = Modifier.weight(1f),
+                                onItemSelected = { index ->
+                                    when (index) {
+                                        0 -> navController.navigate(HomeGraphRoutes.Graph) {
+                                            launchSingleTop = true
+                                        }
+                                        1 -> navController.navigate(ScanGraphRoutes.Scan) {
+                                            launchSingleTop = true
+                                        }
+                                        2 -> navController.navigate(ChatGraphRoutes.ChatDetailRoute()) {
+                                            launchSingleTop = true
+                                        }
+                                        3 -> navController.navigate(FlashcardsGraphRoutes.Graph) {
+                                            launchSingleTop = true
+                                        }
+                                        else -> Unit
                                     }
-                                    1 -> navController.navigate(ScanGraphRoutes.Scan) {
-                                        launchSingleTop = true
-                                    }
-                                    2 -> navController.navigate(ChatGraphRoutes.ChatDetailRoute()) {
-                                        launchSingleTop = true
-                                    }
-                                    3 -> navController.navigate(FlashcardsGraphRoutes.Graph) {
-                                        launchSingleTop = true
-                                    }
-                                    else -> Unit
                                 }
+                            )
+
+                            FloatingActionButton(
+                                onClick = {
+                                    navController.navigate(ScanGraphRoutes.Scan) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                                modifier = Modifier
+                                    .padding(end = 18.dp)
+                                    .offset(y = fabOffsetY)
+                                    .size(66.dp),
+                                shape = CircleShape,
+                                containerColor = Color.Black,
+                                contentColor = Color.White
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add",
+                                    modifier = Modifier.size(29.dp)
+                                )
                             }
-                        )
+                        }
                     }
                 }
             ) { innerPadding ->
@@ -213,10 +254,14 @@ fun App(
                     PaddingValues(
                         start = innerPadding.calculateStartPadding(layoutDirection),
                         end = innerPadding.calculateEndPadding(layoutDirection),
-                        bottom = innerPadding.calculateBottomPadding()
+                        bottom = 0.dp
                     )
                 } else {
-                    innerPadding
+                    PaddingValues(
+                        start = innerPadding.calculateStartPadding(layoutDirection),
+                        end = innerPadding.calculateEndPadding(layoutDirection),
+                        bottom = 0.dp
+                    )
                 }
                 NavigationRoot(
                     navController = navController,

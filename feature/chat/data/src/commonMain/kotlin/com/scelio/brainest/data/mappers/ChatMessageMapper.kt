@@ -8,12 +8,18 @@ import com.scelio.brainest.domain.models.ChatMessage
 fun ChatMessage.toOpenAIMessage(): MessageDto {
     val contentList = mutableListOf<ContentDto>()
 
-    val textContent = if (role == MessageRoles.ASSISTANT) {
-        ContentDto.OutputText(text = content)
-    } else {
-        ContentDto.Text(text = content)
+    val hasImageContent = !imageUrls.isNullOrEmpty() || imageUrl != null
+    val hasFileContent = fileId != null
+    val shouldIncludeText = content.isNotBlank() || (!hasImageContent && !hasFileContent)
+
+    if (shouldIncludeText) {
+        val textContent = if (role == MessageRoles.ASSISTANT) {
+            ContentDto.OutputText(text = content)
+        } else {
+            ContentDto.Text(text = content)
+        }
+        contentList.add(textContent)
     }
-    contentList.add(textContent)
 
     imageUrls?.forEach { url ->
         contentList.add(ContentDto.Image(imageUrl = url))

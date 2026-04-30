@@ -62,6 +62,7 @@ import platform.darwin.NSObject
 actual fun CameraScreen(
     modifier: Modifier,
     captureTrigger: Int,
+    isProcessing: Boolean,
     onImageCaptured: (String) -> Unit,
     onCameraReady: (Boolean) -> Unit,
     onCloseRequested: () -> Unit
@@ -74,12 +75,14 @@ actual fun CameraScreen(
     var isFlashAvailable by remember { mutableStateOf(false) }
     var galleryPreviewPath by remember { mutableStateOf<String?>(null) }
     var isGalleryScanning by remember { mutableStateOf(false) }
+    var hasDispatchedImageForProcessing by remember { mutableStateOf(false) }
     val galleryPicker = remember {
         IOSGalleryImagePicker(
             onImagePicked = { path ->
                 statusMessage = null
                 galleryPreviewPath = path
                 isGalleryScanning = true
+                hasDispatchedImageForProcessing = false
             },
             onError = { message ->
                 statusMessage = message
@@ -93,6 +96,7 @@ actual fun CameraScreen(
                 statusMessage = null
                 galleryPreviewPath = path
                 isGalleryScanning = true
+                hasDispatchedImageForProcessing = false
             },
             onCameraReady = { ready ->
                 currentOnCameraReady(ready)
@@ -122,13 +126,20 @@ actual fun CameraScreen(
         }
     }
 
-    LaunchedEffect(isGalleryScanning, galleryPreviewPath) {
+    LaunchedEffect(isGalleryScanning, galleryPreviewPath, hasDispatchedImageForProcessing) {
         val selectedPath = galleryPreviewPath
-        if (isGalleryScanning && selectedPath != null) {
+        if (isGalleryScanning && selectedPath != null && !hasDispatchedImageForProcessing) {
             delay(1700)
+            hasDispatchedImageForProcessing = true
             currentOnImageCaptured(selectedPath)
+        }
+    }
+
+    LaunchedEffect(isProcessing, hasDispatchedImageForProcessing) {
+        if (!isProcessing && hasDispatchedImageForProcessing) {
             isGalleryScanning = false
             galleryPreviewPath = null
+            hasDispatchedImageForProcessing = false
         }
     }
 
@@ -142,9 +153,11 @@ actual fun CameraScreen(
         CameraBottomControls(
             modifier = Modifier.align(Alignment.BottomCenter),
             onGalleryClick = {
+                if (isProcessing) return@CameraBottomControls
                 galleryPicker.launch()
             },
             onCaptureClick = {
+                if (isProcessing) return@CameraBottomControls
                 cameraController.capture()
             },
             onTypeClick = {
@@ -209,10 +222,10 @@ actual fun CameraScreen(
 
         CameraFullscreenScanOverlay(
             modifier = Modifier.fillMaxSize(),
-            isVisible = isGalleryScanning,
+            isVisible = isGalleryScanning || isProcessing,
             previewBottomInset = previewBottomPadding
         )
-        if (isGalleryScanning) {
+        if (isGalleryScanning || isProcessing) {
             CameraScanningIndicator(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

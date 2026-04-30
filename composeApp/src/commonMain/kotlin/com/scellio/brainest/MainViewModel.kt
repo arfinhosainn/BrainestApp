@@ -29,6 +29,7 @@ class MainViewModel(
     val events = eventChannel.receiveAsFlow()
 
     private var hasLoadedInitialData = false
+    private var hasResolvedStartup = false
 
     private val _state = MutableStateFlow(MainState())
     val state = _state
@@ -49,6 +50,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val isLoggedIn = sessionManager.isAuthenticated()
+                hasResolvedStartup = true
                 _state.update {
                     it.copy(
                         isCheckingAuth = false,
@@ -57,6 +59,7 @@ class MainViewModel(
                 }
             } catch (e: Exception) {
                 logger.error("Error checking auth state", e)
+                hasResolvedStartup = true
                 _state.update {
                     it.copy(
                         isCheckingAuth = false,
@@ -72,6 +75,7 @@ class MainViewModel(
             .onEach { status ->
                 when (status) {
                     is SessionStatus.Authenticated -> {
+                        hasResolvedStartup = true
                         _state.update {
                             it.copy(
                                 isCheckingAuth = false,
@@ -85,6 +89,7 @@ class MainViewModel(
 
                     is SessionStatus.NotAuthenticated -> {
                         val wasLoggedIn = _state.value.isLoggedIn
+                        hasResolvedStartup = true
                         _state.update {
                             it.copy(
                                 isCheckingAuth = false,
@@ -98,13 +103,16 @@ class MainViewModel(
                     }
 
                     is SessionStatus.Initializing -> {
-                        _state.update {
-                            it.copy(isCheckingAuth = true)
+                        if (!hasResolvedStartup) {
+                            _state.update {
+                                it.copy(isCheckingAuth = true)
+                            }
                         }
                     }
 
                     is SessionStatus.RefreshFailure -> {
                         val wasLoggedIn = _state.value.isLoggedIn
+                        hasResolvedStartup = true
                         _state.update {
                             it.copy(
                                 isCheckingAuth = false,

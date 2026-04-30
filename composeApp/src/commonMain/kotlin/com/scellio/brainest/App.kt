@@ -8,9 +8,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.scelio.brainest.domain.onboarding.OnboardingData
 import com.scelio.brainest.domain.onboarding.OnboardingStore
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -43,19 +46,89 @@ fun App(
     DeepLinkListener(navController)
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val onboardingData by onboardingStore.data.collectAsStateWithLifecycle(initialValue = null)
+    val onboardingData by onboardingStore.data.collectAsStateWithLifecycle(initialValue = OnboardingData())
     val appLanguageTag by AppLanguageState.languageTag.collectAsStateWithLifecycle()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val hasCompletedOnboarding = onboardingData.isCompleted()
+    val isStartupReady = !state.isCheckingAuth
+    val hasRenderedApp = remember { mutableStateOf(false) }
+    val shouldRenderApp = isStartupReady || hasRenderedApp.value
+    val startDestination = when {
+        state.isLoggedIn -> HomeGraphRoutes.Graph
+        hasCompletedOnboarding -> AuthGraphRoutes.Graph
+        else -> OnboardingGraphRoutes.Graph
+    }
+    val homePrefix = HomeGraphRoutes::class.qualifiedName
+    val authPrefix = AuthGraphRoutes::class.qualifiedName
+    val onboardingPrefix = OnboardingGraphRoutes::class.qualifiedName
+    val isOnHomeGraph = homePrefix != null && currentRoute?.startsWith(homePrefix) == true
+    val isOnAuthGraph = authPrefix != null && currentRoute?.startsWith(authPrefix) == true
+    val isOnOnboardingGraph = onboardingPrefix != null && currentRoute?.startsWith(onboardingPrefix) == true
+    val isRouteAligned = when {
+        state.isLoggedIn -> isOnHomeGraph
+        hasCompletedOnboarding -> isOnAuthGraph
+        else -> isOnOnboardingGraph
+    }
+    val canDismissSplash = isStartupReady
+    val hasDismissedSplash = remember { mutableStateOf(false) }
 
-    LaunchedEffect(onboardingData?.languageId) {
-        val persistedLanguageId = onboardingData?.languageId ?: return@LaunchedEffect
+    LaunchedEffect(onboardingData.languageId) {
+        val persistedLanguageId = onboardingData.languageId ?: return@LaunchedEffect
         val languageTag = languageIdToTag(persistedLanguageId)
         AppLanguageState.update(languageTag)
         applyAppLanguage(languageTag)
     }
 
-    LaunchedEffect(state.isCheckingAuth) {
-        if (!state.isCheckingAuth) {
+    LaunchedEffect(canDismissSplash) {
+        if (canDismissSplash && !hasDismissedSplash.value) {
+            hasDismissedSplash.value = true
             onAutheticationChecked()
+        }
+    }
+    LaunchedEffect(isStartupReady) {
+        if (isStartupReady) {
+            hasRenderedApp.value = true
+        }
+    }
+    LaunchedEffect(isStartupReady, state.isLoggedIn, hasCompletedOnboarding, currentRoute, hasDismissedSplash.value) {
+        if (!isStartupReady || currentRoute == null || hasDismissedSplash.value || isRouteAligned) {
+            return@LaunchedEffect
+        }
+
+        when {
+            state.isLoggedIn -> {
+                navController.navigate(HomeGraphRoutes.Graph) {
+                    launchSingleTop = true
+                    if (isOnAuthGraph) {
+                        popUpTo(AuthGraphRoutes.Graph) { inclusive = true }
+                    } else if (isOnOnboardingGraph) {
+                        popUpTo(OnboardingGraphRoutes.Graph) { inclusive = true }
+                    }
+                }
+            }
+
+            !state.isLoggedIn && hasCompletedOnboarding -> {
+                navController.navigate(AuthGraphRoutes.Graph) {
+                    launchSingleTop = true
+                    if (isOnHomeGraph) {
+                        popUpTo(HomeGraphRoutes.Graph) { inclusive = true }
+                    } else if (isOnOnboardingGraph) {
+                        popUpTo(OnboardingGraphRoutes.Graph) { inclusive = true }
+                    }
+                }
+            }
+
+            else -> {
+                navController.navigate(OnboardingGraphRoutes.Graph) {
+                    launchSingleTop = true
+                    if (isOnHomeGraph) {
+                        popUpTo(HomeGraphRoutes.Graph) { inclusive = true }
+                    } else if (isOnAuthGraph) {
+                        popUpTo(AuthGraphRoutes.Graph) { inclusive = true }
+                    }
+                }
+            }
         }
     }
 
@@ -74,9 +147,7 @@ fun App(
     BrainestTheme {
         // Consume the app language state so locale updates trigger recomposition.
         appLanguageTag
-        if (!state.isCheckingAuth) {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
+        if (shouldRenderApp) {
             val chatDetailRoutePrefix = ChatGraphRoutes.ChatDetailRoute::class.qualifiedName
             val isChatDetailRoute = chatDetailRoutePrefix != null &&
                 currentRoute?.startsWith(chatDetailRoutePrefix) == true
@@ -149,14 +220,19 @@ fun App(
                 }
                 NavigationRoot(
                     navController = navController,
-                    startDestination = if (state.isLoggedIn) {
-                        HomeGraphRoutes.Graph
-                    } else {
-                        OnboardingGraphRoutes.Graph
-                    },
+                    startDestination = startDestination,
                     modifier = Modifier.padding(navHostPadding)
                 )
             }
         }
     }
+}
+
+private fun OnboardingData.isCompleted(): Boolean {
+    return name.isNotBlank() &&
+        gradeId != null &&
+        goalId != null &&
+        learningMethodId != null &&
+        studyTimeId != null &&
+        languageId != null
 }

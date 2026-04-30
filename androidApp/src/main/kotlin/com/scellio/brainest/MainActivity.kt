@@ -9,10 +9,13 @@ import androidx.core.graphics.toColorInt
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity() {
+    @Volatile
+    private var keepSplashScreenVisible = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { keepSplashScreenVisible }
         val statusBarColor = "#1B5E3E".toColorInt()
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
@@ -21,7 +24,11 @@ class MainActivity : AppCompatActivity() {
             ),
         )
         setContent {
-            App()
+            App(
+                onAutheticationChecked = {
+                    keepSplashScreenVisible = false
+                }
+            )
         }
     }
 }

@@ -1,18 +1,22 @@
 package com.scelio.brainest.designsystem.components.navbar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +30,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -35,14 +38,13 @@ import brainest.core.designsystem.generated.resources.ic_cards
 import brainest.core.designsystem.generated.resources.ic_home
 import brainest.core.designsystem.generated.resources.ic_scan
 import brainest.core.designsystem.generated.resources.ic_stars
-import com.scelio.brainest.designsystem.BrainestMath
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class ButtonData(val text: String, val icon: ImageVector)
 
-private val BarHeight = 92.dp
+private val BarHeight = 72.dp
 
 @Composable
 fun BottomNavigationBar(
@@ -51,35 +53,38 @@ fun BottomNavigationBar(
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedColor = BrainestMath
-    val unselectedColor = Color.DarkGray
+    val selectedColor = MaterialTheme.colorScheme.onSurface
+    val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(BarHeight),
-        contentAlignment = Alignment.BottomCenter,
+            .navigationBarsPadding()
+            .offset(y = (-2).dp)
+            .padding(start = 20.dp, end = 20.dp, top = 2.dp, bottom = 0.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(BarHeight)
-                .clip(shape = RoundedCornerShape(topEnd = 45.dp, topStart = 45.dp))
-                .align(Alignment.BottomCenter)
-                .background(MaterialTheme.colorScheme.surface),
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(40.dp),
+            color = Color(0xFFF2F2F2),
+            tonalElevation = 0.dp,
+            shadowElevation = 0.dp
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 0.dp),
+                    .fillMaxWidth()
+                    .height(BarHeight)
+                    .padding(horizontal = 1.dp, vertical = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 buttons.forEachIndexed { index, button ->
                     val selected = index == selectedIndex
                     val interactionSource = remember { MutableInteractionSource() }
-                    Box(
+                    BoxWithConstraints(
                         modifier = Modifier
                             .weight(1f)
+                            .fillMaxHeight()
                             .clickable(
                                 interactionSource = interactionSource,
                                 indication = ripple(
@@ -89,19 +94,31 @@ fun BottomNavigationBar(
                                 ),
                                 onClick = { onItemSelected(index) },
                             )
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = 0.dp),
                         contentAlignment = Alignment.Center,
                     ) {
+                        val selectedBadgeSize = maxHeight - 6.dp
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
-                            Icon(
-                                imageVector = button.icon,
-                                contentDescription = button.text,
-                                modifier = Modifier.size(35.dp),
-                                tint = if (selected) selectedColor else unselectedColor,
-                            )
+                            Surface(
+                                modifier = Modifier.size(if (selected) selectedBadgeSize else 44.dp),
+                                shape = CircleShape,
+                                color = if (selected) Color.White else Color.Transparent
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = button.icon,
+                                        contentDescription = button.text,
+                                        modifier = Modifier.size(if (selected) 28.dp else 26.dp),
+                                        tint = if (selected) selectedColor else unselectedColor,
+                                    )
+                                }
+                            }
                         }
                     }
                 }

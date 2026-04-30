@@ -2,6 +2,7 @@ package com.scelio.brainest.presentation.chat_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.scelio.brainest.designsystem.components.chat.BrainestChatBubble
@@ -35,6 +36,7 @@ import com.scelio.brainest.presentation.chat_detail.components.ChatConversationS
 import com.scelio.brainest.presentation.chat_detail.components.ChatPaginationShimmer
 import com.scelio.brainest.presentation.chat_detail.components.ChatDetailHeader
 import com.scelio.brainest.presentation.chat_detail.components.ChatHistoryDrawer
+import com.scelio.brainest.presentation.chat_detail.components.MessageImageAttachments
 import com.scelio.brainest.presentation.chat_detail.components.MessageInputBox
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.collectLatest
@@ -203,11 +205,25 @@ fun ChatDetailScreen(
                             items = viewModel.messages,
                             key = { it.id }
                         ) { msg ->
-                            BrainestChatBubble(
-                                messageContent = msg.content,
-                                isFromUser = msg.isFromUser,
-                                formattedDateTime = msg.timestamp.asString()
-                            )
+                            val messageImages = msg.getAllImageUrls()
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = if (msg.isFromUser) Alignment.End else Alignment.Start,
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                if (messageImages.isNotEmpty()) {
+                                    Box(modifier = Modifier.fillMaxWidth(0.65f)) {
+                                        MessageImageAttachments(imageUrls = messageImages)
+                                    }
+                                }
+                                if (msg.content.isNotBlank()) {
+                                    BrainestChatBubble(
+                                        messageContent = msg.content,
+                                        isFromUser = msg.isFromUser,
+                                        formattedDateTime = msg.timestamp.asString()
+                                    )
+                                }
+                            }
                         }
 
                         if (state.isPaginationLoading) {

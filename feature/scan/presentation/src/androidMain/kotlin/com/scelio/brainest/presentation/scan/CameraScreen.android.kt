@@ -54,6 +54,7 @@ import java.io.IOException
 actual fun CameraScreen(
     modifier: Modifier,
     captureTrigger: Int,
+    isProcessing: Boolean,
     onImageCaptured: (String) -> Unit,
     onCameraReady: (Boolean) -> Unit,
     onCloseRequested: () -> Unit
@@ -81,6 +82,7 @@ actual fun CameraScreen(
     var statusMessage by remember { mutableStateOf<String?>(null) }
     var galleryPreviewPath by remember { mutableStateOf<String?>(null) }
     var isGalleryScanning by remember { mutableStateOf(false) }
+    var hasDispatchedImageForProcessing by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -106,6 +108,7 @@ actual fun CameraScreen(
         statusMessage = null
         galleryPreviewPath = imagePath
         isGalleryScanning = true
+        hasDispatchedImageForProcessing = false
     }
 
     fun capturePhoto() {
@@ -125,6 +128,7 @@ actual fun CameraScreen(
                     statusMessage = null
                     galleryPreviewPath = outputFile.absolutePath
                     isGalleryScanning = true
+                    hasDispatchedImageForProcessing = false
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -233,13 +237,20 @@ actual fun CameraScreen(
         }
     }
 
-    LaunchedEffect(isGalleryScanning, galleryPreviewPath) {
+    LaunchedEffect(isGalleryScanning, galleryPreviewPath, hasDispatchedImageForProcessing) {
         val selectedPath = galleryPreviewPath
-        if (isGalleryScanning && selectedPath != null) {
+        if (isGalleryScanning && selectedPath != null && !hasDispatchedImageForProcessing) {
             delay(1700)
+            hasDispatchedImageForProcessing = true
             currentOnImageCaptured(selectedPath)
+        }
+    }
+
+    LaunchedEffect(isProcessing, hasDispatchedImageForProcessing) {
+        if (!isProcessing && hasDispatchedImageForProcessing) {
             isGalleryScanning = false
             galleryPreviewPath = null
+            hasDispatchedImageForProcessing = false
         }
     }
 
@@ -252,11 +263,13 @@ actual fun CameraScreen(
 
         CameraBottomControls(
             modifier = Modifier.align(Alignment.BottomCenter),
-            isCaptureEnabled = hasPermission,
+            isCaptureEnabled = hasPermission && !isProcessing,
             onGalleryClick = {
+                if (isProcessing) return@CameraBottomControls
                 galleryLauncher.launch("image/*")
             },
             onCaptureClick = {
+                if (isProcessing) return@CameraBottomControls
                 if (hasPermission) {
                     capturePhoto()
                 } else {
@@ -356,10 +369,10 @@ actual fun CameraScreen(
 
         CameraFullscreenScanOverlay(
             modifier = Modifier.fillMaxSize(),
-            isVisible = isGalleryScanning,
+            isVisible = isGalleryScanning || isProcessing,
             previewBottomInset = previewBottomPadding
         )
-        if (isGalleryScanning) {
+        if (isGalleryScanning || isProcessing) {
             CameraScanningIndicator(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

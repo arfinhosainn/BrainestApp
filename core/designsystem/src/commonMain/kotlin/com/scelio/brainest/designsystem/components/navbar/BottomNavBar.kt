@@ -114,7 +114,7 @@ fun BottomNavigationBar(
                                     Icon(
                                         imageVector = button.icon,
                                         contentDescription = button.text,
-                                        modifier = Modifier.size(if (selected) 28.dp else 26.dp),
+                                        modifier = Modifier.size(34.dp),
                                         tint = if (selected) selectedColor else unselectedColor,
                                     )
                                 }

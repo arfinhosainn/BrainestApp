@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +71,7 @@ fun VipUnlockScreen(
     val backgroundColor = Color(0xFF1FA45C)
 
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = backgroundColor,
         topBar = {
             CenterAlignedTopAppBar(
@@ -138,7 +142,13 @@ fun VipUnlockScreen(
         }
     ) { innerPadding ->
 
-        Box(modifier = modifier.fillMaxSize().padding(top = 40.dp)) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .padding(top = 40.dp)
+        ) {
             Text(
                 text = headline,
                 style = MaterialTheme.typography.titleLarge,

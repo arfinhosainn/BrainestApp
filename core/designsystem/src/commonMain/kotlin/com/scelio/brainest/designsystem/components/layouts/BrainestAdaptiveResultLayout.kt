@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,12 +38,14 @@ fun BrainestAdaptiveResultLayout(
     val configuration = currentDeviceConfiguration()
 
     Scaffold(
-        modifier = modifier
+        modifier = modifier,
+        contentWindowInsets = WindowInsets.safeDrawing
     ) { innerPadding ->
         if(configuration == DeviceConfiguration.MOBILE_PORTRAIT) {
             BrainestSurface(
                 modifier = Modifier
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
                 header = {
                     Spacer(modifier = Modifier.height(32.dp))
                     BrainestBrandLogo()
@@ -52,6 +57,7 @@ fun BrainestAdaptiveResultLayout(
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .padding(top = 32.dp),

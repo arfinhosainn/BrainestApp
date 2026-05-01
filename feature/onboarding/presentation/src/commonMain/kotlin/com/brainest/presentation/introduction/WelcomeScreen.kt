@@ -37,6 +37,7 @@ fun WelcomeScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = Color.Transparent,
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
@@ -45,6 +46,7 @@ fun WelcomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
                 .background(Color(0xFFEEEEFB))
         ) {
             if (showBottomSheet) {

@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -111,7 +111,6 @@ fun App(
         hasCompletedOnboarding -> isOnAuthGraph
         else -> isOnOnboardingGraph
     }
-    val fabOffsetY = if (isIosPlatform()) (-15).dp else (-28).dp
     val canDismissSplash = isStartupReady
     val hasDismissedSplash = remember { mutableStateOf(false) }
 
@@ -243,7 +242,9 @@ fun App(
                     bottomBar = {
                         if (showBottomBar) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .navigationBarsPadding(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 BrainestBottomNavigationBar(
@@ -266,7 +267,29 @@ fun App(
                                         }
                                     }
                                 )
-                                Spacer(modifier = Modifier.width(84.dp))
+                                if (isHomeScreenRoute) {
+                                    Spacer(modifier = Modifier.width(88.dp))
+                                } else {
+                                    FloatingActionButton(
+                                        onClick = {
+                                            navController.navigate(ScanGraphRoutes.Scan) {
+                                                launchSingleTop = true
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .padding(end = 18.dp)
+                                            .size(70.dp),
+                                        shape = CircleShape,
+                                        containerColor = Color.Black,
+                                        contentColor = Color.White
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add",
+                                            modifier = Modifier.size(34.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -307,8 +330,8 @@ fun App(
                             onExpandedChange = { homeFabExpanded = it },
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .padding(end = 18.dp)
-                                .offset(y = fabOffsetY),
+                                .navigationBarsPadding()
+                                .padding(end = 18.dp),
                             onRecordAudioClick = {
                                 navController.navigate(FlashcardsGraphRoutes.AudioRecording) {
                                     launchSingleTop = true
@@ -325,28 +348,6 @@ fun App(
                                 }
                             }
                         )
-                    } else {
-                        FloatingActionButton(
-                            onClick = {
-                                navController.navigate(ScanGraphRoutes.Scan) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(end = 18.dp)
-                                .offset(y = fabOffsetY)
-                                .size(70.dp),
-                            shape = CircleShape,
-                            containerColor = Color.Black,
-                            contentColor = Color.White
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add",
-                                modifier = Modifier.size(34.dp)
-                            )
-                        }
                     }
                 }
             }

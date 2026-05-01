@@ -6,9 +6,5 @@ import androidx.compose.ui.Modifier
 expect fun isIos(): Boolean
 
 fun Modifier.statusBarsPaddingIfAndroid(): Modifier {
-    return if (isIos()) {
-        this
-    } else {
-        this.statusBarsPadding()
-    }
+    return this.statusBarsPadding()
 }

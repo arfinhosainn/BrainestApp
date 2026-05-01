@@ -1,7 +1,7 @@
 package com.scelio.brainest.designsystem.components.dialogs
 
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -29,8 +29,8 @@ fun BrainestBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = null,
-        contentWindowInsets = { WindowInsets() },
-        modifier = modifier.statusBarsPadding(),
+        contentWindowInsets = { WindowInsets.safeDrawing },
+        modifier = modifier,
     ) {
         content()
     }

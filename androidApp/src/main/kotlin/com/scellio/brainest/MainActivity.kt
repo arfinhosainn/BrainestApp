@@ -1,11 +1,12 @@
 package com.scellio.brainest
 
 import android.os.Bundle
+import android.graphics.Color as AndroidColor
+import android.os.Build
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.toColorInt
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity() {
@@ -16,12 +17,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { keepSplashScreenVisible }
-        val statusBarColor = "#1B5E3E".toColorInt()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+        window.statusBarColor = AndroidColor.TRANSPARENT
+        window.navigationBarColor = AndroidColor.TRANSPARENT
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
-                statusBarColor,
-                statusBarColor
+                AndroidColor.TRANSPARENT,
+                AndroidColor.TRANSPARENT
             ),
+            navigationBarStyle = SystemBarStyle.auto(
+                AndroidColor.TRANSPARENT,
+                AndroidColor.TRANSPARENT
+            )
         )
         setContent {
             App(

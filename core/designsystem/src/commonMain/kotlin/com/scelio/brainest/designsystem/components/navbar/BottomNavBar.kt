@@ -44,7 +44,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class ButtonData(val text: String, val icon: ImageVector)
 
-private val BarHeight = 72.dp
+private val BarHeight = 75.dp
 
 @Composable
 fun BottomNavigationBar(
@@ -114,7 +114,7 @@ fun BottomNavigationBar(
                                     Icon(
                                         imageVector = button.icon,
                                         contentDescription = button.text,
-                                        modifier = Modifier.size(if (selected) 28.dp else 26.dp),
+                                        modifier = Modifier.size(if (selected) 36.dp else 36.dp),
                                         tint = if (selected) selectedColor else unselectedColor,
                                     )
                                 }

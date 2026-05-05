@@ -34,7 +34,7 @@ fun VipUpgradeCard(
     titleLineOne: String = stringResource(Res.string.upgrade_to),
     titleLineTwo: String = stringResource(Res.string.vip_account),
 ) {
-    val cardShape = RoundedCornerShape(28.dp)
+    val cardShape = RoundedCornerShape(40.dp)
     val cardColor = Color(0xFF7BCB63)
     val accentDark = Color(0xFF69B453)
     val accentLight = Color(0xFF8ED978)
@@ -45,7 +45,7 @@ fun VipUpgradeCard(
             .height(180.dp), // ✅ Increased height
         shape = cardShape,
         color = cardColor,
-        shadowElevation = 2.dp,
+        shadowElevation = 0.dp,
     ) {
         Box(
             modifier = Modifier.fillMaxSize()

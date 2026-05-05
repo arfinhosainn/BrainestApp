@@ -46,18 +46,6 @@ fun ProfileStatsOverlay(
                 .offset(y = -(cardHeight * 0.80f)) // shift up by 80% of card height
                 .zIndex(0f)
         )
-
-        // Stats card — pinned to bottom
-        StatsCard(
-            decks = decks,
-            quizzes = quizzes,
-            others = others,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .align(Alignment.BottomCenter)
-                .zIndex(1f)
-        )
     }
 }
 @Preview

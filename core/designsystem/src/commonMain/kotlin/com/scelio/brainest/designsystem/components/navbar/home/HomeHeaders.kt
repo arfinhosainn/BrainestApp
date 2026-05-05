@@ -1,6 +1,6 @@
 package com.scelio.brainest.designsystem.components.navbar.home
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +10,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import brainest.core.designsystem.generated.resources.Res
+import brainest.core.designsystem.generated.resources.background
 import com.scelio.brainest.designsystem.BrainestTheme
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -29,9 +32,14 @@ fun HomeHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)) // clip children to bounds
-            .background(color = Color(0xFF1B5E3E))
+            .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
     ) {
+        Image(
+            painter = painterResource(Res.drawable.background),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
         Column {
             HomeTopNavBar(
                 userName = userName,

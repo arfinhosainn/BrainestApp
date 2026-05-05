@@ -33,9 +33,9 @@ fun ConsecutiveStudyDaysCard(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(40.dp),
         color = Color.White,
-        shadowElevation = 2.dp,
+        shadowElevation = 0.dp,
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),

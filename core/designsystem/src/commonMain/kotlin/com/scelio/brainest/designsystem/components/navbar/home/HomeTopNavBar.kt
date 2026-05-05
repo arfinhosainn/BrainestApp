@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
@@ -110,7 +111,7 @@ private fun DiamondCountChip(
         modifier = modifier
             .clickable(
                 interactionSource = interactionSource,
-                indication = ripple(bounded = true),
+                indication = null,
                 onClick = onClick,
             ),
         contentAlignment = Alignment.CenterStart,
@@ -119,7 +120,15 @@ private fun DiamondCountChip(
             modifier = Modifier
                 .padding(start = 18.dp)
                 .clip(RoundedCornerShape(18.dp))
-                .background(Color(0xFF141414).copy(alpha = .3f))
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colorStops = arrayOf(
+                            0f to Color.Transparent,
+                            0.25f to Color(0xFF141414).copy(alpha = .3f),
+                            1f to Color(0xFF141414).copy(alpha = .3f)
+                        )
+                    )
+                )
                 .padding(start = 24.dp, end = 14.dp)
                 .height(34.dp),
             verticalAlignment = Alignment.CenterVertically,

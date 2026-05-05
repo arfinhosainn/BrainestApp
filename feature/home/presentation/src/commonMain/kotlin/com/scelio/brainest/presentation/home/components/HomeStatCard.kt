@@ -26,9 +26,9 @@ fun HomeStatCard(
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(40.dp),
         color = Color.White,
-        shadowElevation = 1.dp,
+        shadowElevation = 0.dp,
         border = BorderStroke(1.dp, Color(0xFFF1EFEA)),
     ) {
         Column(

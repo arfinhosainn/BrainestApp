@@ -44,6 +44,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 data class ButtonData(val text: String, val icon: ImageVector)
 
 private val BarHeight = 75.dp
+private const val ThreeItemBarWidthFraction = 0.70f
+private const val NavItemScaleFactor = 0.95f
 
 @Composable
 fun BottomNavigationBar(
@@ -54,6 +56,7 @@ fun BottomNavigationBar(
 ) {
     val selectedColor = MaterialTheme.colorScheme.onSurface
     val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val barWidthFraction = if (buttons.size == 3) ThreeItemBarWidthFraction else 1f
 
     Box(
         modifier = modifier
@@ -63,7 +66,7 @@ fun BottomNavigationBar(
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(barWidthFraction),
             shape = RoundedCornerShape(40.dp),
             color = Color(0xFFF2F2F2),
             tonalElevation = 0.dp,
@@ -73,7 +76,7 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(BarHeight)
-                    .padding(horizontal = 1.dp, vertical = 1.dp),
+                    .padding(start = 3.dp, end = 3.dp, top = 1.dp, bottom = 1.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 buttons.forEachIndexed { index, button ->
@@ -95,7 +98,8 @@ fun BottomNavigationBar(
                             .padding(vertical = 0.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        val selectedBadgeSize = maxHeight - 6.dp
+                        val selectedBadgeSize = (maxHeight - 6.dp) * NavItemScaleFactor
+                        val iconSize = 36.dp * NavItemScaleFactor
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -112,7 +116,7 @@ fun BottomNavigationBar(
                                     Icon(
                                         imageVector = button.icon,
                                         contentDescription = button.text,
-                                        modifier = Modifier.size(if (selected) 36.dp else 36.dp),
+                                        modifier = Modifier.size(iconSize),
                                         tint = if (selected) selectedColor else unselectedColor,
                                     )
                                 }

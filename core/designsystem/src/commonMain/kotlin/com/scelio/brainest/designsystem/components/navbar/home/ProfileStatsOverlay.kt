@@ -35,17 +35,7 @@ fun ProfileStatsOverlay(
         contentAlignment = Alignment.BottomCenter
     ) {
         // Turtle — bottom-aligned, 80% above card top, 20% overlaps below
-        Image(
-            painter = painterResource(resource = Res.drawable.turtle),
-            contentDescription = "Mascot",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .height(turtleHeight)
-                .align(Alignment.BottomCenter)
-                .offset(y = -(cardHeight * 0.80f)) // shift up by 80% of card height
-                .zIndex(0f)
-        )
+
     }
 }
 @Preview

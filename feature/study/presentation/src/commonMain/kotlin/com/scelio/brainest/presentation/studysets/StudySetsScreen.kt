@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,13 +21,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -48,15 +53,10 @@ import brainest.feature.study.presentation.generated.resources.Res
 import brainest.feature.study.presentation.generated.resources.study_sets_add
 import brainest.feature.study.presentation.generated.resources.study_sets_empty
 import brainest.feature.study.presentation.generated.resources.study_sets_empty_hint
-import brainest.feature.study.presentation.generated.resources.study_sets_subtitle
-import brainest.feature.study.presentation.generated.resources.study_sets_title
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.presentation.components.StudySetItem
-import com.scelio.brainest.presentation.components.StudySetsSearchBar
-import com.scelio.brainest.presentation.components.TopAppBarStudySets
 import com.scelio.brainest.presentation.components.UploadDocsBottomSheet
 import com.scelio.brainest.presentation.flashcards.rememberDocumentPicker
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
@@ -64,6 +64,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudySetsScreen(
     onOpenSet: (String) -> Unit,
@@ -105,21 +106,24 @@ fun StudySetsScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFEBFCF6))) {
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF00AD67))) {
         Column(modifier = Modifier.fillMaxSize()) {
-            TopAppBarStudySets(
-                title = stringResource(Res.string.study_sets_title),
-                subtitle = stringResource(Res.string.study_sets_subtitle)
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-
-            var query by remember { mutableStateOf("") }
             var selectedFilter by remember { mutableStateOf("All sets") }
 
-            StudySetsSearchBar(
-                initialQuery = "",
-                placeholder = stringResource(Res.string.study_sets_title),
-                onQueryChanged = { query = it }
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Library",
+                        fontFamily = BricolageGrotesq,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                windowInsets = TopAppBarDefaults.windowInsets
             )
 
             // Filter chips row (horizontal, scrollable) - custom rounded chips with BricolageGrotesq font
@@ -128,7 +132,7 @@ fun StudySetsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
-                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
+                    .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 chips.forEach { chip ->
@@ -205,9 +209,6 @@ fun StudySetsScreen(
                             .toSet()
 
                         val filtered = state.sets.filter { set ->
-                            val matchesQuery =
-                                query.isBlank() || set.title.contains(query, ignoreCase = true)
-
                             val matchesFilter = when (selectedFilter) {
                                 "All sets" -> true
                                 "Recent" -> recentIds.contains(set.id)
@@ -228,35 +229,23 @@ fun StudySetsScreen(
                                 else -> true
                             }
 
-                            matchesQuery && matchesFilter
+                            matchesFilter
                         }
 
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                .padding(horizontal = 16.dp),
+                            contentPadding = PaddingValues(
+                                top = 20.dp,
+                                bottom = WindowInsets.navigationBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding() + 132.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             items(filtered, key = { it.id }) { set ->
-                                val filename = set.sourceFilename
-                                val lower = filename?.lowercase()
-                                val docType =
-                                    if (lower != null && (lower.endsWith(".mp3") || lower.endsWith(".wav") || lower.endsWith(
-                                            ".m4a"
-                                        ) || lower.endsWith(".aac") || lower.endsWith(".ogg"))
-                                    ) {
-                                        com.scelio.brainest.presentation.components.DocType.AUDIO
-                                    } else {
-                                        com.scelio.brainest.presentation.components.DocType.DOCUMENT
-                                    }
-
-                                val totalItems = set.flashcardsCount + set.quizCount
-                                val completedItems =
-                                    (set.flashcardsSwiped.coerceAtMost(set.flashcardsCount)) + (set.quizzesCompleted.coerceAtMost(
-                                        set.quizCount
-                                    ))
-                                val masteryPercent =
-                                    if (totalItems <= 0) 0 else ((completedItems * 100) / totalItems)
+                                val docType = resolveDocType(set.sourceFilename)
 
                                 StudySetItem(
                                     id = set.id,
@@ -264,9 +253,6 @@ fun StudySetsScreen(
                                     createdAt = formatDate(set.createdAt),
                                     flashcardsCount = set.flashcardsCount,
                                     quizCount = set.quizCount,
-                                    flashcardsSwiped = set.flashcardsSwiped,
-                                    quizzesCompleted = set.quizzesCompleted,
-                                    masteryPercent = masteryPercent,
                                     docType = docType,
                                     onSetClick = { id -> onOpenSet(id) }
                                 )
@@ -281,7 +267,7 @@ fun StudySetsScreen(
             onClick = { isUploadSheetVisible = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(24.dp),
+                .padding(end = 24.dp, bottom = 27.dp),
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -339,3 +325,30 @@ private val monthNames = listOf(
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 )
+
+private val documentExtensions = setOf(
+    "pdf", "doc", "docx", "txt", "md", "rtf", "odt"
+)
+
+private val audioExtensions = setOf(
+    "mp3", "wav", "m4a", "aac", "ogg", "flac", "opus", "webm"
+)
+
+private val visualOrSlideExtensions = setOf(
+    "ppt", "pptx", "key", "png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "heif", "avif", "tiff"
+)
+
+private fun resolveDocType(sourceFilename: String?): com.scelio.brainest.presentation.components.DocType {
+    val extension = sourceFilename
+        ?.substringAfterLast('.', missingDelimiterValue = "")
+        ?.lowercase()
+        ?.trim()
+        .orEmpty()
+
+    return when {
+        extension in audioExtensions -> com.scelio.brainest.presentation.components.DocType.AUDIO
+        extension in documentExtensions -> com.scelio.brainest.presentation.components.DocType.DOCUMENT
+        extension in visualOrSlideExtensions -> com.scelio.brainest.presentation.components.DocType.OTHER
+        else -> com.scelio.brainest.presentation.components.DocType.OTHER
+    }
+}

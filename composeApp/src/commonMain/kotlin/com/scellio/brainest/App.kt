@@ -223,14 +223,7 @@ fun App(
             val isMainGraphRoute = mainGraphPrefixes.any { prefix ->
                 currentRoute?.startsWith(prefix) == true
             }
-            val homeGraphRoute = HomeGraphRoutes.Graph::class.qualifiedName
-            val isHomeScreenRoute = currentRoute == HomeGraphRoutes.Home::class.qualifiedName ||
-                currentRoute?.endsWith(".Home") == true ||
-                currentRoute == homeGraphRoute ||
-                (homeGraphRoute != null && currentRoute?.startsWith(homeGraphRoute) == true)
-            LaunchedEffect(isHomeScreenRoute) {
-                if (!isHomeScreenRoute) homeFabExpanded = false
-            }
+            LaunchedEffect(currentRoute) { homeFabExpanded = false }
             val showBottomBar = (state.isLoggedIn || isMainGraphRoute) && !hideBottomBar
             Box(
                 modifier = Modifier
@@ -254,42 +247,17 @@ fun App(
                                             0 -> navController.navigate(HomeGraphRoutes.Graph) {
                                                 launchSingleTop = true
                                             }
-                                            1 -> navController.navigate(ScanGraphRoutes.Scan) {
+                                            1 -> navController.navigate(ChatGraphRoutes.ChatDetailRoute()) {
                                                 launchSingleTop = true
                                             }
-                                            2 -> navController.navigate(ChatGraphRoutes.ChatDetailRoute()) {
-                                                launchSingleTop = true
-                                            }
-                                            3 -> navController.navigate(FlashcardsGraphRoutes.Graph) {
+                                            2 -> navController.navigate(FlashcardsGraphRoutes.Graph) {
                                                 launchSingleTop = true
                                             }
                                             else -> Unit
                                         }
                                     }
                                 )
-                                if (isHomeScreenRoute) {
-                                    Spacer(modifier = Modifier.width(88.dp))
-                                } else {
-                                    FloatingActionButton(
-                                        onClick = {
-                                            navController.navigate(ScanGraphRoutes.Scan) {
-                                                launchSingleTop = true
-                                            }
-                                        },
-                                        modifier = Modifier
-                                            .padding(end = 18.dp)
-                                            .size(70.dp),
-                                        shape = CircleShape,
-                                        containerColor = Color.Black,
-                                        contentColor = Color.White
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add",
-                                            modifier = Modifier.size(34.dp)
-                                        )
-                                    }
-                                }
+                                Spacer(modifier = Modifier.width(88.dp))
                             }
                         }
                     }
@@ -308,7 +276,7 @@ fun App(
                                 .padding(navHostPadding)
                                 .consumeWindowInsets(navHostPadding)
                         )
-                        if (isHomeScreenRoute && homeFabExpanded) {
+                        if (homeFabExpanded) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -324,31 +292,29 @@ fun App(
                 }
 
                 if (showBottomBar) {
-                    if (isHomeScreenRoute) {
-                        ExpandableHomeFab(
-                            expanded = homeFabExpanded,
-                            onExpandedChange = { homeFabExpanded = it },
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .navigationBarsPadding()
-                                .padding(end = 18.dp),
-                            onRecordAudioClick = {
-                                navController.navigate(FlashcardsGraphRoutes.AudioRecording) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            onUploadAudioClick = {
-                                navController.navigate(FlashcardsGraphRoutes.Graph) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            onUploadDocumentClick = {
-                                navController.navigate(FlashcardsGraphRoutes.Graph) {
-                                    launchSingleTop = true
-                                }
+                    ExpandableHomeFab(
+                        expanded = homeFabExpanded,
+                        onExpandedChange = { homeFabExpanded = it },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .navigationBarsPadding()
+                            .padding(end = 25.dp, bottom = 4.dp),
+                        onRecordAudioClick = {
+                            navController.navigate(FlashcardsGraphRoutes.AudioRecording) {
+                                launchSingleTop = true
                             }
-                        )
-                    }
+                        },
+                        onUploadAudioClick = {
+                            navController.navigate(FlashcardsGraphRoutes.Graph) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onUploadDocumentClick = {
+                            navController.navigate(FlashcardsGraphRoutes.Graph) {
+                                launchSingleTop = true
+                            }
+                        }
+                    )
                 }
             }
         }

@@ -93,7 +93,7 @@ fun HomeScreen(
     onSettingsClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
 ) {
-    val cardsTopOffset = 15.dp
+    val cardsTopOffset = 80.dp
     val topNavTouchSafeArea = 96.dp
     val bottomOverlayReserve = 120.dp
     val listState = rememberLazyListState()
@@ -129,7 +129,7 @@ fun HomeScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color(0xFF76E074))
+            .background(color = Color(0xFF00AD67))
     ) {
         HomeHeader(
             userName = userName,

@@ -13,7 +13,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import brainest.core.designsystem.generated.resources.Res
-import brainest.core.designsystem.generated.resources.background
+import brainest.core.designsystem.generated.resources.gardenbackground
+import brainest.core.designsystem.generated.resources.gardentheme
 import com.scelio.brainest.designsystem.BrainestTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -32,10 +33,9 @@ fun HomeHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
     ) {
         Image(
-            painter = painterResource(Res.drawable.background),
+            painter = painterResource(Res.drawable.gardentheme),
             contentDescription = null,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop

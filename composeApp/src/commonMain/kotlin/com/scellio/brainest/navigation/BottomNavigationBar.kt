@@ -10,10 +10,8 @@ import brainest.composeapp.generated.resources.Res
 import brainest.composeapp.generated.resources.bottom_nav_chat
 import brainest.composeapp.generated.resources.bottom_nav_flash_quiz
 import brainest.composeapp.generated.resources.bottom_nav_home
-import brainest.composeapp.generated.resources.bottom_nav_scan
 import brainest.composeapp.generated.resources.ic_cards
 import brainest.composeapp.generated.resources.ic_home
-import brainest.composeapp.generated.resources.ic_scan
 import brainest.composeapp.generated.resources.ic_stars
 import com.scelio.brainest.designsystem.components.navbar.BottomNavigationBar
 import com.scelio.brainest.designsystem.components.navbar.ButtonData
@@ -29,7 +27,6 @@ fun BrainestBottomNavigationBar(
 
     val buttons = listOf(
         ButtonData(stringResource(Res.string.bottom_nav_home), icon = vectorResource(Res.drawable.ic_home)),
-        ButtonData(stringResource(Res.string.bottom_nav_scan), icon = vectorResource(Res.drawable.ic_scan)),
         ButtonData(stringResource(Res.string.bottom_nav_chat), icon = vectorResource(Res.drawable.ic_stars)),
         ButtonData(stringResource(Res.string.bottom_nav_flash_quiz), icon = vectorResource(Res.drawable.ic_cards)),
     )

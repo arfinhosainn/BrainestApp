@@ -1,5 +1,10 @@
 package com.scelio.brainest.presentation.studysets
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.outlined.AutoStories
 import androidx.compose.material.icons.outlined.Quiz
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,11 +38,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,6 +65,8 @@ import brainest.feature.study.presentation.generated.resources.quiz_back
 import brainest.feature.study.presentation.generated.resources.smart_notes
 import brainest.feature.study.presentation.generated.resources.smart_notes_empty
 import brainest.feature.study.presentation.generated.resources.study_set_detail_title
+import com.scelio.brainest.flashcards.domain.StudySourceType
+import com.scelio.brainest.presentation.components.DocType
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.components.StudySetItem
 import kotlinx.datetime.TimeZone
@@ -70,6 +79,10 @@ import kotlin.time.Instant
 
 private const val DefaultGenerationCount = 10
 private const val DefaultMultipleChoice = true
+private const val DetailEnterDurationMs = 400
+private const val DetailEnterInitialScale = 0.92f
+private val DetailDepthSpring =
+    spring<Float>(dampingRatio = 0.85f, stiffness = Spring.StiffnessLow)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,9 +96,28 @@ fun StudySetDetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    var deckContentVisible by remember(deckId) { mutableStateOf(false) }
+    val contentAlpha by animateFloatAsState(
+        targetValue = if (deckContentVisible) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = DetailEnterDurationMs,
+            easing = FastOutSlowInEasing
+        ),
+        label = "study_set_detail_alpha"
+    )
+    val contentScale by animateFloatAsState(
+        targetValue = if (deckContentVisible) 1f else DetailEnterInitialScale,
+        animationSpec = DetailDepthSpring,
+        label = "study_set_detail_scale"
+    )
 
     LaunchedEffect(deckId) {
         viewModel.load(deckId)
+    }
+    LaunchedEffect(state.deck?.id) {
+        if (state.deck != null) {
+            deckContentVisible = true
+        }
     }
 
     LaunchedEffect(lifecycleOwner, deckId) {
@@ -105,15 +137,20 @@ fun StudySetDetailScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
-            state.isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-
             state.deck != null -> {
                 val deck = requireNotNull(state.deck)
+                val docType = resolveDocType(
+                    sourceType = state.source?.sourceType,
+                    sourceFilename = deck.sourceFilename
+                )
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .graphicsLayer {
+                            alpha = contentAlpha
+                            scaleX = contentScale
+                            scaleY = contentScale
+                        }
                         .verticalScroll(rememberScrollState())
                         .padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -138,8 +175,7 @@ fun StudySetDetailScreen(
                         createdAt = formatDate(deck.createdAt),
                         flashcardsCount = deck.totalCards,
                         quizCount = state.quizCount,
-                        flashcardsSwiped = state.flashcardsSwiped,
-                        quizzesCompleted = state.quizzesCompleted,
+                        docType = docType,
                         onSetClick = {}
                     )
 
@@ -439,3 +475,30 @@ private val monthNames = listOf(
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 )
+
+private val detailDocumentExtensions = setOf(
+    "pdf", "doc", "docx", "txt", "md", "rtf", "odt"
+)
+
+private val detailVisualOrSlideExtensions = setOf(
+    "ppt", "pptx", "key", "png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "heif", "avif", "tiff"
+)
+
+private fun resolveDocType(
+    sourceType: StudySourceType?,
+    sourceFilename: String?
+): DocType {
+    if (sourceType == StudySourceType.AUDIO) return DocType.AUDIO
+
+    val extension = sourceFilename
+        ?.substringAfterLast('.', missingDelimiterValue = "")
+        ?.lowercase()
+        ?.trim()
+        .orEmpty()
+
+    return when {
+        extension in detailDocumentExtensions -> DocType.DOCUMENT
+        extension in detailVisualOrSlideExtensions -> DocType.OTHER
+        else -> DocType.OTHER
+    }
+}

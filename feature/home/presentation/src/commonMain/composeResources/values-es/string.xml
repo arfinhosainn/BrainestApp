@@ -23,4 +23,5 @@
     <string name="home_lessons_label">Lecciones</string>
     <string name="home_vocabulary_label">Vocabulario</string>
     <string name="home_bronze_class_label">Clase Bronce</string>
+    <string name="home_today_label">Hoy</string>
 </resources>

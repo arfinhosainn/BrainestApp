@@ -41,6 +41,7 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.components.navbar.home.HomeHeader
 import com.scelio.brainest.designsystem.components.vip.vipcard.VipUpgradeCard
 import com.scelio.brainest.presentation.home.components.ConsecutiveStudyDaysCard
+import com.scelio.brainest.presentation.home.components.HomeHeaderIconsRow
 import com.scelio.brainest.presentation.home.components.HomeStatCardUi
 import com.scelio.brainest.presentation.home.components.HomeStatsGrid
 import com.scelio.brainest.presentation.home.components.StudyDayUi
@@ -93,14 +94,21 @@ fun HomeScreen(
     onSettingsClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
 ) {
-    val cardsTopOffset = 80.dp
+    val cardsTopOffset = 60.dp
+    val cardsItemSpacing = 8.dp
     val topNavTouchSafeArea = 96.dp
     val bottomOverlayReserve = 120.dp
     val listState = rememberLazyListState()
     var headerHeightPx by remember { mutableIntStateOf(0) }
+    var headerIconsHeightPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
     val headerHeightDp = with(density) { headerHeightPx.toDp() }
-    val listTopContentPadding = (headerHeightDp + cardsTopOffset - topNavTouchSafeArea)
+    val headerIconsHeightDp = with(density) { headerIconsHeightPx.toDp() }
+    val headerIconsToCardsGap =
+        ((headerIconsHeightDp + cardsItemSpacing) * 1.5f) - headerIconsHeightDp
+    val listTopContentPadding = (
+        headerHeightDp + cardsTopOffset + headerIconsHeightDp + headerIconsToCardsGap - topNavTouchSafeArea
+    )
         .let { if (it > 0.dp) it else 0.dp }
     val navigationBottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val stats = listOf(
@@ -142,12 +150,19 @@ fun HomeScreen(
             onNotificationsClick = onNotificationsClick,
         )
 
+        HomeHeaderIconsRow(
+            modifier = Modifier
+                .padding(top = headerHeightDp + cardsTopOffset)
+                .padding(horizontal = 16.dp)
+                .onSizeChanged { headerIconsHeightPx = it.height },
+        )
+
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = topNavTouchSafeArea),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(cardsItemSpacing),
             contentPadding = PaddingValues(
                 top = listTopContentPadding,
                 bottom = navigationBottomInset + bottomOverlayReserve

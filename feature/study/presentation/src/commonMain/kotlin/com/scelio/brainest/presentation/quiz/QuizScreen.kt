@@ -2,6 +2,8 @@ package com.scelio.brainest.presentation.quiz
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
@@ -20,10 +23,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,26 +40,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.study.presentation.generated.resources.Res
-import brainest.feature.study.presentation.generated.resources.quiz_answered_count
 import brainest.feature.study.presentation.generated.resources.quiz_back
+import brainest.feature.study.presentation.generated.resources.quiz_completion_continue
+import brainest.feature.study.presentation.generated.resources.quiz_completion_correct_label
+import brainest.feature.study.presentation.generated.resources.quiz_completion_earned_label
+import brainest.feature.study.presentation.generated.resources.quiz_completion_exp_format
+import brainest.feature.study.presentation.generated.resources.quiz_completion_reward_prefix
+import brainest.feature.study.presentation.generated.resources.quiz_completion_reward_suffix
+import brainest.feature.study.presentation.generated.resources.quiz_completion_title
+import brainest.feature.study.presentation.generated.resources.ic_diamond
+import brainest.feature.study.presentation.generated.resources.ic_stage
 import brainest.feature.study.presentation.generated.resources.quiz_playing_title
 import brainest.feature.study.presentation.generated.resources.quiz_question_index
-import brainest.feature.study.presentation.generated.resources.quiz_result_summary
-import brainest.feature.study.presentation.generated.resources.quiz_results_title
-import brainest.feature.study.presentation.generated.resources.quiz_retry
-import brainest.feature.study.presentation.generated.resources.quiz_score_format
-import brainest.feature.study.presentation.generated.resources.quiz_stat_answered
-import brainest.feature.study.presentation.generated.resources.quiz_stat_correct
-import brainest.feature.study.presentation.generated.resources.quiz_stat_wrong
-import brainest.feature.study.presentation.generated.resources.quiz_total_count
 import brainest.feature.study.presentation.generated.resources.quizbackground
 import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.presentation.quiz.components.QuizBottomBar
 import com.scelio.brainest.presentation.quiz.components.QuizOptionItem
 import com.scelio.brainest.presentation.quiz.components.QuizOptionState
-import com.scelio.brainest.presentation.quiz.components.QuizQuestionCard
-import com.scelio.brainest.presentation.quiz.components.QuizTopAppBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -221,90 +221,7 @@ fun QuizScreen(
     }
 }
 
-@Composable
-fun QuizResultsScreen(
-    totalQuestions: Int,
-    answeredQuestions: Int,
-    correctAnswers: Int,
-    onBackClick: () -> Unit,
-    onRetryClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val scorePercent = if (totalQuestions == 0) 0 else (correctAnswers * 100) / totalQuestions
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            QuizTopAppBar(
-                title = stringResource(Res.string.quiz_results_title),
-                timeLeftText = stringResource(Res.string.quiz_answered_count, answeredQuestions),
-                totalTimeText = stringResource(Res.string.quiz_total_count, totalQuestions),
-                progress = 1f,
-                onBackClick = onBackClick
-            )
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                QuizQuestionCard(
-                    title = stringResource(Res.string.quiz_score_format, scorePercent),
-                    subtitle = stringResource(Res.string.quiz_result_summary, correctAnswers, totalQuestions)
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatSummary(label = stringResource(Res.string.quiz_stat_answered), value = answeredQuestions.toString())
-                    StatSummary(label = stringResource(Res.string.quiz_stat_correct), value = correctAnswers.toString())
-                    StatSummary(label = stringResource(Res.string.quiz_stat_wrong), value = (answeredQuestions - correctAnswers).coerceAtLeast(0).toString())
-                }
-            }
-
-            Button(
-                onClick = onRetryClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                Text(text = stringResource(Res.string.quiz_retry))
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatSummary(
-    label: String,
-    value: String
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
 
 @Preview
 @Composable
@@ -352,3 +269,4 @@ private fun PreviewQuizScreen() {
         }
     }
 }
+

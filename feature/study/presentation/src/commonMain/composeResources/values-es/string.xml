@@ -13,6 +13,13 @@
     <string name="quiz_stat_correct">Correcto</string>
     <string name="quiz_stat_wrong">Equivocado</string>
     <string name="quiz_retry">Reintentar el cuestionario</string>
+    <string name="quiz_completion_title">¡Completado!</string>
+    <string name="quiz_completion_correct_label">Respuesta correcta</string>
+    <string name="quiz_completion_earned_label">Ganado</string>
+    <string name="quiz_completion_exp_format">%1$d EXP</string>
+    <string name="quiz_completion_reward_prefix">Has recibido</string>
+    <string name="quiz_completion_reward_suffix">recompensa</string>
+    <string name="quiz_completion_continue">Continuar</string>
     <string name="quiz_loading">Cargando cuestionario...</string>
     <string name="quiz_no_questions">No hay preguntas de cuestionario disponibles.</string>
     <string name="quiz_previous">Anterior</string>

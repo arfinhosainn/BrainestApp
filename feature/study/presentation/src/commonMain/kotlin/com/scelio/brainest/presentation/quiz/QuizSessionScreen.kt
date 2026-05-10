@@ -2,7 +2,6 @@ package com.scelio.brainest.presentation.quiz
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
@@ -14,8 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
-import com.scelio.brainest.presentation.quiz.QuizResultsScreen
-
 import brainest.feature.study.presentation.generated.resources.Res
 import brainest.feature.study.presentation.generated.resources.quiz
 import brainest.feature.study.presentation.generated.resources.quiz_loading
@@ -60,8 +57,7 @@ fun QuizSessionScreen(
             totalQuestions = totalQuestions,
             answeredQuestions = state.answeredQuestions,
             correctAnswers = state.correctAnswers,
-            onBackClick = onBackClick,
-            onRetryClick = viewModel::restartQuiz,
+            onContinueClick = onBackClick,
             modifier = Modifier
         )
         return

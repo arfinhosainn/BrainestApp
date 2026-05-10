@@ -13,6 +13,13 @@
     <string name="quiz_stat_correct">Correct</string>
     <string name="quiz_stat_wrong">Wrong</string>
     <string name="quiz_retry">Retry quiz</string>
+    <string name="quiz_completion_title">Completed!</string>
+    <string name="quiz_completion_correct_label">Correct Answer</string>
+    <string name="quiz_completion_earned_label">Earned</string>
+    <string name="quiz_completion_exp_format">%1$d EXP</string>
+    <string name="quiz_completion_reward_prefix">You're given</string>
+    <string name="quiz_completion_reward_suffix">reward</string>
+    <string name="quiz_completion_continue">Continue</string>
     <string name="quiz_loading">Loading quiz...</string>
     <string name="quiz_no_questions">No quiz questions available.</string>
     <string name="quiz_previous">Previous</string>

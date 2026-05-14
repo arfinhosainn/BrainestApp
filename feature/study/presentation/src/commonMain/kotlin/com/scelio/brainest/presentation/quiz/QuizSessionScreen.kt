@@ -57,6 +57,8 @@ fun QuizSessionScreen(
             totalQuestions = totalQuestions,
             answeredQuestions = state.answeredQuestions,
             correctAnswers = state.correctAnswers,
+            earnedExp = state.earnedExp,
+            earnedDiamonds = state.earnedDiamonds,
             onContinueClick = onBackClick,
             modifier = Modifier
         )

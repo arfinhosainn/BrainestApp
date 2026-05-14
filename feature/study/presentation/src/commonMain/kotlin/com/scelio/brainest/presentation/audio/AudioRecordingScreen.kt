@@ -230,15 +230,8 @@ fun AudioRecordingScreen(
 
                     Spacer(modifier = Modifier.height(80.dp))
 
-                    WaveForm(
-                        amplitudeBarWidth = 6.dp,
-                        amplitudeBarSpacing = 5.dp,
-                        powerRatios = state.amplitudes,
-                        trackColor = Color.White,
-                        trackFillColor = Color(0xFF19C472),
-                        playerProgress = { 0f },
-                        useProgressFill = false,
-                        silenceThreshold = 0.06f,
+                    AudioLiveWaveForm(
+                        viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)
@@ -326,4 +319,24 @@ fun AudioRecordingScreen(
             }
         }
     }
+}
+
+@Composable
+private fun AudioLiveWaveForm(
+    viewModel: AudioRecordingViewModel,
+    modifier: Modifier = Modifier
+) {
+    val amplitudes by viewModel.amplitudes.collectAsStateWithLifecycle()
+
+    WaveForm(
+        amplitudeBarWidth = 6.dp,
+        amplitudeBarSpacing = 5.dp,
+        powerRatios = amplitudes,
+        trackColor = Color.White,
+        trackFillColor = Color(0xFF19C472),
+        playerProgress = { 0f },
+        useProgressFill = false,
+        silenceThreshold = 0.06f,
+        modifier = modifier
+    )
 }

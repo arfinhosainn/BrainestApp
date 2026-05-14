@@ -52,6 +52,8 @@ fun StudySetItem(
     createdAt: String,
     flashcardsCount: Int,
     quizCount: Int,
+    flashcardsSwiped: Int = 0,
+    quizzesCompleted: Int = 0,
     docType: DocType = DocType.DOCUMENT,
     onSetClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -66,7 +68,10 @@ fun StudySetItem(
         DocType.AUDIO -> "Audio upload / recording"
         DocType.OTHER -> "PPT, images, or idle/default"
     }
-    val estimatedExp = (flashcardsCount + quizCount).coerceAtLeast(1) * 2
+    val isCompleted = flashcardsCount > 0 &&
+        flashcardsSwiped >= flashcardsCount &&
+        quizCount > 0 &&
+        quizzesCompleted > 0
 
     Box(
         modifier = modifier
@@ -126,15 +131,24 @@ fun StudySetItem(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "\uD83C\uDF81", fontSize = 22.sp)
-                        Spacer(modifier = Modifier.width(8.dp))
+                    if (isCompleted) {
                         Text(
-                            text = "~$estimatedExp EXP",
+                            text = "Completed",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = ColorExp
                         )
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "\uD83C\uDF81", fontSize = 22.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "25/50/80 EXP",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = ColorExp
+                            )
+                        }
                     }
                 }
             }

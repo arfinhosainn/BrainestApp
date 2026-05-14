@@ -159,6 +159,32 @@ class QuizRepositoryImpl(
         }
     }
 
+    override suspend fun syncDeckQuizProgress(
+        deckId: String
+    ): EmptyResult<DataError.Remote> {
+        val hasLocalProgress = studyDao.getQuizProgressByDeckId(deckId).isNotEmpty()
+        if (hasLocalProgress) {
+            return Result.Success(Unit)
+        }
+
+        return when (val result = fetchRemoteQuizProgress(deckId)) {
+            is Result.Success -> {
+                if (result.data.isNotEmpty()) {
+                    studyDao.replaceSyncedQuizProgress(
+                        deckId = deckId,
+                        progress = result.data.map { it.toEntity() }
+                    )
+                }
+                Result.Success(Unit)
+            }
+
+            is Result.Failure -> {
+                logger.error("Failed to sync remote quiz progress for $deckId: ${result.error}")
+                result
+            }
+        }
+    }
+
     private suspend fun syncQuizQuestionsToRemote(
         deckId: String,
         questions: List<QuizQuestion>

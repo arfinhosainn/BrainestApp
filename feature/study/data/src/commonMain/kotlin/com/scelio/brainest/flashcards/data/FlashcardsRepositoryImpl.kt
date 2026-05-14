@@ -21,7 +21,6 @@ import com.scelio.brainest.flashcards.domain.SessionSummary
 import com.scelio.brainest.flashcards.domain.StudySetSummary
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySession
-import com.scelio.brainest.quiz.domain.QuizRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
@@ -67,7 +66,7 @@ class FlashcardsRepositoryImpl(
             is Result.Success -> {
                 cacheRemoteDecks(userId, remoteDecks.data)
                 remoteDecks.data.forEach { deck ->
-                    quizSyncProvider.syncDeckQuizQuestions(deck.id)
+                    syncDeckSupplementaryData(deck.id)
                 }
                 Result.Success(Unit)
             }
@@ -148,7 +147,7 @@ class FlashcardsRepositoryImpl(
                 cacheRemoteDecks(userId, remoteDecks.data)
                 remoteDecks.data.forEach { deck ->
                     coroutineScope.launch(Dispatchers.IO) {
-                        quizSyncProvider.syncDeckQuizQuestions(deck.id)
+                        syncDeckSupplementaryData(deck.id)
                     }
                 }
                 Result.Success(remoteDecks.data)
@@ -468,6 +467,42 @@ class FlashcardsRepositoryImpl(
             }
             .decodeList<SupabaseDeckDto>()
         return decks.firstOrNull()?.totalCards
+    }
+
+    private suspend fun syncDeckSupplementaryData(deckId: String) {
+        when (val quizQuestionsSync = quizSyncProvider.syncDeckQuizQuestions(deckId)) {
+            is Result.Failure -> {
+                logger.error("Failed to sync remote quiz questions for $deckId: ${quizQuestionsSync.error}")
+            }
+
+            is Result.Success -> Unit
+        }
+
+        val hasLocalFlashcardProgress = studyDao.getFlashcardProgressByDeckId(deckId).isNotEmpty()
+        if (!hasLocalFlashcardProgress) {
+            when (val flashcardProgressSync = fetchRemoteFlashcardProgress(deckId)) {
+                is Result.Success -> {
+                    if (flashcardProgressSync.data.isNotEmpty()) {
+                        studyDao.replaceSyncedFlashcardProgress(
+                            deckId = deckId,
+                            progress = flashcardProgressSync.data.map { it.toEntity() }
+                        )
+                    }
+                }
+
+                is Result.Failure -> {
+                    logger.error("Failed to sync remote flashcard progress for $deckId: ${flashcardProgressSync.error}")
+                }
+            }
+        }
+
+        when (val quizProgressSync = quizSyncProvider.syncDeckQuizProgress(deckId)) {
+            is Result.Failure -> {
+                logger.error("Failed to sync remote quiz progress for $deckId: ${quizProgressSync.error}")
+            }
+
+            is Result.Success -> Unit
+        }
     }
 
     private suspend fun syncFlashcardProgressToRemote(progress: FlashcardProgress) {

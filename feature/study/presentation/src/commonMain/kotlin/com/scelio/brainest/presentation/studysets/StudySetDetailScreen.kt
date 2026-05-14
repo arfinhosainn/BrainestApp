@@ -111,9 +111,6 @@ fun StudySetDetailScreen(
         label = "study_set_detail_scale"
     )
 
-    LaunchedEffect(deckId) {
-        viewModel.load(deckId)
-    }
     LaunchedEffect(state.deck?.id) {
         if (state.deck != null) {
             deckContentVisible = true
@@ -175,6 +172,8 @@ fun StudySetDetailScreen(
                         createdAt = formatDate(deck.createdAt),
                         flashcardsCount = deck.totalCards,
                         quizCount = state.quizCount,
+                        flashcardsSwiped = state.flashcardsSwiped,
+                        quizzesCompleted = state.quizzesCompleted,
                         docType = docType,
                         onSetClick = {}
                     )
@@ -367,7 +366,16 @@ private fun SmartNotesContent(
     notes: String,
     modifier: Modifier = Modifier
 ) {
-    val sections = remember(notes) { parseSmartNotesSections(notes) }
+    val sections = remember(notes) {
+        parseSmartNotesSections(notes).map { section ->
+            RenderedSmartNotesSection(
+                heading = section.heading,
+                bodyText = section.body
+                    .joinToString(separator = "\n") { line -> normalizeSmartNotesLine(line) }
+                    .trim()
+            )
+        }
+    }
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -381,13 +389,9 @@ private fun SmartNotesContent(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            val bodyText = section.body
-                .map { line -> normalizeSmartNotesLine(line) }
-                .joinToString("\n")
-                .trim()
-            if (bodyText.isNotBlank()) {
+            if (section.bodyText.isNotBlank()) {
                 Text(
-                    text = bodyText,
+                    text = section.bodyText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -399,6 +403,11 @@ private fun SmartNotesContent(
 private data class SmartNotesSectionData(
     val heading: String?,
     val body: List<String>
+)
+
+private data class RenderedSmartNotesSection(
+    val heading: String?,
+    val bodyText: String
 )
 
 private fun parseSmartNotesSections(raw: String): List<SmartNotesSectionData> {

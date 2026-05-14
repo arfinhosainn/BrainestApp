@@ -27,7 +27,9 @@ import com.scelio.brainest.home.domain.WeeklyPointsRepository
 import com.scelio.brainest.home.domain.WeeklyPointsSchedule
 import com.scelio.brainest.presentation.home.components.StudyDayUi
 import com.scelio.brainest.presentation.home.components.StudyDayStatus
+import com.scelio.brainest.quiz.domain.QuizRewardSeed
 import com.scelio.brainest.quiz.domain.QuizRepository
+import com.scelio.brainest.quiz.domain.computeEffectiveQuizRewards
 import kotlin.time.Clock
 import kotlin.time.Instant
 import kotlinx.coroutines.async
@@ -57,6 +59,7 @@ data class HomeState(
     val completedDaysThisWeek: Int = 0,
     val earnedPoints: Int = 0,
     val totalPoints: Int = 0,
+    val diamondCount: Int = 0,
     val studyDays: List<StudyDayUi> = defaultStudyDays(),
     val error: String? = null
 )
@@ -67,7 +70,8 @@ private data class DeckStudySnapshot(
     val flashcardsSwiped: Int,
     val flashCompletionDates: Set<LocalDate>,
     val quizCompletionDates: List<LocalDate>,
-    val completedQuizCount: Int
+    val completedQuizCount: Int,
+    val quizRewardSeeds: List<QuizRewardSeed>
 )
 
 class HomeViewModel(
@@ -100,6 +104,9 @@ class HomeViewModel(
                 _state.update {
                     it.copy(
                         error = getString(Res.string.home_error_no_authenticated_user),
+                        earnedPoints = 0,
+                        totalPoints = 0,
+                        diamondCount = 0,
                         studyDays = buildStudyDays(emptySet(), cachedWeeklySchedule)
                     )
                 }
@@ -130,6 +137,9 @@ class HomeViewModel(
                 _state.update {
                     it.copy(
                         error = getString(Res.string.home_error_failed_to_load_decks, decksResult.error.toString()),
+                        earnedPoints = 0,
+                        totalPoints = 0,
+                        diamondCount = 0,
                         studyDays = buildStudyDays(
                             completedDays = emptySet(),
                             schedule = cachedWeeklySchedule,
@@ -159,12 +169,29 @@ class HomeViewModel(
                         is Result.Failure -> emptySet()
                     }
 
-                    val (quizCompletionDates, completedQuizCount) = when (quizProgressResult) {
-                        is Result.Success -> Pair(
-                            quizProgressResult.data.map { it.completedAt.toLocalDate() },
-                            quizProgressResult.data.size
-                        )
-                        is Result.Failure -> Pair(emptyList(), 0)
+                    val quizCompletionDates: List<LocalDate>
+                    val completedQuizCount: Int
+                    val quizRewardSeeds: List<QuizRewardSeed>
+                    when (quizProgressResult) {
+                        is Result.Success -> {
+                            val completions = quizProgressResult.data
+                            quizCompletionDates = completions.map { it.completedAt.toLocalDate() }
+                            completedQuizCount = completions.size
+                            quizRewardSeeds = completions.map { completion ->
+                                QuizRewardSeed(
+                                    deckId = completion.deckId,
+                                    completedAtEpochMillis = completion.completedAt.toEpochMilliseconds(),
+                                    totalQuestions = completion.totalQuestions,
+                                    answeredQuestions = completion.answeredQuestions,
+                                    correctAnswers = completion.correctAnswers
+                                )
+                            }
+                        }
+                        is Result.Failure -> {
+                            quizCompletionDates = emptyList()
+                            completedQuizCount = 0
+                            quizRewardSeeds = emptyList()
+                        }
                     }
 
                     DeckStudySnapshot(
@@ -173,7 +200,8 @@ class HomeViewModel(
                         flashcardsSwiped = flashcardsSwiped,
                         flashCompletionDates = flashCompletionDates,
                         quizCompletionDates = quizCompletionDates,
-                        completedQuizCount = completedQuizCount
+                        completedQuizCount = completedQuizCount,
+                        quizRewardSeeds = quizRewardSeeds
                     )
                 }
             }.awaitAll()
@@ -187,6 +215,11 @@ class HomeViewModel(
                 snapshot.totalCards > 0 && snapshot.flashcardsSwiped >= snapshot.totalCards
             }
             val completedQuizzes = deckSnapshots.sumOf { it.completedQuizCount }
+            val effectiveQuizRewards = computeEffectiveQuizRewards(
+                deckSnapshots.flatMap { it.quizRewardSeeds }
+            )
+            val quizRewardExp = effectiveQuizRewards.sumOf { it.earnedExp }
+            val quizRewardDiamonds = effectiveQuizRewards.sumOf { it.earnedDiamonds }
             val currentStreakDays = calculateStreak(completedDaySet)
             val longestStreakDays = calculateLongestStreak(completedDaySet)
 
@@ -194,9 +227,10 @@ class HomeViewModel(
             scheduleDeferred?.await()
             val schedule = cachedWeeklySchedule
 
-            val earnedPoints = completedDaySet.sumOf { date ->
+            val weeklySchedulePoints = completedDaySet.sumOf { date ->
                 schedule?.getPointsForDay(date.dayOfWeek.ordinal + 1) ?: 0
             }
+            val earnedPoints = weeklySchedulePoints + quizRewardExp
             val achievementsResult = achievementsDeferred.await()
             val previousAchievements = (achievementsResult as? Result.Success)?.data
 
@@ -236,6 +270,7 @@ class HomeViewModel(
                     streakDays = totalStreakDays,
                     earnedPoints = earnedPoints,
                     totalPoints = totalPoints,
+                    diamondCount = quizRewardDiamonds,
                     completedDaysThisWeek = completedDaySet.count {
                         isInCurrentWeek(it, accountCreatedDate = accountCreatedDate)
                     },

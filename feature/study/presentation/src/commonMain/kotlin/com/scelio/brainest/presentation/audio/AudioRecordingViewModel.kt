@@ -9,15 +9,15 @@ import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
 import com.scelio.brainest.flashcards.domain.StudySource
 import com.scelio.brainest.flashcards.domain.StudySourceType
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.time.Clock
@@ -30,8 +30,11 @@ private const val AmplitudeWindowSize = 50
 private const val AmplitudeNoiseFloor = 0.01f
 private const val AmplitudeLogCurve = 30f
 private const val MinVisualAmplitude = 0.04f
+private const val ElapsedTickerIntervalMillis = 1_000L
+private const val AmplitudeUiUpdateIntervalMillis = 33L
+private val EmptyAmplitudeWindow = List(AmplitudeWindowSize) { 0f }
+
 data class AudioRecordingUiState(
-    val amplitudes: List<Float> = List(AmplitudeWindowSize) { 0f },
     val status: RecordingStatus = RecordingStatus.STOPPED,
     val elapsedMillis: Long = 0L,
     val transcript: String = "",
@@ -53,6 +56,9 @@ class AudioRecordingViewModel(
     private val _state = MutableStateFlow(AudioRecordingUiState())
     val state: StateFlow<AudioRecordingUiState> = _state
 
+    private val _amplitudes = MutableStateFlow(EmptyAmplitudeWindow)
+    val amplitudes: StateFlow<List<Float>> = _amplitudes
+
     private val _transcriptionErrors = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val transcriptionErrors = _transcriptionErrors.asSharedFlow()
 
@@ -62,6 +68,7 @@ class AudioRecordingViewModel(
     private var elapsedTickerJob: Job? = null
     private var activeRecordingStartedAt: TimeMark? = null
     private var accumulatedElapsedMillis = 0L
+    private var lastAmplitudeUiUpdateMark: TimeMark? = null
 
     init {
         viewModelScope.launch {
@@ -198,6 +205,10 @@ class AudioRecordingViewModel(
             RecordingStatus.PAUSED,
             RecordingStatus.STOPPED -> stopElapsedTicker()
         }
+
+        if (status == RecordingStatus.STOPPED) {
+            resetAmplitudeWindow()
+        }
     }
 
     private fun startElapsedTicker() {
@@ -210,7 +221,7 @@ class AudioRecordingViewModel(
 
         elapsedTickerJob = viewModelScope.launch {
             while (isActive) {
-                delay(250L)
+                delay(ElapsedTickerIntervalMillis)
                 publishElapsedTime()
             }
         }
@@ -245,22 +256,55 @@ class AudioRecordingViewModel(
         activeRecordingStartedAt = null
         accumulatedElapsedMillis = 0L
         _state.update { it.copy(elapsedMillis = 0L) }
+        resetAmplitudeWindow()
     }
 
     private fun pushAmplitude(rawAmplitude: Float) {
+        if (!shouldPublishAmplitudeFrame()) return
+
         val normalized = ((rawAmplitude - AmplitudeNoiseFloor) / (1f - AmplitudeNoiseFloor))
             .coerceIn(0f, 1f)
         val curved = ln(1f + AmplitudeLogCurve * normalized) / ln(1f + AmplitudeLogCurve)
         val clamped = curved.coerceIn(0f, 1f)
-        _state.update { state ->
-            val visual = if (state.status == RecordingStatus.STOPPED) {
-                0f
-            } else {
-                max(clamped, MinVisualAmplitude)
-            }
-            val updated = (listOf(visual) + state.amplitudes).take(AmplitudeWindowSize)
-            state.copy(amplitudes = updated)
+
+        val visual = if (_state.value.status == RecordingStatus.STOPPED) {
+            0f
+        } else {
+            max(clamped, MinVisualAmplitude)
         }
+
+        _amplitudes.update { current ->
+            val size = current.size
+            if (size == 0) return@update listOf(visual)
+
+            val updated = MutableList(size) { 0f }
+            updated[0] = visual
+            for (index in 1 until size) {
+                updated[index] = current[index - 1]
+            }
+            updated
+        }
+    }
+
+    private fun shouldPublishAmplitudeFrame(): Boolean {
+        val lastMark = lastAmplitudeUiUpdateMark
+        if (lastMark == null) {
+            lastAmplitudeUiUpdateMark = TimeSource.Monotonic.markNow()
+            return true
+        }
+
+        val elapsedMillis = lastMark.elapsedNow().inWholeMilliseconds
+        if (elapsedMillis < AmplitudeUiUpdateIntervalMillis) {
+            return false
+        }
+
+        lastAmplitudeUiUpdateMark = TimeSource.Monotonic.markNow()
+        return true
+    }
+
+    private fun resetAmplitudeWindow() {
+        lastAmplitudeUiUpdateMark = null
+        _amplitudes.value = EmptyAmplitudeWindow
     }
 
     private fun deriveTitleFromTranscript(transcript: String): String {
@@ -278,13 +322,13 @@ class AudioRecordingViewModel(
         deckId: String,
         transcript: String
     ): StudySource {
-            return StudySource(
+        return StudySource(
             id = Uuid.random().toString(),
             deckId = deckId,
             sourceType = StudySourceType.AUDIO,
             sourceText = transcript,
-                sourceFileId = null,
-                sourceFilename = "audio-recording.m4a",
+            sourceFileId = null,
+            sourceFilename = "audio-recording.m4a",
             createdAt = Clock.System.now()
         )
     }

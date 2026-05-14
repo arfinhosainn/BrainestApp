@@ -43,6 +43,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -63,6 +64,12 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
+
+private const val FilterAllSets = "All sets"
+private const val FilterRecent = "Recent"
+private const val FilterMastered = "Mastered"
+private const val FilterNotComplete = "Not complete"
+private val StudySetFilters = listOf(FilterAllSets, FilterRecent, FilterMastered, FilterNotComplete)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,10 +93,6 @@ fun StudySetsScreen(
         }
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.loadSets()
-    }
-
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.loadSets()
@@ -108,7 +111,10 @@ fun StudySetsScreen(
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFF00AD67))) {
         Column(modifier = Modifier.fillMaxSize()) {
-            var selectedFilter by remember { mutableStateOf("All sets") }
+            var selectedFilter by remember { mutableStateOf(FilterAllSets) }
+            val filteredSets = remember(state.sets, selectedFilter) {
+                filterStudySets(state.sets, selectedFilter)
+            }
 
             TopAppBar(
                 title = {
@@ -126,35 +132,36 @@ fun StudySetsScreen(
                 windowInsets = TopAppBarDefaults.windowInsets
             )
 
-            // Filter chips row (horizontal, scrollable) - custom rounded chips with BricolageGrotesq font
-            val chips = listOf("All sets", "Recent", "Mastered", "Not complete")
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                chips.forEach { chip ->
-                    val isSelected = selectedFilter == chip
-                    Surface(
-                        tonalElevation = 0.dp,
-                        shape = RoundedCornerShape(24.dp),
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else Color(
-                            0xFFE8F0E6
-                        ),
-                        modifier = Modifier
-                            .clickable { selectedFilter = chip }
-                            .padding(vertical = 6.dp)
-                    ) {
-                        Text(
-                            text = chip,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            fontFamily = BricolageGrotesq
-                        )
+            if (state.sets.isNotEmpty()) {
+                // Filter chips row (horizontal, scrollable) - custom rounded chips with BricolageGrotesq font
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    StudySetFilters.forEach { chip ->
+                        val isSelected = selectedFilter == chip
+                        Surface(
+                            tonalElevation = 0.dp,
+                            shape = RoundedCornerShape(24.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else Color(
+                                0xFFE8F0E6
+                            ),
+                            modifier = Modifier
+                                .clickable { selectedFilter = chip }
+                                .padding(vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = chip,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = BricolageGrotesq
+                            )
+                        }
                     }
                 }
             }
@@ -177,61 +184,34 @@ fun StudySetsScreen(
                     }
 
                     state.sets.isEmpty() -> {
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = stringResource(Res.string.study_sets_empty),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(Res.string.study_sets_empty_hint),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Column(
+                                modifier = Modifier.padding(horizontal = 24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(Res.string.study_sets_empty),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stringResource(Res.string.study_sets_empty_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
 
                     else -> {
-                        // Precompute recent set ids (top 10 by createdAt). This avoids needing platform clocks in commonMain.
-                        val recentIds = state.sets
-                            .sortedByDescending {
-                                runCatching { it.createdAt.toEpochMilliseconds() }.getOrNull()
-                                    ?: Long.MIN_VALUE
-                            }
-                            .take(10)
-                            .map { it.id }
-                            .toSet()
-
-                        val filtered = state.sets.filter { set ->
-                            val matchesFilter = when (selectedFilter) {
-                                "All sets" -> true
-                                "Recent" -> recentIds.contains(set.id)
-                                "Mastered" -> {
-                                    val fc = set.flashcardsCount
-                                    val swiped = set.flashcardsSwiped
-                                    fc in 1..swiped
-                                }
-
-                                "Not complete" -> {
-                                    val fc = set.flashcardsCount
-                                    val swiped = set.flashcardsSwiped
-                                    val qc = set.quizCount
-                                    val qDone = set.quizzesCompleted
-                                    (fc > 0 && swiped < fc) || (qc > 0 && qDone < qc)
-                                }
-
-                                else -> true
-                            }
-
-                            matchesFilter
-                        }
-
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -244,7 +224,7 @@ fun StudySetsScreen(
                             ),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
-                            items(filtered, key = { it.id }) { set ->
+                            items(filteredSets, key = { it.id }) { set ->
                                 val docType = resolveDocType(set.sourceFilename)
 
                                 StudySetItem(
@@ -253,6 +233,8 @@ fun StudySetsScreen(
                                     createdAt = formatDate(set.createdAt),
                                     flashcardsCount = set.flashcardsCount,
                                     quizCount = set.quizCount,
+                                    flashcardsSwiped = set.flashcardsSwiped,
+                                    quizzesCompleted = set.quizzesCompleted,
                                     docType = docType,
                                     onSetClick = { id -> onOpenSet(id) }
                                 )
@@ -350,5 +332,41 @@ private fun resolveDocType(sourceFilename: String?): com.scelio.brainest.present
         extension in documentExtensions -> com.scelio.brainest.presentation.components.DocType.DOCUMENT
         extension in visualOrSlideExtensions -> com.scelio.brainest.presentation.components.DocType.OTHER
         else -> com.scelio.brainest.presentation.components.DocType.OTHER
+    }
+}
+
+private fun isStudySetCompleted(set: StudySetItemUi): Boolean {
+    return set.flashcardsCount > 0 &&
+        set.flashcardsSwiped >= set.flashcardsCount &&
+        set.quizCount > 0 &&
+        set.quizzesCompleted > 0
+}
+
+private fun filterStudySets(
+    sets: List<StudySetItemUi>,
+    selectedFilter: String
+): List<StudySetItemUi> {
+    if (selectedFilter == FilterAllSets) return sets
+
+    val recentIds = if (selectedFilter == FilterRecent) {
+        sets
+            .sortedByDescending {
+                runCatching { it.createdAt.toEpochMilliseconds() }.getOrNull()
+                    ?: Long.MIN_VALUE
+            }
+            .take(10)
+            .map { it.id }
+            .toSet()
+    } else {
+        emptySet()
+    }
+
+    return sets.filter { set ->
+        when (selectedFilter) {
+            FilterRecent -> recentIds.contains(set.id)
+            FilterMastered -> isStudySetCompleted(set)
+            FilterNotComplete -> !isStudySetCompleted(set)
+            else -> true
+        }
     }
 }

@@ -32,4 +32,8 @@ interface QuizRepository : QuizSyncProvider {
     override suspend fun syncDeckQuizQuestions(
         deckId: String
     ): EmptyResult<DataError.Remote>
+
+    override suspend fun syncDeckQuizProgress(
+        deckId: String
+    ): EmptyResult<DataError.Remote>
 }

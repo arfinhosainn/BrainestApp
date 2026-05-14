@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
@@ -34,7 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import brainest.feature.study.presentation.generated.resources.Res
 import brainest.feature.study.presentation.generated.resources.ic_25coin
+import brainest.feature.study.presentation.generated.resources.ic_50coin
+import brainest.feature.study.presentation.generated.resources.ic_80coin
 import brainest.feature.study.presentation.generated.resources.ic_diamond
 import brainest.feature.study.presentation.generated.resources.ic_stage
 import brainest.feature.study.presentation.generated.resources.quiz_completion_continue
@@ -63,6 +64,8 @@ fun QuizResultsScreen(
     totalQuestions: Int,
     answeredQuestions: Int,
     correctAnswers: Int,
+    earnedExp: Int,
+    earnedDiamonds: Int,
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -71,8 +74,12 @@ fun QuizResultsScreen(
     val coinAlpha = remember { Animatable(0f) }
     val totalForStats = totalQuestions.coerceAtLeast(answeredQuestions).coerceAtLeast(1)
     val normalizedScore = correctAnswers.coerceAtLeast(0).coerceAtMost(totalForStats)
-    val earnedExp = (normalizedScore * 200) / totalForStats
-    val diamondReward = (normalizedScore * 40) / totalForStats
+    val coinRewardIcon = when (earnedExp) {
+        80 -> Res.drawable.ic_80coin
+        50 -> Res.drawable.ic_50coin
+        25 -> Res.drawable.ic_25coin
+        else -> null
+    }
 
     LaunchedEffect(Unit) {
         coinAlpha.snapTo(0f)
@@ -102,15 +109,19 @@ fun QuizResultsScreen(
                 contentScale = ContentScale.FillWidth,
                 alignment = Alignment.TopCenter
             )
-            Icon(
-                painter = painterResource(Res.drawable.ic_25coin),
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(y = stageCoinVerticalOffset)
-                    .alpha(coinAlpha.value),
-                tint = Color.Unspecified
-            )
+            if (coinRewardIcon != null) {
+                Icon(
+                    painter = painterResource(coinRewardIcon),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .graphicsLayer {
+                            translationY = stageCoinVerticalOffset.toPx()
+                            alpha = coinAlpha.value
+                        },
+                    tint = Color.Unspecified
+                )
+            }
         }
 
         Column(
@@ -213,7 +224,7 @@ fun QuizResultsScreen(
                     color = Color(0xFF4E544D),
                 )
                 Text(
-                    text = diamondReward.toString(),
+                    text = earnedDiamonds.toString(),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFFF9640),
@@ -283,6 +294,8 @@ private fun PreviewQuizResultsScreen() {
                 totalQuestions = 6,
                 answeredQuestions = 6,
                 correctAnswers = 6,
+                earnedExp = 50,
+                earnedDiamonds = 2,
                 onContinueClick = {}
             )
         }

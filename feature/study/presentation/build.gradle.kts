@@ -2,6 +2,13 @@ plugins {
     alias(libs.plugins.convention.cmp.library)
 }
 
+if (providers.gradleProperty("composeReports").orNull == "true") {
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
+}
+
 kotlin {
     // Source set declarations.
     // Declaring a target automatically creates a source set with the same name. By default, the

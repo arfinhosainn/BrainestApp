@@ -58,6 +58,7 @@ import com.scelio.brainest.designsystem.BricolageGrotesq
 import com.scelio.brainest.presentation.components.StudySetItem
 import com.scelio.brainest.presentation.components.UploadDocsBottomSheet
 import com.scelio.brainest.presentation.flashcards.rememberDocumentPicker
+import com.scelio.brainest.presentation.navigation.FlashcardsUploadIntent
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
@@ -77,6 +78,8 @@ fun StudySetsScreen(
     onOpenSet: (String) -> Unit,
     onCreateSet: (String, Boolean) -> Unit,
     onRecordAudio: () -> Unit,
+    initialUploadIntent: FlashcardsUploadIntent? = null,
+    uploadRequestId: Int = 0,
     viewModel: StudySetsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -92,6 +95,23 @@ fun StudySetsScreen(
             viewModel.setCreationError(message)
         }
     )
+    val audioPicker = rememberDocumentPicker(
+        onDocumentPicked = { audio ->
+            isUploadSheetVisible = false
+            viewModel.createSetFromAudio(audio)
+        },
+        onError = { message ->
+            viewModel.setCreationError(message)
+        }
+    )
+
+    LaunchedEffect(initialUploadIntent, uploadRequestId) {
+        when (initialUploadIntent) {
+            FlashcardsUploadIntent.AUDIO -> audioPicker.launchAudio()
+            FlashcardsUploadIntent.DOCUMENT -> documentPicker.launch()
+            null -> Unit
+        }
+    }
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -286,6 +306,9 @@ fun StudySetsScreen(
             },
             onUploadDocument = {
                 documentPicker.launch()
+            },
+            onUploadAudio = {
+                audioPicker.launchAudio()
             }
         )
     }

@@ -61,6 +61,7 @@ import com.scelio.brainest.designsystem.BrainestTheme
 import com.scelio.brainest.presentation.navigation.AuthGraphRoutes
 import com.scelio.brainest.presentation.navigation.ChatGraphRoutes
 import com.scelio.brainest.presentation.navigation.FlashcardsGraphRoutes
+import com.scelio.brainest.presentation.navigation.FlashcardsUploadIntent
 import com.scelio.brainest.presentation.navigation.HomeGraphRoutes
 import com.scelio.brainest.presentation.navigation.ScanGraphRoutes
 import com.scelio.brainest.presentation.util.ObserveAsEvents
@@ -113,6 +114,7 @@ fun App(
     }
     val canDismissSplash = isStartupReady
     val hasDismissedSplash = remember { mutableStateOf(false) }
+    var uploadRequestId by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(onboardingData.languageId) {
         val persistedLanguageId = onboardingData.languageId ?: return@LaunchedEffect
@@ -305,12 +307,24 @@ fun App(
                             }
                         },
                         onUploadAudioClick = {
-                            navController.navigate(FlashcardsGraphRoutes.Graph) {
+                            uploadRequestId += 1
+                            navController.navigate(
+                                FlashcardsGraphRoutes.Generate(
+                                    uploadIntent = FlashcardsUploadIntent.AUDIO,
+                                    uploadRequestId = uploadRequestId
+                                )
+                            ) {
                                 launchSingleTop = true
                             }
                         },
                         onUploadDocumentClick = {
-                            navController.navigate(FlashcardsGraphRoutes.Graph) {
+                            uploadRequestId += 1
+                            navController.navigate(
+                                FlashcardsGraphRoutes.Generate(
+                                    uploadIntent = FlashcardsUploadIntent.DOCUMENT,
+                                    uploadRequestId = uploadRequestId
+                                )
+                            ) {
                                 launchSingleTop = true
                             }
                         }

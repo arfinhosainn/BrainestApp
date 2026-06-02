@@ -34,7 +34,7 @@ val coreDataModule = module {
 
     single {
         createSupabaseClient (
-            supabaseUrl = BuildKonfig.SUPABASE_URL,
+            supabaseUrl = BuildKonfig.SUPABASE_URL.toSupabaseProjectUrl(),
             supabaseKey = BuildKonfig.SUPABASE_KEY
         ) {
             defaultLogLevel = LogLevel.DEBUG
@@ -53,4 +53,10 @@ val coreDataModule = module {
             })
         }
     }
+}
+
+private fun String.toSupabaseProjectUrl(): String {
+    return trim()
+        .trimEnd('/')
+        .removeSuffix("/rest/v1")
 }

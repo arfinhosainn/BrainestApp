@@ -22,6 +22,13 @@ private val SupportedDocumentTypes = listOf(
     "public.plain-text"
 )
 
+private val SupportedAudioTypes = listOf(
+    "public.audio",
+    "public.mp3",
+    "public.mpeg-4-audio",
+    "com.microsoft.waveform-audio"
+)
+
 @Composable
 actual fun rememberDocumentPicker(
     onDocumentPicked: (PickedDocument) -> Unit,
@@ -35,8 +42,16 @@ private class IosDocumentPicker(
     private val delegate: DocumentPickerDelegate
 ) : DocumentPicker {
     override fun launch() {
+        presentPicker(SupportedDocumentTypes)
+    }
+
+    override fun launchAudio() {
+        presentPicker(SupportedAudioTypes)
+    }
+
+    private fun presentPicker(documentTypes: List<String>) {
         val picker = UIDocumentPickerViewController(
-            documentTypes = SupportedDocumentTypes,
+            documentTypes = documentTypes,
             inMode = UIDocumentPickerMode.UIDocumentPickerModeImport
         )
         picker.allowsMultipleSelection = false
@@ -110,6 +125,13 @@ private fun mimeTypeFromFileName(fileName: String): String {
         lower.endsWith(".pdf") -> "application/pdf"
         lower.endsWith(".docx") -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         lower.endsWith(".txt") -> "text/plain"
+        lower.endsWith(".mp3") -> "audio/mpeg"
+        lower.endsWith(".wav") -> "audio/wav"
+        lower.endsWith(".m4a") -> "audio/mp4"
+        lower.endsWith(".aac") -> "audio/aac"
+        lower.endsWith(".ogg") -> "audio/ogg"
+        lower.endsWith(".flac") -> "audio/flac"
+        lower.endsWith(".webm") -> "audio/webm"
         else -> "application/octet-stream"
     }
 }

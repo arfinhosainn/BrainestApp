@@ -6,6 +6,9 @@ import com.scelio.brainest.domain.auth.AuthService
 import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.domain.util.awaitValue
 import com.scelio.brainest.domain.util.validateDocumentForUpload
+import com.scelio.brainest.flashcards.domain.AudioChunkData
+import com.scelio.brainest.flashcards.domain.AudioTranscriptionError
+import com.scelio.brainest.flashcards.domain.AudioTranscriptionService
 import com.scelio.brainest.flashcards.domain.DocumentTranscriptionError
 import com.scelio.brainest.flashcards.domain.DocumentTranscriptionService
 import com.scelio.brainest.flashcards.domain.Deck
@@ -27,7 +30,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
 data class StudySetItemUi(
     val id: String,
@@ -60,6 +62,7 @@ class StudySetsViewModel(
     private val repository: FlashcardsRepository,
     private val fileService: OpenAiFileService,
     private val documentTranscriptionService: DocumentTranscriptionService,
+    private val audioTranscriptionService: AudioTranscriptionService,
     private val authService: AuthService
 ) : ViewModel() {
 
@@ -220,6 +223,98 @@ class StudySetsViewModel(
         }
     }
 
+    fun createSetFromAudio(audio: PickedDocument) {
+        if (_state.value.isCreating) return
+
+        val validationError = validateAudio(audio)
+        if (validationError != null) {
+            _state.update { it.copy(creationError = validationError) }
+            return
+        }
+
+        _state.update { it.copy(isCreating = true, creationError = null) }
+
+        viewModelScope.launch {
+            val userId = awaitUserId()
+            if (userId == null) {
+                _state.update { it.copy(isCreating = false, creationError = "No authenticated user found.") }
+                return@launch
+            }
+
+            val transcriptionResult = audioTranscriptionService.transcribeChunk(
+                AudioChunkData(
+                    bytes = audio.bytes,
+                    mimeType = audio.mimeType,
+                    fileName = audio.fileName
+                )
+            )
+            if (transcriptionResult is Result.Failure) {
+                _state.update {
+                    it.copy(
+                        isCreating = false,
+                        creationError = "Audio transcription failed: ${
+                            audioTranscriptionErrorMessage(transcriptionResult.error)
+                        }"
+                    )
+                }
+                return@launch
+            }
+
+            val transcript = (transcriptionResult as Result.Success).data.text.trim()
+            if (transcript.isBlank()) {
+                _state.update {
+                    it.copy(
+                        isCreating = false,
+                        creationError = "Audio transcription failed: empty text."
+                    )
+                }
+                return@launch
+            }
+
+            val title = audio.fileName.substringBeforeLast('.').ifBlank {
+                "Audio Set ${Clock.System.now().toEpochMilliseconds()}"
+            }
+
+            when (val deckResult = repository.createDeck(
+                userId = userId,
+                title = title,
+                sourceFilename = audio.fileName
+            )) {
+                is Result.Success -> {
+                    val deck = deckResult.data
+                    val source = buildStudySource(
+                        deck = deck,
+                        type = StudySourceType.AUDIO,
+                        sourceText = transcript,
+                        sourceFileId = null,
+                        sourceFilename = audio.fileName
+                    )
+                    val sourceResult = repository.saveStudySource(source)
+                    if (sourceResult is Result.Failure) {
+                        _state.update {
+                            it.copy(
+                                isCreating = false,
+                                creationError = "Failed to save study source: ${sourceResult.error}"
+                            )
+                        }
+                        return@launch
+                    }
+                    _state.update { it.copy(isCreating = false) }
+                    _events.tryEmit(StudySetsEvent.OpenSetDetail(deck.id, promptGeneration = true))
+                }
+
+                is Result.Failure -> {
+                    _state.update {
+                        it.copy(
+                            isCreating = false,
+                            creationError = "Failed to create study set: ${deckResult.error}"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun clearCreationError() {
         _state.update { it.copy(creationError = null) }
     }
@@ -268,11 +363,33 @@ class StudySetsViewModel(
         )
     }
 
+    private fun validateAudio(audio: PickedDocument): String? {
+        val maxBytes = 25 * 1024 * 1024
+        if (audio.bytes.size > maxBytes) {
+            return "Audio is too large. Max size is 25MB."
+        }
+
+        val normalizedFileName = audio.fileName.lowercase()
+        val normalizedMimeType = audio.mimeType.lowercase()
+        val isSupported = normalizedMimeType in supportedAudioMimeTypes ||
+            supportedAudioExtensions.any { normalizedFileName.endsWith(".$it") }
+
+        return if (isSupported) null else "Unsupported audio type. Use MP3, WAV, M4A, AAC, OGG, FLAC, or WEBM."
+    }
+
     private fun documentTranscriptionErrorMessage(error: DocumentTranscriptionError): String {
         return when (error) {
             is DocumentTranscriptionError.Empty -> error.message
             is DocumentTranscriptionError.Invalid -> error.message
             is DocumentTranscriptionError.Remote -> "Transcription failed: ${error.error}"
+        }
+    }
+
+    private fun audioTranscriptionErrorMessage(error: AudioTranscriptionError): String {
+        return when (error) {
+            is AudioTranscriptionError.Empty -> error.message
+            is AudioTranscriptionError.Invalid -> error.message
+            is AudioTranscriptionError.Remote -> "Transcription failed: ${error.error}"
         }
     }
 
@@ -299,3 +416,24 @@ class StudySetsViewModel(
         return awaitValue({ authService.currentUserId() })
     }
 }
+
+private val supportedAudioMimeTypes = setOf(
+    "audio/mpeg",
+    "audio/wav",
+    "audio/x-wav",
+    "audio/mp4",
+    "audio/aac",
+    "audio/ogg",
+    "audio/flac",
+    "audio/webm"
+)
+
+private val supportedAudioExtensions = setOf(
+    "mp3",
+    "wav",
+    "m4a",
+    "aac",
+    "ogg",
+    "flac",
+    "webm"
+)

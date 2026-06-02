@@ -10,6 +10,7 @@ data class PickedDocument(
 
 interface DocumentPicker {
     fun launch()
+    fun launchAudio()
 }
 
 @Composable

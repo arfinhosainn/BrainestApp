@@ -15,6 +15,17 @@ private val SupportedMimeTypes = arrayOf(
     "text/plain"
 )
 
+private val SupportedAudioMimeTypes = arrayOf(
+    "audio/mpeg",
+    "audio/wav",
+    "audio/x-wav",
+    "audio/mp4",
+    "audio/aac",
+    "audio/ogg",
+    "audio/flac",
+    "audio/webm"
+)
+
 @Composable
 actual fun rememberDocumentPicker(
     onDocumentPicked: (PickedDocument) -> Unit,
@@ -47,6 +58,10 @@ actual fun rememberDocumentPicker(
         object : DocumentPicker {
             override fun launch() {
                 launcher.launch(SupportedMimeTypes)
+            }
+
+            override fun launchAudio() {
+                launcher.launch(SupportedAudioMimeTypes)
             }
         }
     }

@@ -31,7 +31,7 @@ fun NavGraphBuilder.flashcardsGraph(
     navController: NavController
 ) {
     navigation<FlashcardsGraphRoutes.Graph>(
-        startDestination = FlashcardsGraphRoutes.Generate
+        startDestination = FlashcardsGraphRoutes.Generate()
     ) {
         composable<FlashcardsGraphRoutes.Generate>(
             exitTransition = {
@@ -64,8 +64,11 @@ fun NavGraphBuilder.flashcardsGraph(
                     null
                 }
             }
-        ) {
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<FlashcardsGraphRoutes.Generate>()
             StudySetsScreen(
+                initialUploadIntent = route.uploadIntent,
+                uploadRequestId = route.uploadRequestId,
                 onOpenSet = { deckId ->
                     navController.navigate(FlashcardsGraphRoutes.StudySetDetail(deckId))
                 },

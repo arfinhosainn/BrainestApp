@@ -92,10 +92,10 @@ class FlashcardsRepositoryImpl(
 
         return try {
             studyDao.upsertDeck(deck.toEntity(isPendingSync = true))
-            coroutineScope.launch(Dispatchers.IO) {
-                syncDeckToRemote(deck)
+            when (val syncResult = syncDeckToRemote(deck)) {
+                is Result.Success -> Result.Success(deck)
+                is Result.Failure -> syncResult
             }
-            Result.Success(deck)
         } catch (e: Exception) {
             logger.error("Failed to create local deck", e)
             Result.Failure(DataError.Remote.UNKNOWN)
@@ -356,12 +356,14 @@ class FlashcardsRepositoryImpl(
         }
     }
 
-    private suspend fun syncDeckToRemote(deck: Deck) {
-        try {
+    private suspend fun syncDeckToRemote(deck: Deck): EmptyResult<DataError.Remote> {
+        return try {
             supabase.from("decks").upsert(deck.toSupabaseDto())
             studyDao.upsertDeck(deck.toEntity(isPendingSync = false))
+            Result.Success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to sync deck", e)
+            Result.Failure(e.toDataError())
         }
     }
 

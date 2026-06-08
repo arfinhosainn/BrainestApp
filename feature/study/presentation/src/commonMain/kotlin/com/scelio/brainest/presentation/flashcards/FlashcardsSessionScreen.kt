@@ -5,9 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import com.scelio.brainest.presentation.FlashCardScreen
-import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -16,7 +14,6 @@ fun FlashcardsSessionScreen(
     viewModel: FlashcardsSessionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(deckId) {
         viewModel.loadDeck(deckId)
@@ -24,7 +21,7 @@ fun FlashcardsSessionScreen(
 
     DisposableEffect(deckId) {
         onDispose {
-            scope.launch { viewModel.finishSession() }
+            viewModel.finishSession()
         }
     }
 

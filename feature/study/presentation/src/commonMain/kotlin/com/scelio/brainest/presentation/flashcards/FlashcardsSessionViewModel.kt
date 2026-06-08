@@ -7,10 +7,12 @@ import com.scelio.brainest.domain.util.Result
 import com.scelio.brainest.flashcards.domain.Flashcard
 import com.scelio.brainest.flashcards.domain.FlashcardResult
 import com.scelio.brainest.flashcards.domain.FlashcardsRepository
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
 data class FlashcardsSessionState(
@@ -32,6 +34,7 @@ class FlashcardsSessionViewModel(
     private var tracker = FlashcardsSessionTracker()
     private var activeDeckId: String? = null
     private var hasFinished = false
+    private var isFinishingSession = false
 
     private val _state = MutableStateFlow(FlashcardsSessionState())
     val state: StateFlow<FlashcardsSessionState> = _state
@@ -43,6 +46,7 @@ class FlashcardsSessionViewModel(
 
         activeDeckId = deckId
         hasFinished = false
+        isFinishingSession = false
         tracker = FlashcardsSessionTracker()
         _state.update {
             it.copy(
@@ -123,20 +127,27 @@ class FlashcardsSessionViewModel(
 
     fun finishSession() {
         val sessionId = _state.value.sessionId ?: return
-        if (hasFinished) return
-        hasFinished = true
+        if (hasFinished || isFinishingSession) return
+        isFinishingSession = true
 
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
             val summary = tracker.buildSummary()
             val records = tracker.snapshotRecords()
 
-            when (val result = repository.finishSession(sessionId, summary, records)) {
+            val result = withContext(NonCancellable) {
+                repository.finishSession(sessionId, summary, records)
+            }
+
+            when (result) {
                 is Result.Success -> {
+                    hasFinished = true
+                    isFinishingSession = false
                     _state.update { it.copy(isSaving = false) }
                 }
 
                 is Result.Failure -> {
+                    isFinishingSession = false
                     _state.update {
                         it.copy(
                             isSaving = false,
